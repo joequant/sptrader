@@ -16,7 +16,7 @@ $zip_file = $shell_app.namespace((Get-Location).Path + "\dll\$filename_sptrader"
 $destination = $shell_app.namespace((Get-Location).Path + "\dll")
 $destination.Copyhere($zip_file.items())
 Remove-Item "dll/$($filename_sptrader)"
-pip install algobroker
+pip install cffi
 
 Write-Output "Press any key to finish"
 $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
