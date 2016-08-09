@@ -7,13 +7,16 @@ $client.DownloadFile("https://www.python.org/ftp/python/3.5.2/python-3.5.2-webin
 Start-Process ./python-3.5.2-webinstall PrependPath=1 -Wait
 Remove-Item python-3.5.2-webinstall.exe
 
+New-Item dll -type directory -force
 Write-Output "Installing SPTrader"
 $filename_sptrader = "SPAPIDLL_R8.742_WIN32.zip"
-$client.DownloadFile("http://spsystem.info/download/API/R8742/$($filename_sptrader)",$filename_sptrader)
-$zip_file = $shell_app.namespace((Get-Location).Path + "\$filename_sptrader")
-$destination = $shell_app.namespace((Get-Location).Path)
+$client.DownloadFile("http://spsystem.info/download/API/R8742/$($filename_sptrader)",
+"dll/" + $filename_sptrader)
+$zip_file = $shell_app.namespace((Get-Location).Path + "\dll\$filename_sptrader")
+$destination = $shell_app.namespace((Get-Location).Path + "\dll")
 $destination.Copyhere($zip_file.items())
-Remove-Item $filename_sptrader
+Remove-Item "dll/$($filename_sptrader)"
+pip install algobroker
 
 Write-Output "Press any key to finish"
 $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
