@@ -18,5 +18,14 @@ $destination.Copyhere($zip_file.items())
 Remove-Item "dll/$($filename_sptrader)"
 pip install cffi
 
+Write-Output "Installing openssl"
+$shell_app = new-object -com shell.application
+$client.DownloadFile("https://indy.fulgan.com/SSL/openssl-1.0.2h-i386-win32.zip",
+"dll/openssl-1.0.2h-i386-win32.zip")
+$zip_file = $shell_app.namespace((Get-Location).Path + "\dll\openssl-1.0.2h-i386-win32.zip")
+$destination = $shell_app.namespace((Get-Location).Path + "\dll")
+$destination.Copyhere($zip_file.items())
+Remove-Item "dll/openssl-1.0.2h-i386-win32.zip"
+
 Write-Output "Press any key to finish"
 $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
