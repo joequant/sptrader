@@ -4,45 +4,7 @@ var ButtonToolbar = ReactBootstrap.ButtonToolbar;
 var Button = ReactBootstrap.Button;
 var Input = ReactBootstrap.Input;
 
-function play(audio, times, ended) {
-    if (times <= 0) {
-	return;
-    }
-    var played = 0;
-    audio.addEventListener("ended", function() {
-	played++;
-	if (played < times) {
-	    audio.play();
-	} else if (ended) {
-	    ended();
-	}
-    });
-    audio.play();
-}
-
-var AudioButton = React.createClass({
-    getInitialState: function() {
-	return {url: undefined,
-		repeat: 1};
-    },
-    play: function() {
-	var audio = new Audio(this.props.url);
-	play(audio, this.props.repeat);
-    },
-    componentDidMount: function() {
-    },
-    render: function() {
-	return(<Button bsStyle="success" onClick={this.play}>{this.props.text}</Button>);
-    }
-});
-
-var HelloMessage = React.createClass({
-    render: function() {
-	return <div>Hello {this.props.name}</div>;
-    }
-});
-
-var LogBox = React.createClass( {
+var SubscribeBox = React.createClass( {
     getInitialState: function() {
 	return {data: "HelloWorld\n"};
     },
@@ -111,20 +73,18 @@ var Injector = React.createClass( {
 });
 
 function publish() {
-    $.get("/publish-test");
+    $.get("/ping");
 };
 
 const tabsInstance = (
 <Tabs>
-    <Tab eventKey={1} title="Injector"><Injector/></Tab>
+    <Tab eventKey={1} title="Login"></Tab>
     <Tab eventKey={2} title="Scratchpad">
       <ButtonToolbar>
 	<Button bsStyle="success" onClick={publish}>Ping</Button>
-	<AudioButton url="/static/high.ogg" repeat="3" text="High"/>
-	<LogBox url="/subscribe" event="log" />
+	<SubscribeBox url="/subscribe" event="ping" />
       </ButtonToolbar>
     </Tab>
-    <Tab eventKey={3} title="Scratchpad 2"><HelloMessage name="John" /></Tab>
 </Tabs>
 );
 

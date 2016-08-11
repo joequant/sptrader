@@ -9,7 +9,7 @@ wget "https://www.python.org/ftp/python/3.5.2/python-3.5.2-webinstall.exe" -OutF
 Start-Process "$($env:TEMP)/python-3.5.2-webinstall.exe" "PrependPath=1 InstallAllUsers=1 Include_test=0" -Wait
 Remove-Item "$($env:TEMP)/python-3.5.2-webinstall.exe"
 $env:Path += ";c:\\Program Files (x86)\\Python35-32\\Scripts"
-Start-Process pip "install cffi Flask" -Verb runAs
+Start-Process pip "install cffi Flask gevent" -Verb runAs
 
 Write-Output "Downloading VC redistribution"
 wget "http://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe" -OutFile "$($env:TEMP)/vcredist_x86.exe"
