@@ -1,6 +1,6 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
-var ReactDataGrid = require('react-datagrid');
+var DataGrid = require('react-datagrid');
 var ReactBootstrap = require('react-bootstrap');
 var ReactAddonsLinkedStateMixin = require('react-addons-linked-state-mixin');
 
@@ -82,15 +82,27 @@ function publish() {
     $.get("/ping");
 };
 
+
+var columns = [
+    { name : 'index' },
+    { name : 'firstName' },
+    { name : 'city' }
+]
+
+var data = []
+
 const tabsInstance = (
-<Tabs>
+
+	<Tabs>
     <Tab eventKey={1} title="Login"></Tab>
     <Tab eventKey={2} title="Scratchpad">
       <ButtonToolbar>
 	<Button bsStyle="success" onClick={publish}>Ping</Button>
-
+	</ButtonToolbar>
 	<SubscribeBox url="/subscribe" event="ping" />
-      </ButtonToolbar>
+	<DataGrid
+    idProperty='id' emptyText={'No records'} columns={columns} dataSource={data} style={{height:400}} />
+
     </Tab>
 </Tabs>
 );

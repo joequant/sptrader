@@ -14,7 +14,7 @@
 	"reactify" : "latest"
     },
     "scripts": {
-	"build-js": "browserify -t reactify static/sptrader.js > static/bundle.js",
-	"watch-js": "watchify -t reactify static/sptrader.js > static/bundle.js"	
+	"build-js": "browserify -t reactify static/sptrader.js -o static/bundle.js",
+	"watch-js": "watchify -t reactify static/sptrader.js -o static/bundle.js"	
     }
 }
