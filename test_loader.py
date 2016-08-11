@@ -1,17 +1,17 @@
 import cffi
 import os
-import ctypes
+import sys
+
 location = os.path.dirname(os.path.realpath(__file__))
-dll_location = os.path.join(location, "dll")
-print ("Testing loader")
-print ("Loading dlls from directory '%s'" % dll_location)
-ctypes.windll.LoadLibrary(os.path.join(dll_location, "libeay32.dll"))
-ctypes.windll.LoadLibrary(os.path.join(dll_location, "ssleay32.dll"))
-ctypes.windll.LoadLibrary(os.path.join(dll_location, "spapidllm32.dll"))
-print(ctypes.windll.spapidllm32)
-
-sptrader = ctypes.windll.spapidllm32;
-print(sptrader.SPAPI_Initialize())
-
+sys.path.insert(0, location)
+import sptrader
+sptrader = sptrader.SPTrader("demo.spsystem.info", 8080,
+                             "DLLAPITEST",
+                             "DLLAPITEST",
+                             "SPAPI47",
+                             "12345678")
+print(sptrader.login())
+print(sptrader.get_login_status(81))
+print(sptrader.logout())
 input("Press any key to exit")
 
