@@ -6,16 +6,12 @@ import sse
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, location)
 
-import gevent
-from gevent.queue import Queue
-from gevent.wsgi import WSGIServer
+from queue import Queue
 from sse import ServerSentEvent
 import sptrader
 
 sptrader = None
 subscriptions = []
-
-
 
 @app.route("/")
 def hello():
@@ -63,6 +59,5 @@ def subscribe():
 
 if __name__ == "__main__":
     app.debug = True
-    server = WSGIServer(("", 5000), app)
-    server.serve_forever()
+    app.run(threaded=True)
 
