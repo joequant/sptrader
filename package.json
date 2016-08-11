@@ -1,0 +1,20 @@
+{
+    "name" : "Sptrader",
+    "version" : "0.0.1",
+    "author" : "Joseph C Wang <joequant@gmail.com>",
+    "dependencies" : {
+	"react" : "15.x",
+	"react-dom" : "15.x",
+	"react-datagrid" : "latest",
+	"react-bootstrap" : "latest",
+	"react-addons-linked-state-mixin" : "latest"
+    },
+    "devDepenedencies" : {
+	"browserify" : "latest",
+	"reactify" : "latest"
+    },
+    "scripts": {
+	"build-js": "browserify -t reactify static/sptrader.js > static/bundle.js",
+	"watch-js": "watchify -t reactify static/sptrader.js > static/bundle.js"	
+    }
+}
