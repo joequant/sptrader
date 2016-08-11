@@ -9,7 +9,7 @@
 	"react-bootstrap" : "latest",
 	"react-addons-linked-state-mixin" : "latest"
     },
-    "devDepenedencies" : {
+    "devDependencies" : {
 	"browserify" : "latest",
 	"reactify" : "latest"
     },
