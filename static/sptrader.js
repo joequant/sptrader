@@ -1,8 +1,14 @@
-var Tabs = ReactBootstrap.Tabs;
-var Tab = ReactBootstrap.Tab;
-var ButtonToolbar = ReactBootstrap.ButtonToolbar;
-var Button = ReactBootstrap.Button;
-var Input = ReactBootstrap.Input;
+var React = require('react');
+var ReactDOM = require('react-dom');
+var ReactDataGrid = require('react-datagrid');
+var ReactBootstrap = require('react-bootstrap');
+var ReactAddonsLinkedStateMixin = require('react-addons-linked-state-mixin');
+
+var Tabs = require('react-bootstrap').Tabs;
+var Tab = require('react-bootstrap').Tab;
+var ButtonToolbar = require('react-bootstrap').ButtonToolbar;
+var Button = require('react-bootstrap').Button;
+var FormControl = require('react-bootstrap').FormControl;
 
 var SubscribeBox = React.createClass( {
     getInitialState: function() {
@@ -21,12 +27,12 @@ var SubscribeBox = React.createClass( {
 	});
     },
     render: function() {
-	return (<Input type="textarea" value={this.state.data} />);
+        return (<FormControl componentClass="textarea" defaultValue={this.state.data} />);
     }
 });
 
 var Injector = React.createClass( {
-    mixins: [React.addons.LinkedStateMixin],
+    mixins: [ReactAddonsLinkedStateMixin],
     getInitialState: function() {
 	return {message: 'Hello!',
 		textinput : ''};
@@ -64,9 +70,9 @@ var Injector = React.createClass( {
 <Button bsStyle="success" onClick={this.inject}>Inject</Button>
 <Button bsStyle="success" onClick={this.clear}>Clear</Button>
 <Button bsStyle="success" onClick={this.injectTest}>Test</Button>
-<Input type="file" onChange={this.fileOpen} />
-<Input type="textarea" valueLink={this.linkState('textinput')} />
-<Input type="textarea" valueLink={this.linkState('message')} />
+<FormControl componentClass="file" onChange={this.fileOpen} />
+<FormControl componentClass="textarea" valueLink={this.linkState('textinput')} />
+<FormControl componentClass="textarea" valueLink={this.linkState('message')} />
 </div>
 	);
     }
@@ -82,6 +88,7 @@ const tabsInstance = (
     <Tab eventKey={2} title="Scratchpad">
       <ButtonToolbar>
 	<Button bsStyle="success" onClick={publish}>Ping</Button>
+
 	<SubscribeBox url="/subscribe" event="ping" />
       </ButtonToolbar>
     </Tab>
@@ -94,8 +101,8 @@ var helloWorld = React.createClass({
     }
 });
 
-React.render(
+ReactDOM.render(
     React.createElement(helloWorld, null),
     document.getElementById('content')
 );
-React.render(tabsInstance, document.getElementById('test'));
+ReactDOM.render(tabsInstance, document.getElementById('test'));
