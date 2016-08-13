@@ -1,18 +1,23 @@
 from flask import Flask, Response
-app = Flask(__name__)
+
+
 import os
 import sys
-import sse
-location = os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(0, location)
 
+location = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.join(location, "..", "sptrader"))
+
+import sse
 from queue import Queue
 from sse import ServerSentEvent
 import sptrader
 
 sptrader = None
 subscriptions = []
-
+app = Flask(__name__,
+            static_url_path="/static",
+            static_folder=os.path.join(location, "..",
+                                                 "static"))
 @app.route("/")
 def hello():
     return app.send_static_file("sptrader.html")

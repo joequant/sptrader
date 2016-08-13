@@ -2,7 +2,7 @@ from cffi import FFI
 import atexit
 import os
 location = os.path.dirname(os.path.realpath(__file__))
-dll_location = os.path.join(location, "dll")
+dll_location = os.path.join(location, "..", "dll")
 ffi = FFI()
 ffi.cdef("""
 typedef void (__stdcall *LoginReplyAddr)(long ret_code, char* ret_msg);
