@@ -4,11 +4,14 @@ var DataGrid = require('react-datagrid');
 var ReactBootstrap = require('react-bootstrap');
 var ReactAddonsLinkedStateMixin = require('react-addons-linked-state-mixin');
 
-var Tabs = require('react-bootstrap').Tabs;
-var Tab = require('react-bootstrap').Tab;
-var ButtonToolbar = require('react-bootstrap').ButtonToolbar;
-var Button = require('react-bootstrap').Button;
-var FormControl = require('react-bootstrap').FormControl;
+var Tabs = ReactBootstrap.Tabs;
+var Tab = ReactBootstrap.Tab;
+var ButtonToolbar = ReactBootstrap.ButtonToolbar;
+var Button = ReactBootstrap.Button;
+var FormControl = ReactBootstrap.FormControl;
+var FormGroup = ReactBootstrap.FormGroup;
+var ControlLabel = ReactBootstrap.ControlLabel;
+var HelpBlock = ReactBootstrap.HelpBlock;
 
 var SubscribeBox = React.createClass( {
     getInitialState: function() {
@@ -89,12 +92,47 @@ var columns = [
     { name : 'city' }
 ]
 
-var data = []
+var data = [];
+
+function FieldGroup({ id, label, help, ...props }) {
+  return (
+    <FormGroup controlId={id}>
+      <ControlLabel>{label}</ControlLabel>
+      <FormControl {...props} />
+      {help && <HelpBlock>{help}</HelpBlock>}
+    </FormGroup>
+  );
+}
+
+const formInstance = (
+  <form>
+    <FieldGroup
+      id="formControlsText"
+      type="text"
+      label="Text"
+      placeholder="Enter text"
+    />
+    <FieldGroup
+      id="formControlsEmail"
+      type="email"
+      label="Email address"
+      placeholder="Enter email"
+    />
+    <FieldGroup
+      id="formControlsPassword"
+      label="Password"
+      type="password"
+    />
+    <Button type="submit">
+      Submit
+    </Button>
+  </form>
+);
 
 const tabsInstance = (
 
 	<Tabs>
-    <Tab eventKey={1} title="Login"></Tab>
+	<Tab eventKey={1} title="Login">{formInstance}</Tab>
     <Tab eventKey={2} title="Scratchpad">
       <ButtonToolbar>
 	<Button bsStyle="success" onClick={publish}>Ping</Button>
@@ -106,6 +144,7 @@ const tabsInstance = (
     </Tab>
 </Tabs>
 );
+
 
 var helloWorld = React.createClass({
     render: function() {

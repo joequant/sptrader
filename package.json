@@ -11,10 +11,12 @@
     },
     "devDependencies" : {
 	"browserify" : "latest",
-	"reactify" : "latest"
+	"babel-preset-es2015" : "latest",
+	"babel-preset-react" : "latest",
+	"babel-preset-stage-2" : "latest"
     },
     "scripts": {
-	"build-js": "browserify -t reactify static/sptrader.js -o static/bundle.js",
-	"watch-js": "watchify -t reactify static/sptrader.js -o static/bundle.js"	
+	"build-js": "browserify -t [ babelify --presets [ es2015 react stage-2 ] ]  static/sptrader.js -o static/bundle.js",
+	"watch-js": "watchify -t  [ babelify --presets [ es2015 react stage-2 ] ] static/sptrader.js -o static/bundle.js"
     }
 }
