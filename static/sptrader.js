@@ -104,35 +104,70 @@ function FieldGroup({ id, label, help, ...props }) {
   );
 }
 
-const formInstance = (
-  <form>
-    <FieldGroup
-      id="formControlsText"
-      type="text"
-      label="Text"
-      placeholder="Enter text"
-    />
-    <FieldGroup
-      id="formControlsEmail"
-      type="email"
-      label="Email address"
-      placeholder="Enter email"
-    />
-    <FieldGroup
-      id="formControlsPassword"
-      label="Password"
-      type="password"
-    />
-    <Button type="submit">
-      Submit
-    </Button>
-  </form>
-);
+var LoginForm = React.createClass({
+    getInitialState: function() {
+	return {
+	    host: '',
+	    port: 8080,
+	    license: '',
+	    app_id : '',
+	    user_id : '',
+	    password: ''
+	};
+    },
+    handleHostChange: function(e) {
+	this.setState({host: e.target.value});
+    }
+    render: function() {
+	return (
+		<form>
+		<FieldGroup
+	    id="formControlsText"
+	    type="text"
+	    label="Host"
+	    placeholder="Enter host"
+		/>
+		<FieldGroup
+	    id="formControlsPort"
+	    type="text"
+	    label="Port"
+	    placeholder="Enter port"
+		/>
+		<FieldGroup
+	    id="formControlsLicense"
+	    type="text"
+	    label="License"
+	    placeholder="Enter license"
+		/>
+		<FieldGroup
+	    id="formControlsAppId"
+	    type="text"
+	    label="App Id"
+	    placeholder="Enter app id"
+		/>
+		<FieldGroup
+	    id="formControlsUserId"
+	    type="text"
+	    label="User Id"
+	    placeholder="Enter user id"
+		/>
+		<FieldGroup
+	    id="formControlsPassword"
+	    label="Password"
+	    type="password"
+		/>
+		<Button type="submit">
+		Submit
+	    </Button>
+		</form>
+	);
+    }
+});
 
 const tabsInstance = (
 
 	<Tabs>
-	<Tab eventKey={1} title="Login">{formInstance}</Tab>
+	<Tab eventKey={1} title="Login"><LoginForm/></Tab>
     <Tab eventKey={2} title="Scratchpad">
       <ButtonToolbar>
 	<Button bsStyle="success" onClick={publish}>Ping</Button>
