@@ -3,13 +3,21 @@ Import-module $ScriptDir\modules
 
 #filenames
 $pyversion = "3.5.2"
-$pyfile = "python-$($pyversion)-webinstall.exe"
-$pypath = "c:\\Program Files (x86)\\Python35-32\\Scripts"
-$vcredist = "vcredist_x86.exe"
-$spzipfile = "SPAPIDLL_R8.742_WIN32.zip"
-$sslzipfile = "openssl-1.0.2h-i386-win32.zip"
 $nodeversion = "v4.4.7"
-$nodefile = "node-$($nodeversion)-x86.msi"
+
+#$pyfile = "python-$($pyversion)-webinstall.exe"
+#$pypath = "c:\\Program Files (x86)\\Python35-32\\Scripts"
+#$vcredist = "vcredist_x86.exe"
+#$spzipfile = "SPAPIDLL_R8.742_WIN32.zip"
+#$sslzipfile = "openssl-1.0.2h-i386-win32.zip"
+#$nodefile = "node-$($nodeversion)-x86.msi"
+
+$pyfile = "python-$($pyversion)-amd64-webinstall.exe"
+$pypath = "c:\\Program Files\\Python35\\Scripts"
+$vcredist = "vcredist_x64.exe"
+$spzipfile = "SPAPIDLL_R8.742_WIN64.zip"
+$sslzipfile = "openssl-1.0.2h-x64_86-win64.zip"
+$nodefile = "node-$($nodeversion)-x64.msi"
 
 #start
 hello_world

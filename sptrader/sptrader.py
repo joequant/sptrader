@@ -22,7 +22,7 @@ void SPAPI_Uninitialize();
 """)
 ffi.dlopen(os.path.join(dll_location, "libeay32.dll"))
 ffi.dlopen(os.path.join(dll_location, "ssleay32.dll"))
-sp = ffi.dlopen(os.path.join(dll_location, "spapidllm32.dll"))
+sp = ffi.dlopen(os.path.join(dll_location, "spapidllm64.dll"))
 sp.SPAPI_SetLanguageId(0)
 sp.SPAPI_Initialize()
 
