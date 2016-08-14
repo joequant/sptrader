@@ -125,7 +125,7 @@ var LoginForm = React.createClass({
 	console.log(this.state);
     },
     render: function() {
-	return (
+	return (<form>
 		<Modal.Dialog>
 		<Modal.Header>
 		<Modal.Title>Login</Modal.Title>
@@ -137,7 +137,7 @@ var LoginForm = React.createClass({
 	    label="Host"
 	    placeholder="Enter host"
 	    onChange={this.onChange}
-	    value={this.state.host}
+	    defaultValue={this.state.host}
 		/>
 		<FieldGroup
 	    id="port"
@@ -145,7 +145,7 @@ var LoginForm = React.createClass({
 	    label="Port"
 	    placeholder="Enter port"
 	    onChange={this.onChange}
-	    value={this.state.port}
+	    defaultValue={this.state.port}
 		/>
 		<FieldGroup
 	    id="license"
@@ -153,7 +153,7 @@ var LoginForm = React.createClass({
 	    label="License"
 	    placeholder="Enter license"
 	    onChange={this.onChange}
-	    value={this.state.license}
+	    defaultValue={this.state.license}
 		/>
 		<FieldGroup
 	    id="app_id"
@@ -161,7 +161,7 @@ var LoginForm = React.createClass({
 	    label="App Id"
 	    placeholder="Enter app id"
 	    onChange={this.onChange}
-	    	    value={this.state.app_id}
+	    defaultValue={this.state.app_id}
 		/>
 		<FieldGroup
 	    id="user_id"
@@ -169,14 +169,14 @@ var LoginForm = React.createClass({
 	    label="User Id"
 	    placeholder="Enter user id"
 	    onChange={this.onChange}
-	    value={this.state.user_id}
+	    defaultValue={this.state.user_id}
 		/>
 		<FieldGroup
 	    id="password"
 	    label="Password"
 	    type="password"
 	    onChange={this.onChange}
-	    value={this.state.password}
+	    defaultValue={this.state.password}
 		/>
 		</Modal.Body>
 		<Modal.Footer>
@@ -186,6 +186,7 @@ var LoginForm = React.createClass({
 	    </Button>
 		</Modal.Footer>
 		</Modal.Dialog>
+		</form>
 	);
     }
 });
