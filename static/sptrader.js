@@ -12,6 +12,7 @@ var FormControl = ReactBootstrap.FormControl;
 var FormGroup = ReactBootstrap.FormGroup;
 var ControlLabel = ReactBootstrap.ControlLabel;
 var HelpBlock = ReactBootstrap.HelpBlock;
+var Modal = ReactBootstrap.Modal;
 
 var SubscribeBox = React.createClass( {
     getInitialState: function() {
@@ -96,14 +97,14 @@ var data = [];
 
 function FieldGroup({ id, label, help, ...props }) {
   return (
-    <FormGroup controlId={id}>
-      <ControlLabel>{label}</ControlLabel>
+    <div>
+      <label>{label}</label>
       <FormControl {...props} />
       {help && <HelpBlock>{help}</HelpBlock>}
-    </FormGroup>
+    </div>
   );
 }
-
+console.log("HEELOO!!!");console.log
 var LoginForm = React.createClass({
     getInitialState: function() {
 	return {
@@ -115,51 +116,76 @@ var LoginForm = React.createClass({
 	    password: ''
 	};
     },
-    handleHostChange: function(e) {
-	this.setState({host: e.target.value});
-    }
+    onChange: function(e) {
+	var change = {}
+	change[e.target.id] = e.target.value;
+	this.setState(change);
+    },
+    onSubmit: function(e) {
+	console.log(this.state);
+    },
     render: function() {
 	return (
-		<form>
+		<Modal.Dialog>
+		<Modal.Header>
+		<Modal.Title>Login</Modal.Title>
+		</Modal.Header>
+		<Modal.Body>
 		<FieldGroup
-	    id="formControlsText"
+	    id="host"
 	    type="text"
 	    label="Host"
 	    placeholder="Enter host"
+	    onChange={this.onChange}
+	    value={this.state.host}
 		/>
 		<FieldGroup
-	    id="formControlsPort"
-	    type="text"
+	    id="port"
+	    type="text"nodejs windows installer
 	    label="Port"
 	    placeholder="Enter port"
+	    onChange={this.onChange}
+	    value={this.state.port}
 		/>
 		<FieldGroup
-	    id="formControlsLicense"
+	    id="license"
 	    type="text"
 	    label="License"
 	    placeholder="Enter license"
+	    onChange={this.onChange}
+	    value={this.state.license}
 		/>
 		<FieldGroup
-	    id="formControlsAppId"
+	    id="app_id"
 	    type="text"
 	    label="App Id"
 	    placeholder="Enter app id"
+	    onChange={this.onChange}
+	    	    value={this.state.app_id}
 		/>
 		<FieldGroup
-	    id="formControlsUserId"
+	    id="user_id"
 	    type="text"
 	    label="User Id"
 	    placeholder="Enter user id"
+	    onChange={this.onChange}
+	    value={this.state.user_id}
 		/>
 		<FieldGroup
-	    id="formControlsPassword"
+	    id="password"
 	    label="Password"
 	    type="password"
+	    onChange={this.onChange}
+	    value={this.state.password}
 		/>
-		<Button type="submit">
-		Submit
+		</Modal.Body>
+		<Modal.Footer>
+		<Button
+	    onClick={this.onSubmit}>
+		Login
 	    </Button>
-		</form>
+		</Modal.Footer>
+		</Modal.Dialog>
 	);
     }
 });
