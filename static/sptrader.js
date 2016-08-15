@@ -86,7 +86,6 @@ function publish() {
     $.get("/ping");
 };
 
-
 var columns = [
     { name : 'index' },
     { name : 'firstName' },
@@ -104,29 +103,31 @@ function FieldGroup({ id, label, help, ...props }) {
     </div>
   );
 }
-console.log("HEELOO!!!");console.log
+console.log("HEELOO!!!");
 var LoginForm = React.createClass({
     getInitialState: function() {
 	return {
-	    host: '',
-	    port: 8080,
-	    license: '',
-	    app_id : '',
-	    user_id : '',
-	    password: ''
+	    data: {
+		host: '',
+		port: 8080,
+		license: '',
+		app_id : '',
+		user_id : '',
+		password: ''
+	    }
 	};
     },
     onChange: function(e) {
 	var change = {}
 	change[e.target.id] = e.target.value;
-	this.setState(change);
+	this.setState({data: change});
     },
     onSubmit: function(e) {
-	console.log(this.state);
+	this.props.onSubmit(this.state.data);
     },
     render: function() {
 	return (<form>
-		<Modal.Dialog>
+		<Modal show={this.props.show}>
 		<Modal.Header>
 		<Modal.Title>Login</Modal.Title>
 		</Modal.Header>
@@ -185,16 +186,33 @@ var LoginForm = React.createClass({
 		Login
 	    </Button>
 		</Modal.Footer>
-		</Modal.Dialog>
+		</Modal>
 		</form>
 	);
     }
 });
 
-const tabsInstance = (
-
-	<Tabs>
-	<Tab eventKey={1} title="Login"><LoginForm/></Tab>
+var SpTraderApp = React.createClass({
+    getInitialState: function() {
+	return {
+	    showModal: true
+	};
+    },
+    submitModal: function(data) {
+	this.setState({showModal: false});
+	console.log(data);
+    },
+    logout: function() {
+	this.setState({showModal: true});
+    },
+    render: function() {
+	return(
+	<Tabs id="tabs">
+		<Tab eventKey={1} title="Login">
+		<LoginForm show={this.state.showModal}
+	    onSubmit={this.submitModal}/>
+	<Button bsStyle="success" onClick={this.logout}>Logout</Button>
+    </Tab>
     <Tab eventKey={2} title="Scratchpad">
       <ButtonToolbar>
 	<Button bsStyle="success" onClick={publish}>Ping</Button>
@@ -205,7 +223,9 @@ const tabsInstance = (
 
     </Tab>
 </Tabs>
-);
+	)
+    }
+});
 
 
 var helloWorld = React.createClass({
@@ -215,7 +235,11 @@ var helloWorld = React.createClass({
 });
 
 ReactDOM.render(
-    React.createElement(helloWorld, null),
+    <helloWorld />,
     document.getElementById('content')
 );
-ReactDOM.render(tabsInstance, document.getElementById('test'));
+
+ReactDOM.render(
+    <SpTraderApp />,
+    document.getElementById('test')
+);
