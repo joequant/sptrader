@@ -20,7 +20,7 @@ var SubscribeBox = React.createClass( {
     },
     addData: function (data) {
 	var log = this.state.data;
-	this.setState({data: log + data.level + ": " + data.msg + "\n"});
+	this.setState({data: log + JSON.stringify(data) + "\n"});
     },
     componentDidMount: function() {
 	var source = new EventSource(this.props.url);

@@ -31,9 +31,15 @@ def logininfo():
 
 @sptrader.ffi.callback("LoginReplyAddr")
 def login_reply(ret_code, ret_msg):
+    if ret_code == 0:
+        ret_msg = ''
+    else:
+        ret_msg =  sptrader.ffi.string(ret_msg).decode('utf-8')
+
     msg = {
         "id" : "ping",
-        "msg" : "%d %s" % (ret_code, sptrader.ffi.string(ret_msg))
+        "ret_code" : ret_code,
+        "ret_msg" : ret_msg
         }
     for sub in subscriptions[:]:
         sub.put(msg)
