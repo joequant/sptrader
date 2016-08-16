@@ -47,9 +47,10 @@ class SPTrader(object):
                               user_id.encode("utf-8"),
                               password.encode("utf-8"))
     def login(self, callback=None):
-        sp.SPAPI_Login()
+        retval = sp.SPAPI_Login()
         if callback != None:
             sp.SPAPI_RegisterLoginReply(callback)
+        return retval
     def get_login_status(self, status_id):
         return sp.SPAPI_GetLoginStatus(self.user, status_id)
     def logout(self):
