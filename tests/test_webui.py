@@ -8,6 +8,7 @@ location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 
 import sse
+import config
 from queue import Queue
 from sse import ServerSentEvent
 import sptrader
@@ -21,6 +22,10 @@ app = Flask(__name__,
 @app.route("/")
 def hello():
     return app.send_static_file("sptrader.html")
+
+@app.route("/logininfo")
+def logininfo():
+    return jsonify(config.logininfo)
 
 @app.route("/login", methods=['POST'])
 def login():

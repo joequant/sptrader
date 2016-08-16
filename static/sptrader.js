@@ -31,7 +31,7 @@ var SubscribeBox = React.createClass( {
 	});
     },
     render: function() {
-        return (<FormControl componentClass="textarea" defaultValue={this.state.data} />);
+        return (<FormControl componentClass="textarea" value={this.state.data} />);
     }
 });
 
@@ -106,19 +106,24 @@ function FieldGroup({ id, label, help, ...props }) {
 console.log("HEELOO!!!");
 var LoginForm = React.createClass({
     getInitialState: function() {
+	var logininfo = $.getJSON('/logininfo', function(d) {
+		d.password = '';
+		this.setState({data: d});
+	    }
+	);
 	return {
 	    data: {
 		host: '',
 		port: 8080,
 		license: '',
-		app_id : '',
-		user_id : '',
+		app_id: '',
+		user_id: '',
 		password: ''
 	    }
 	};
     },
     onChange: function(e) {
-	var change = {}
+	var change = this.state.data;
 	change[e.target.id] = e.target.value;
 	this.setState({data: change});
     },
@@ -138,15 +143,15 @@ var LoginForm = React.createClass({
 	    label="Host"
 	    placeholder="Enter host"
 	    onChange={this.onChange}
-	    defaultValue={this.state.host}
+	    value={this.state.data.host}
 		/>
 		<FieldGroup
 	    id="port"
-	    type="text"nodejs windows installer
+	    type="text"
 	    label="Port"
 	    placeholder="Enter port"
 	    onChange={this.onChange}
-	    defaultValue={this.state.port}
+	    value={this.state.data.port}
 		/>
 		<FieldGroup
 	    id="license"
@@ -154,7 +159,7 @@ var LoginForm = React.createClass({
 	    label="License"
 	    placeholder="Enter license"
 	    onChange={this.onChange}
-	    defaultValue={this.state.license}
+	    value={this.state.data.license}
 		/>
 		<FieldGroup
 	    id="app_id"
@@ -162,7 +167,7 @@ var LoginForm = React.createClass({
 	    label="App Id"
 	    placeholder="Enter app id"
 	    onChange={this.onChange}
-	    defaultValue={this.state.app_id}
+	    value={this.state.data.app_id}
 		/>
 		<FieldGroup
 	    id="user_id"
@@ -170,14 +175,14 @@ var LoginForm = React.createClass({
 	    label="User Id"
 	    placeholder="Enter user id"
 	    onChange={this.onChange}
-	    defaultValue={this.state.user_id}
+	    value={this.state.data.user_id}
 		/>
 		<FieldGroup
 	    id="password"
 	    label="Password"
 	    type="password"
 	    onChange={this.onChange}
-	    defaultValue={this.state.password}
+	    value={this.state.data.password}
 		/>
 		</Modal.Body>
 		<Modal.Footer>

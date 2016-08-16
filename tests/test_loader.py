@@ -5,17 +5,19 @@ import time
 import threading
 from ctypes import *
 
-
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, location)
 sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 
 import sptrader
+import config
 cv = threading.Condition()
-sptrader = sptrader.SPTrader("demo.spsystem.info", 8080,
-                             "57ABC58F6555F",
-                             "SPDEMO",
-                             "DEMO201608054",
+login = config.logininfo;
+sptrader = sptrader.SPTrader(login['host'],
+                             login['port'],
+                             login['license'],
+                             login['app_id'],
+                             login['user_id'],
                              "test1")
 
 
