@@ -106,11 +106,11 @@ function FieldGroup({ id, label, help, ...props }) {
 console.log("HEELOO!!!");
 var LoginForm = React.createClass({
     getInitialState: function() {
-	var logininfo = $.getJSON('/logininfo', function(d) {
-		d.password = '';
-		this.setState({data: d});
-	    }
-	);
+	var l = this;
+	$.getJSON("/logininfo", function(d) {
+	    d.password = '';
+	    l.setState({"data" : d});
+	});
 	return {
 	    data: {
 		host: '',
@@ -123,9 +123,9 @@ var LoginForm = React.createClass({
 	};
     },
     onChange: function(e) {
-	var change = this.state.data;
+	var change = {}
 	change[e.target.id] = e.target.value;
-	this.setState({data: change});
+	this.setState({"data": change});
     },
     onSubmit: function(e) {
 	this.props.onSubmit(this.state.data);

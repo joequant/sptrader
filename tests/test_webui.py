@@ -1,4 +1,4 @@
-from flask import Flask, Response
+from flask import Flask, Response, jsonify
 
 
 import os
@@ -12,6 +12,7 @@ import config
 from queue import Queue
 from sse import ServerSentEvent
 import sptrader
+import config
 
 sptrader = None
 subscriptions = []
