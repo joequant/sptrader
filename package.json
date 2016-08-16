@@ -2,6 +2,11 @@
     "name" : "Sptrader",
     "version" : "0.0.1",
     "author" : "Joseph C Wang <joequant@gmail.com>",
+    "license" : "BSD-2-Clause",
+    "repository" : {
+	"type" : "git",
+	"url" : "https://github.com/joequant/sptrader.git"
+    },
     "dependencies" : {
 	"react" : "15.x",
 	"react-dom" : "15.x",
