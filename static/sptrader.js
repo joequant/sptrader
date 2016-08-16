@@ -123,8 +123,8 @@ var LoginForm = React.createClass({
 	};
     },
     onChange: function(e) {
-	var change = {}
-	change[e.target.id] = e.target.value;
+	var change = this.state.data;
+	change[e.target.name] = e.target.value;
 	this.setState({"data": change});
     },
     onSubmit: function(e) {
@@ -138,7 +138,7 @@ var LoginForm = React.createClass({
 		</Modal.Header>
 		<Modal.Body>
 		<FieldGroup
-	    id="host"
+	    name="host"
 	    type="text"
 	    label="Host"
 	    placeholder="Enter host"
@@ -146,7 +146,7 @@ var LoginForm = React.createClass({
 	    value={this.state.data.host}
 		/>
 		<FieldGroup
-	    id="port"
+	    name="port"
 	    type="text"
 	    label="Port"
 	    placeholder="Enter port"
@@ -154,7 +154,7 @@ var LoginForm = React.createClass({
 	    value={this.state.data.port}
 		/>
 		<FieldGroup
-	    id="license"
+	    name="license"
 	    type="text"
 	    label="License"
 	    placeholder="Enter license"
@@ -162,7 +162,7 @@ var LoginForm = React.createClass({
 	    value={this.state.data.license}
 		/>
 		<FieldGroup
-	    id="app_id"
+	    name="app_id"
 	    type="text"
 	    label="App Id"
 	    placeholder="Enter app id"
@@ -170,7 +170,7 @@ var LoginForm = React.createClass({
 	    value={this.state.data.app_id}
 		/>
 		<FieldGroup
-	    id="user_id"
+	    name="user_id"
 	    type="text"
 	    label="User Id"
 	    placeholder="Enter user id"
@@ -178,7 +178,7 @@ var LoginForm = React.createClass({
 	    value={this.state.data.user_id}
 		/>
 		<FieldGroup
-	    id="password"
+	    name="password"
 	    label="Password"
 	    type="password"
 	    onChange={this.onChange}
@@ -206,8 +206,15 @@ var SpTraderApp = React.createClass({
     submitModal: function(data) {
 	this.setState({showModal: false});
 	console.log(data);
+	$.ajax({
+	    type: 'post',
+	    url: '/login',
+	    data: JSON.stringify(data),
+	    contentType: "application/json"
+	});
     },
     logout: function() {
+	$.get("/logout", data);
 	this.setState({showModal: true});
     },
     render: function() {
@@ -235,7 +242,7 @@ var SpTraderApp = React.createClass({
 
 var helloWorld = React.createClass({
     render: function() {
-	return (<h2>Greetings from algobroker</h2>)
+	return (<h2>Greetings from SPTrader</h2>)
     }
 });
 
