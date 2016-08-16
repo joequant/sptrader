@@ -11,6 +11,8 @@
     },
     "devDependencies" : {
 	"browserify" : "latest",
+	"watchify" : "latest",
+	"babelify" : "latest",
 	"babel-preset-es2015" : "latest",
 	"babel-preset-react" : "latest",
 	"babel-preset-stage-2" : "latest"
