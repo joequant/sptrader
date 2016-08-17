@@ -15,7 +15,7 @@ from sse import ServerSentEvent
 import sptrader
 import config
 
-sp = None
+sp = sptrader.SPTrader()
 subscriptions = []
 app = Flask(__name__,
             static_url_path="/static",
@@ -49,14 +49,12 @@ def login():
     global sp
     if not request.json:
         abort(400)
-    if sp != None:
-        abort(400)
-    sp = sptrader.SPTrader(request.json["host"],
-                           request.json["port"],
-                           request.json["license"],
-                           request.json["app_id"],
-                           request.json["user_id"],
-                           request.json["password"])
+    sp.set_login_info(request.json["host"],
+                      request.json["port"],
+                      request.json["license"],
+                      request.json["app_id"],
+                      request.json["user_id"],
+                      request.json["password"])
     return jsonify({"retval" : sp.login(login_reply)})
 
 @app.route("/ping")
@@ -73,7 +71,6 @@ def ping():
 def logout():
     global sp
     sp.logout()
-    sp = None
     return "OK"
     
 @app.route("/subscribe")

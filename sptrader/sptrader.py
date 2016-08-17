@@ -23,8 +23,6 @@ void SPAPI_Uninitialize();
 ffi.dlopen(os.path.join(dll_location, "libeay32.dll"))
 ffi.dlopen(os.path.join(dll_location, "ssleay32.dll"))
 sp = ffi.dlopen(os.path.join(dll_location, "spapidllm64.dll"))
-sp.SPAPI_SetLanguageId(0)
-sp.SPAPI_Initialize()
 
 # Remember to convert unicode strings to byte strings otherwise
 # ctypes will assume that the characters are wchars and not
@@ -32,13 +30,17 @@ sp.SPAPI_Initialize()
 
 class SPTrader(object):
     ffi = ffi
-    def __init__(self,
-                 host,
-                 port,
-                 license,
-                 app_id,
-                 user_id,
-                 password):
+    def __init__(self):
+        sp.SPAPI_SetLanguageId(0)
+        sp.SPAPI_Initialize()
+        self.user = None
+    def set_login_info(self,
+                       host,
+                       port,
+                       license,
+                       app_id,
+                       user_id,
+                       password):
         self.user = user_id.encode("utf-8")
         sp.SPAPI_SetLoginInfo(host.encode("utf-8"),
                               port,
@@ -54,8 +56,11 @@ class SPTrader(object):
     def get_login_status(self, status_id):
         return sp.SPAPI_GetLoginStatus(self.user, status_id)
     def logout(self):
-        return sp.SPAPI_Logout(self.user)
-    
+        user = self.user
+        if user != None:
+            self.user = None
+            return sp.SPAPI_Logout(user)
+
         
 #def cleanup():
 #    sp.SPAPI_Uninitialize()
