@@ -195,6 +195,12 @@ var LoginForm = React.createClass({
 
 var SpTraderApp = React.createClass({
     getInitialState: function() {
+	var l = this;
+	$.getJSON("/get-login-status/80", function(d) {
+	    if (parseInt(d) != -1) {
+		l.setState({showModal: false});
+	    }
+	});
 	return {
 	    log: '',
 	    loginLabel: '',

@@ -58,6 +58,13 @@ def login():
                       request.json["password"])
     return jsonify({"retval" : sp.login(login_reply)})
 
+@app.route("/get-login-status/<int:host_id>")
+def get_login_status(host_id):
+    global sp
+    if host_id not in [80, 81, 83, 87, 88]:
+        return "-1"
+    return "%d" % sp.get_login_status(host_id)
+
 @app.route("/ping")
 def ping():
     msg = {

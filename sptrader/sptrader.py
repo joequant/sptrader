@@ -5,6 +5,19 @@ location = os.path.dirname(os.path.realpath(__file__))
 dll_location = os.path.join(location, "..", "dll")
 ffi = FFI()
 ffi.cdef("""
+typedef signed long int __int64_t;typedef signed long int __int64_t;
+
+typedef char            tinyint;
+typedef unsigned char   u_tinyint;
+typedef unsigned char   u_char;
+typedef unsigned short  u_short;
+typedef unsigned int    u_int;
+typedef unsigned long   u_long;
+
+typedef char STR4[4];
+typedef char STR16[16];
+typedef char STR40[40];
+
 typedef void (__stdcall *LoginReplyAddr)(long ret_code, char* ret_msg);
 typedef void (__stdcall *AccountLoginReplyAddr)(char *accNo, long ret_code, char* ret_msg);
 typedef void (__stdcall *AccountLogoutReplyAddr)(long ret_code, char *ret_msg);
@@ -54,6 +67,8 @@ class SPTrader(object):
             sp.SPAPI_RegisterLoginReply(callback)
         return retval
     def get_login_status(self, status_id):
+        if self.user == None:
+            return -1
         return sp.SPAPI_GetLoginStatus(self.user, status_id)
     def logout(self):
         user = self.user
