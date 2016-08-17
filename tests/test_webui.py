@@ -41,6 +41,7 @@ def login_reply(ret_code, ret_msg):
         "ret_code" : ret_code,
         "ret_msg" : ret_msg
         }
+    print(msg)
     for sub in subscriptions[:]:
         sub.put(msg)
 

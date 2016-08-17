@@ -132,6 +132,7 @@ var LoginForm = React.createClass({
 		<Modal.Title>Login</Modal.Title>
 		</Modal.Header>
 		<Modal.Body>
+		<label>{this.props.label}</label>
 		<FieldGroup
 	    name="host"
 	    type="text"
@@ -196,11 +197,11 @@ var SpTraderApp = React.createClass({
     getInitialState: function() {
 	return {
 	    log: '',
+	    loginLabel: '',
 	    showModal: true
 	};
     },
     submitModal: function(data) {
-	console.log(data);
 	$.ajax({
 	    type: 'post',
 	    url: '/login',
@@ -210,14 +211,20 @@ var SpTraderApp = React.createClass({
     },
     logout: function() {
 	$.get("/logout", data);
+	this.setState({loginLabel: ''});
 	this.setState({showModal: true});
     },
     addToLog: function(event) {
-	this.setState({log: this.state.log + JSON.stringify(event.data) + "\n"});
+	this.setState({log: this.state.log + event.data + "\n"});
     },
     loginReply: function(event) {
-	this.setState({log: this.state.log + JSON.stringify(event.data) + "\n"});
-	this.setState({showModal: false});
+	data = JSON.parse(event.data);
+	this.setState({log: this.state.log + event.data + "\n"});
+	if (parseInt(data.ret_code) == 0) {
+	    this.setState({showModal: false});
+	} else {
+	    this.setState({loginLabel: data.ret_msg});
+	}
     },
     render: function() {
 	var events = {
@@ -228,6 +235,7 @@ var SpTraderApp = React.createClass({
 	<Tabs id="tabs">
 		<Tab eventKey={1} title="Login">
 		<LoginForm show={this.state.showModal}
+	    label={this.state.loginLabel}
 	    onSubmit={this.submitModal}/>
 	<Button bsStyle="success" onClick={this.logout}>Logout</Button>
     </Tab>
