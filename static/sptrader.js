@@ -16,22 +16,17 @@ var Modal = ReactBootstrap.Modal;
 
 var SubscribeBox = React.createClass( {
     getInitialState: function() {
-	return {data: "HelloWorld\n"};
-    },
-    addData: function (data) {
-	var log = this.state.data;
-	this.setState({data: log + JSON.stringify(data) + "\n"});
+	return {};
     },
     componentDidMount: function() {
 	var source = new EventSource(this.props.url);
 	var obj = this;
-	source.addEventListener(this.props.event, function(event) {
-	    var data = JSON.parse(event.data);
-	    obj.addData(data);
+	$.each(this.props.event, function(k, v) {
+	    source.addEventListener(k, v);
 	});
     },
     render: function() {
-        return (<FormControl componentClass="textarea" value={this.state.data} />);
+        return '';
     }
 });
 
@@ -103,7 +98,7 @@ function FieldGroup({ id, label, help, ...props }) {
     </div>
   );
 }
-console.log("HEELOO!!!");
+console.log("New SPTrader");
 var LoginForm = React.createClass({
     getInitialState: function() {
 	var l = this;
@@ -200,6 +195,7 @@ var LoginForm = React.createClass({
 var SpTraderApp = React.createClass({
     getInitialState: function() {
 	return {
+	    log: '',
 	    showModal: true
 	};
     },
@@ -217,7 +213,13 @@ var SpTraderApp = React.createClass({
 	$.get("/logout", data);
 	this.setState({showModal: true});
     },
+    addToLog: function(event) {
+	this.setState({log: this.state.log + JSON.stringify(event.data) + "\n"});
+    },
     render: function() {
+	var events = {
+	    "ping" : this.addToLog
+	}
 	return(
 	<Tabs id="tabs">
 		<Tab eventKey={1} title="Login">
@@ -229,7 +231,8 @@ var SpTraderApp = React.createClass({
       <ButtonToolbar>
 	<Button bsStyle="success" onClick={publish}>Ping</Button>
 	</ButtonToolbar>
-	<SubscribeBox url="/subscribe" event="ping" />
+	<SubscribeBox url="/subscribe" event={events} />
+	<FormControl componentClass="textarea" value={this.state.log} />
 	<DataGrid
     idProperty='id' emptyText={'No records'} columns={columns} dataSource={data} style={{height:400}} />
 
