@@ -41,7 +41,16 @@ def login_reply(ret_code, ret_msg):
         "ret_code" : ret_code,
         "ret_msg" : ret_msg
         }
-    print(msg)
+    for sub in subscriptions[:]:
+        sub.put(msg)
+
+@sptrader.ffi.callback("ConnectingReplyAddr")
+def connecting_reply(host_type, con_status):
+    msg = {
+        "id" : "ConnectingReply",
+        "host_type" : host_type,
+        "con_status" : con_status
+        }
     for sub in subscriptions[:]:
         sub.put(msg)
 

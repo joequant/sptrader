@@ -248,7 +248,7 @@ typedef struct
 } SPApiCcyRate;
 
 typedef void (__stdcall *LoginReplyAddr)(long ret_code, char* ret_msg);
-typedef void (__stdcall *ConnectedReplyAddr)(long host_type, long con_status);
+typedef void (__stdcall *ConnectingReplyAddr)(long host_type, long con_status);
 typedef void (__stdcall *ApiPriceUpdateAddr)(SPApiPrice *price);
 typedef void (__stdcall *ApiTickerUpdateAddr)(SPApiTicker *ticker);
 typedef void (__stdcall *AccountLoginReplyAddr)(char *accNo, long ret_code, char* ret_msg);
@@ -299,6 +299,7 @@ int SPAPI_Logout(char *user_id);
 
 void SPAPI_RegisterLoginReply(LoginReplyAddr addr);
 void SPAPI_RegisterApiPriceUpdate(ApiPriceUpdateAddr addr);
+void SPAPI_RegisterConnectingReply(ConnectingReplyAddr addr);
 void SPAPI_RegisterTickerUpdate(ApiTickerUpdateAddr addr);
 void SPAPI_RegisterAccountLoginReply(AccountLoginReplyAddr addr);
 void SPAPI_RegisterAccountLogoutReply(AccountLogoutReplyAddr addr);

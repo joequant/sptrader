@@ -221,10 +221,13 @@ var SpTraderApp = React.createClass({
 	this.setState({showModal: true});
     },
     addToLog: function(event) {
+	data = JSON.parse(event.data);
+	console.log(data);
 	this.setState({log: this.state.log + event.data + "\n"});
     },
     loginReply: function(event) {
 	data = JSON.parse(event.data);
+	console.log(data);
 	this.setState({log: this.state.log + event.data + "\n"});
 	if (parseInt(data.ret_code) == 0) {
 	    this.setState({showModal: false});
@@ -232,10 +235,16 @@ var SpTraderApp = React.createClass({
 	    this.setState({loginLabel: data.ret_msg});
 	}
     },
+    connectingReply: function(event) {
+	data = JSON.parse(event.data);
+	console.log(data);
+	this.setState({log: this.state.log + event.data + "\n"});
+    },
     render: function() {
 	var events = {
 	    "ping" : this.addToLog,
-	    "LoginReply" : this.loginReply
+	    "LoginReply" : this.loginReply,
+	    "ConnectingReply" : this.connectingReply
 	}
 	return(
 	<Tabs id="tabs">
