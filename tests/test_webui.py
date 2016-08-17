@@ -37,7 +37,7 @@ def login_reply(ret_code, ret_msg):
         ret_msg =  sptrader.ffi.string(ret_msg).decode('utf-8')
 
     msg = {
-        "id" : "ping",
+        "id" : "LoginReply",
         "ret_code" : ret_code,
         "ret_msg" : ret_msg
         }

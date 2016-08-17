@@ -200,7 +200,6 @@ var SpTraderApp = React.createClass({
 	};
     },
     submitModal: function(data) {
-	this.setState({showModal: false});
 	console.log(data);
 	$.ajax({
 	    type: 'post',
@@ -216,9 +215,14 @@ var SpTraderApp = React.createClass({
     addToLog: function(event) {
 	this.setState({log: this.state.log + JSON.stringify(event.data) + "\n"});
     },
+    loginReply: function(event) {
+	this.setState({log: this.state.log + JSON.stringify(event.data) + "\n"});
+	this.setState({showModal: false});
+    },
     render: function() {
 	var events = {
-	    "ping" : this.addToLog
+	    "ping" : this.addToLog,
+	    "LoginReply" : this.loginReply
 	}
 	return(
 	<Tabs id="tabs">
