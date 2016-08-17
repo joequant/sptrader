@@ -26,7 +26,7 @@ var SubscribeBox = React.createClass( {
 	});
     },
     render: function() {
-        return '';
+        return null;
     }
 });
 
