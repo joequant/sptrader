@@ -275,26 +275,23 @@ int SPAPI_GetTradeByTradeNo(long int_order_no, bigint trade_no,
     SPApiTrade *trade);
 
 int SPAPI_SubscribePrice(char *prod_code, int mode);
-int SPAPI_GetPriceCourt();
-int SPAPI_GetPrice(int idx, SPApiPrice *price);
-int SPAPI_GetPriceByCode(char *prod_code, SPApiPrice *price);
 
 int SPAPI_LoadInstrumentList();
 
 int SPAPI_GetInstrumentCount();
-int SPAPI_GetInstrument(int idx, SPApiInstrument *inst);
+int SPAPI_GetInstrumentByArray(SPApiInstrument *apiInstList);
 int SPAPI_GetInstrumentByCode(char *inst_code, SPApiInstrument *inst);
 
 int SPAPI_GetProductCount();
-int SPAPI_GetProduct(int idx, SPApiProduct *prod);
-int SPAPI_GetProductByCode(char *inst_code, SPApiProduct *prod);
+int SPAPI_GetProductByArray(SPApiProduct *apiProdList);
+int SPAPI_GetProductByCode(char *prod_code, SPApiProduct *prod);
 
 int SPAPI_GetAccBalCount();
 int SPAPI_GetAccBal(int idx, SPApiAccBal *prod);
 int SPAPI_GetAccBalByCurrency(char *inst_code, SPApiAccBal *prod);
 
 int SPAPI_SubscribeTicker(char *user_id, char *prod_code, int mode);
-int SPAPI_GetAccInfo(SPApiAccInfo *acc_info);
+int SPAPI_GetAccInfo(char *user_id, SPApiAccInfo *acc_info);
 int SPAPI_Logout(char *user_id);
 
 void SPAPI_RegisterLoginReply(LoginReplyAddr addr);
