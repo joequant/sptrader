@@ -293,7 +293,7 @@ int SPAPI_GetAccBalCount();
 int SPAPI_GetAccBal(int idx, SPApiAccBal *prod);
 int SPAPI_GetAccBalByCurrency(char *inst_code, SPApiAccBal *prod);
 
-int SPAPI_SubscribeTicker(char *prod_code, int mode);
+int SPAPI_SubscribeTicker(char *user_id, char *prod_code, int mode);
 int SPAPI_GetAccInfo(SPApiAccInfo *acc_info);
 int SPAPI_Logout(char *user_id);
 
@@ -307,7 +307,7 @@ void SPAPI_Uninitialize();
 """)
 ffi.dlopen(os.path.join(dll_location, "libeay32.dll"))
 ffi.dlopen(os.path.join(dll_location, "ssleay32.dll"))
-sp = ffi.dlopen(os.path.join(dll_location, "spapidllm64.dll"))
+spapi = ffi.dlopen(os.path.join(dll_location, "spapidllm64.dll"))
 
 # Remember to convert unicode strings to byte strings otherwise
 # ctypes will assume that the characters are wchars and not
@@ -315,9 +315,10 @@ sp = ffi.dlopen(os.path.join(dll_location, "spapidllm64.dll"))
 
 class SPTrader(object):
     ffi = ffi
+    api = spapi
     def __init__(self):
-        sp.SPAPI_SetLanguageId(0)
-        sp.SPAPI_Initialize()
+        self.api.SPAPI_SetLanguageId(0)
+        self.api.SPAPI_Initialize()
         self.user = None
     def set_login_info(self,
                        host,
@@ -327,29 +328,28 @@ class SPTrader(object):
                        user_id,
                        password):
         self.user = user_id.encode("utf-8")
-        sp.SPAPI_SetLoginInfo(host.encode("utf-8"),
+        self.api.SPAPI_SetLoginInfo(host.encode("utf-8"),
                               port,
                               license.encode("utf-8"),
                               app_id.encode("utf-8"),
                               user_id.encode("utf-8"),
                               password.encode("utf-8"))
     def login(self, callback=None):
-        retval = sp.SPAPI_Login()
+        retval = self.api.SPAPI_Login()
         if callback != None:
-            sp.SPAPI_RegisterLoginReply(callback)
+            self.api.SPAPI_RegisterLoginReply(callback)
         return retval
     def get_login_status(self, status_id):
         if self.user == None:
             return -1
-        return sp.SPAPI_GetLoginStatus(self.user, status_id)
+        return self.api.SPAPI_GetLoginStatus(self.user, status_id)
     def logout(self):
         user = self.user
         if user != None:
             self.user = None
-            return sp.SPAPI_Logout(user)
-
+            return self.api.SPAPI_Logout(user)
         
 #def cleanup():
-#    sp.SPAPI_Uninitialize()
+#    self.api.SPAPI_Uninitialize()
 
 #atexit.register(cleanup)
