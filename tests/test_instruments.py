@@ -15,7 +15,7 @@ cv = threading.Condition()
 login = config.logininfo;
 sp = sptrader.SPTrader()
 sp.set_login_info(login['host'],
-                  login['port'],
+                  8080,
                   login['license'],
                   login['app_id'],
                   login['user_id'],
@@ -25,30 +25,43 @@ sp.set_login_info(login['host'],
 def ticker_action(data):
     print("Ticker")
 
+@sp.ffi.callback("ConnectedReplyAddr")
+def connected_reply_func(host_type, con_status):
+    print("connected", host_type, con_status)
+
+@sp.ffi.callback("AccountInfoPushAddr")
+def account_info_func(data):
+    print("Account")
+    print(data[0].NAV)
+    print(sp.ffi.string(data[0].ClientId))
+    print(data[0].CreditLimit)
+    print(sp.ffi.string(data[0].MarginClass))
+
 @sp.ffi.callback("LoginReplyAddr")
 def login_actions(ret_code, ret_msg):
-    cv.acquire()
     print("login")
+    print(login['user_id'].encode("utf-8"))
+    user = sp.ffi.new("char[]", login['user_id'].encode("utf-8"))
+    print(user)
+
+    print(sp.api.SPAPI_GetAccBalCount(user))
+    print(sp.get_login_status(80))
     print(sp.get_login_status(81))
+    print(sp.get_login_status(83))
+    print(sp.get_login_status(88))
     sp.api.SPAPI_RegisterTickerUpdate(ticker_action)
     print(sp.api.SPAPI_SubscribeTicker(
-        login['user_id'].encode("utf-8"),
+        user,
         b"003888", 1))
     print(sp.api.SPAPI_LoadInstrumentList());
     print(sp.api.SPAPI_GetInstrumentCount());
     print(sp.api.SPAPI_GetProductCount());
 
-    account_info = sp.ffi.new("SPApiAccInfo[1]")
-    print(sp.api.SPAPI_GetAccInfo(login['user_id'].encode("utf-8"),
-                                  account_info))
-    print(account_info[0].NAV)
-    input("Press any key to exit")
-    cv.notify()
-    cv.release()
 
-cv.acquire()
+sp.api.SPAPI_RegisterAccountInfoPush(account_info_func)
+sp.api.SPAPI_RegisterConnectingReply(connected_reply_func)
 print(sp.login(login_actions))
-cv.wait()
+input("Press any key to exit")
 sp.logout()
-cv.release()
+
 

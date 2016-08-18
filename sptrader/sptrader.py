@@ -248,11 +248,12 @@ typedef struct
 } SPApiCcyRate;
 
 typedef void (__stdcall *LoginReplyAddr)(long ret_code, char* ret_msg);
-typedef void (__stdcall *ConnectingReplyAddr)(long host_type, long con_status);
+typedef void (__stdcall *ConnectedReplyAddr)(long host_type, long con_status);
 typedef void (__stdcall *ApiPriceUpdateAddr)(SPApiPrice *price);
 typedef void (__stdcall *ApiTickerUpdateAddr)(SPApiTicker *ticker);
 typedef void (__stdcall *AccountLoginReplyAddr)(char *accNo, long ret_code, char* ret_msg);
 typedef void (__stdcall *AccountLogoutReplyAddr)(long ret_code, char *ret_msg);
+typedef void (__stdcall *AccountInfoPushAddr)(SPApiAccInfo *acc_info);
 
 int SPAPI_SetLanguageId(int langid);
 int SPAPI_Initialize();
@@ -286,8 +287,8 @@ int SPAPI_GetProductCount();
 int SPAPI_GetProductByArray(SPApiProduct *apiProdList);
 int SPAPI_GetProductByCode(char *prod_code, SPApiProduct *prod);
 
-int SPAPI_GetAccBalCount();
-int SPAPI_GetAccBal(int idx, SPApiAccBal *prod);
+int SPAPI_GetAccBalCount(char *user);
+int SPAPI_GetAccBalByArray(SPApiAccBal *prod);
 int SPAPI_GetAccBalByCurrency(char *inst_code, SPApiAccBal *prod);
 
 int SPAPI_SubscribeTicker(char *user_id, char *prod_code, int mode);
@@ -295,8 +296,9 @@ int SPAPI_GetAccInfo(char *user_id, SPApiAccInfo *acc_info);
 int SPAPI_Logout(char *user_id);
 
 void SPAPI_RegisterLoginReply(LoginReplyAddr addr);
+void SPAPI_RegisterAccountInfoPush(AccountInfoPushAddr addr);
 void SPAPI_RegisterApiPriceUpdate(ApiPriceUpdateAddr addr);
-void SPAPI_RegisterConnectingReply(ConnectingReplyAddr addr);
+void SPAPI_RegisterConnectingReply(ConnectedReplyAddr addr);
 void SPAPI_RegisterTickerUpdate(ApiTickerUpdateAddr addr);
 void SPAPI_RegisterAccountLoginReply(AccountLoginReplyAddr addr);
 void SPAPI_RegisterAccountLogoutReply(AccountLogoutReplyAddr addr);
@@ -324,12 +326,12 @@ class SPTrader(object):
                        app_id,
                        user_id,
                        password):
-        self.user = user_id.encode("utf-8")
+        self.user = ffi.new("char[]", user_id.encode("utf-8"))
         self.api.SPAPI_SetLoginInfo(host.encode("utf-8"),
                               port,
                               license.encode("utf-8"),
                               app_id.encode("utf-8"),
-                              user_id.encode("utf-8"),
+                              self.user,
                               password.encode("utf-8"))
     def login(self, callback=None):
         retval = self.api.SPAPI_Login()
