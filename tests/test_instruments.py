@@ -3,7 +3,6 @@ import os
 import sys
 import time
 import threading
-from ctypes import *
 
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, location)
@@ -64,7 +63,6 @@ def login_actions(ret_code, ret_msg):
     print("price", sp.api.SPAPI_GetPriceByCode(user, b"HSIQ6", price))
     print(price[0].Close)
     print(sp.api.SPAPI_GetAccBalCount(user))
-    sp.api.SPAPI_RegisterTickerUpdate(ticker_action)
     print(sp.api.SPAPI_SubscribePrice(user, b"HSIQ6", 1))
     print(sp.api.SPAPI_SubscribeTicker(
         user,
@@ -78,6 +76,7 @@ sp.register_account_info_push(account_info_func)
 sp.register_connecting_reply(connected_reply_func)
 sp.register_instrument_list_reply(instrument_list_reply_func)
 sp.api.SPAPI_RegisterApiPriceUpdate(api_price_update_func)
+sp.api.SPAPI_RegisterTickerUpdate(ticker_action)
 print("instrument_list", sp.api.SPAPI_LoadInstrumentList());
 print(sp.login())
 input("Press any key to exit")
