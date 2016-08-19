@@ -45,6 +45,14 @@ def instrument_list_reply_func(is_ready, ret_msg):
     print(sp.ffi.string(ret_msg))
     print(sp.api.SPAPI_GetInstrumentCount());
 
+@sp.ffi.callback("ApiPriceUpdateAddr")
+def api_price_update_func(data):
+    print("api_price_update")
+    print(data[0].Close)
+    print(data[0].Last[0])
+    print(data[0].LastQty[0])
+    print(data[0].LastTime[0])
+    print(data[0].Timestamp)
 
 @sp.ffi.callback("LoginReplyAddr")
 def login_actions(ret_code, ret_msg):
@@ -52,11 +60,10 @@ def login_actions(ret_code, ret_msg):
     print(login['user_id'].encode("utf-8"))
     user = sp.ffi.new("char[]", login['user_id'].encode("utf-8"))
     print(user)
+    price = sp.ffi.new("SPApiPrice[1]")
+    print("price", sp.api.SPAPI_GetPriceByCode(user, b"HSIQ6", price))
+    print(price[0].Close)
     print(sp.api.SPAPI_GetAccBalCount(user))
-    print(sp.get_login_status(80))
-    print(sp.get_login_status(81))
-    print(sp.get_login_status(83))
-    print(sp.get_login_status(88))
     sp.api.SPAPI_RegisterTickerUpdate(ticker_action)
     print(sp.api.SPAPI_SubscribePrice(user, b"HSIQ6", 1))
     print(sp.api.SPAPI_SubscribeTicker(
@@ -70,6 +77,7 @@ sp.register_login_reply(login_actions)
 sp.register_account_info_push(account_info_func)
 sp.register_connecting_reply(connected_reply_func)
 sp.register_instrument_list_reply(instrument_list_reply_func)
+sp.api.SPAPI_RegisterApiPriceUpdate(api_price_update_func)
 print("instrument_list", sp.api.SPAPI_LoadInstrumentList());
 print(sp.login())
 input("Press any key to exit")

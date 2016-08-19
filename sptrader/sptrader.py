@@ -277,6 +277,7 @@ int SPAPI_GetTradeByTradeNo(long int_order_no, bigint trade_no,
     SPApiTrade *trade);
 
 int SPAPI_SubscribePrice(char *user_id, char *prod_code, int mode);
+int SPAPI_GetPriceByCode(char *user_id, char *prod_code, SPApiPrice *price);
 
 int SPAPI_LoadInstrumentList();
 
