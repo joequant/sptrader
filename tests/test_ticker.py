@@ -29,11 +29,11 @@ def ticker_action(data):
 def login_actions(ret_code, ret_msg):
     print("login")
     print(sp.get_login_status(81))
-    sp.api.SPAPI_RegisterTickerUpdate(ticker_action)
     print(sp.api.SPAPI_SubscribeTicker(
         login['user_id'].encode("utf-8"),
-        b"003888", 1))
-    
+        b"HSBQ6", 1))
+
+sp.api.SPAPI_RegisterTickerUpdate(ticker_action)
 sp.register_login_reply(login_actions)
 print(sp.login())
 input("Press any key to exit")
