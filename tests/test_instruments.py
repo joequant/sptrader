@@ -33,9 +33,18 @@ def connected_reply_func(host_type, con_status):
 def account_info_func(data):
     print("Account")
     print(data[0].NAV)
+    print(sp.ffi.string(data[0].AccName))
     print(sp.ffi.string(data[0].ClientId))
+    print(sp.ffi.string(data[0].AEId))
     print(data[0].CreditLimit)
     print(sp.ffi.string(data[0].MarginClass))
+
+@sp.ffi.callback("InstrumentListReplyAddr")
+def instrument_list_reply_func(is_ready, ret_msg):
+    print("InstrumentListReply")
+    print(sp.ffi.string(ret_msg))
+    print(sp.api.SPAPI_GetInstrumentCount());
+
 
 @sp.ffi.callback("LoginReplyAddr")
 def login_actions(ret_code, ret_msg):
@@ -43,25 +52,25 @@ def login_actions(ret_code, ret_msg):
     print(login['user_id'].encode("utf-8"))
     user = sp.ffi.new("char[]", login['user_id'].encode("utf-8"))
     print(user)
-
     print(sp.api.SPAPI_GetAccBalCount(user))
     print(sp.get_login_status(80))
     print(sp.get_login_status(81))
     print(sp.get_login_status(83))
     print(sp.get_login_status(88))
     sp.api.SPAPI_RegisterTickerUpdate(ticker_action)
+    print(sp.api.SPAPI_SubscribePrice(user, b"HSIQ6", 1))
     print(sp.api.SPAPI_SubscribeTicker(
         user,
-        b"003888", 1))
-    print(sp.api.SPAPI_LoadInstrumentList());
+        b"HSIQ6", 1))
     print(sp.api.SPAPI_GetInstrumentCount());
     print(sp.api.SPAPI_GetProductCount());
+
 
 sp.register_login_reply(login_actions)
 sp.register_account_info_push(account_info_func)
 sp.register_connecting_reply(connected_reply_func)
+sp.register_instrument_list_reply(instrument_list_reply_func)
+print("instrument_list", sp.api.SPAPI_LoadInstrumentList());
 print(sp.login())
 input("Press any key to exit")
 sp.logout()
-
-

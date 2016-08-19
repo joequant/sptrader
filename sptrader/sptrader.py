@@ -254,6 +254,7 @@ typedef void (__stdcall *ApiTickerUpdateAddr)(SPApiTicker *ticker);
 typedef void (__stdcall *AccountLoginReplyAddr)(char *accNo, long ret_code, char* ret_msg);
 typedef void (__stdcall *AccountLogoutReplyAddr)(long ret_code, char *ret_msg);
 typedef void (__stdcall *AccountInfoPushAddr)(SPApiAccInfo *acc_info);
+typedef void (__stdcall *InstrumentListReplyAddr)(bool is_ready, char *ret_msg);
 
 int SPAPI_SetLanguageId(int langid);
 int SPAPI_Initialize();
@@ -275,7 +276,7 @@ int SPAPI_GetTrade(int idx, SPApiTrade *trade);
 int SPAPI_GetTradeByTradeNo(long int_order_no, bigint trade_no,
     SPApiTrade *trade);
 
-int SPAPI_SubscribePrice(char *prod_code, int mode);
+int SPAPI_SubscribePrice(char *user_id, char *prod_code, int mode);
 
 int SPAPI_LoadInstrumentList();
 
@@ -296,6 +297,7 @@ int SPAPI_GetAccInfo(char *user_id, SPApiAccInfo *acc_info);
 int SPAPI_Logout(char *user_id);
 
 void SPAPI_RegisterLoginReply(LoginReplyAddr addr);
+void SPAPI_RegisterInstrumentListReply(InstrumentListReplyAddr addr);
 void SPAPI_RegisterAccountInfoPush(AccountInfoPushAddr addr);
 void SPAPI_RegisterApiPriceUpdate(ApiPriceUpdateAddr addr);
 void SPAPI_RegisterConnectingReply(ConnectedReplyAddr addr);
@@ -325,6 +327,8 @@ class SPTrader(object):
         self.api.SPAPI_RegisterAccountInfoPush(account_info_func)
     def register_connecting_reply(self, connected_reply_func):
         self.api.SPAPI_RegisterConnectingReply(connected_reply_func)
+    def register_instrument_list_reply(self, func):
+        self.api.SPAPI_RegisterInstrumentListReply(func)
     def set_login_info(self,
                        host,
                        port,

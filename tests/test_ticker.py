@@ -31,7 +31,7 @@ def login_actions(ret_code, ret_msg):
     print(sp.get_login_status(81))
     print(sp.api.SPAPI_SubscribeTicker(
         login['user_id'].encode("utf-8"),
-        b"HSBQ6", 1))
+        b"HSBQ6", 0))
 
 sp.api.SPAPI_RegisterTickerUpdate(ticker_action)
 sp.register_login_reply(login_actions)
