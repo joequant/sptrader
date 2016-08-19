@@ -319,6 +319,12 @@ class SPTrader(object):
         self.api.SPAPI_SetLanguageId(0)
         self.api.SPAPI_Initialize()
         self.user = None
+    def register_login_reply(self, login_reply_func):
+        self.api.SPAPI_RegisterLoginReply(login_reply_func)
+    def register_account_info_push(self, account_info_func):
+        self.api.SPAPI_RegisterAccountInfoPush(account_info_func)
+    def register_connecting_reply(self, connected_reply_func):
+        self.api.SPAPI_RegisterConnectingReply(connected_reply_func)
     def set_login_info(self,
                        host,
                        port,
@@ -333,11 +339,8 @@ class SPTrader(object):
                               app_id.encode("utf-8"),
                               self.user,
                               password.encode("utf-8"))
-    def login(self, callback=None):
-        retval = self.api.SPAPI_Login()
-        if callback != None:
-            self.api.SPAPI_RegisterLoginReply(callback)
-        return retval
+    def login(self):
+        return self.api.SPAPI_Login()
     def get_login_status(self, status_id):
         if self.user == None:
             return -1

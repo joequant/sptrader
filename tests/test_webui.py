@@ -29,12 +29,12 @@ def hello():
 def logininfo():
     return jsonify(config.logininfo)
 
-@sptrader.ffi.callback("LoginReplyAddr")
+@sp.ffi.callback("LoginReplyAddr")
 def login_reply(ret_code, ret_msg):
     if ret_code == 0:
         ret_msg = ''
     else:
-        ret_msg =  sptrader.ffi.string(ret_msg).decode('utf-8')
+        ret_msg =  sp.ffi.string(ret_msg).decode('utf-8')
 
     msg = {
         "id" : "LoginReply",
@@ -43,16 +43,31 @@ def login_reply(ret_code, ret_msg):
         }
     for sub in subscriptions[:]:
         sub.put(msg)
+sp.register_login_reply(login_reply)
 
-@sptrader.ffi.callback("ConnectingReplyAddr")
-def connecting_reply(host_type, con_status):
+@sp.ffi.callback("ConnectedReplyAddr")
+def connected_reply(host_type, con_status):
     msg = {
-        "id" : "ConnectingReply",
+        "id" : "ConnectedReply",
         "host_type" : host_type,
         "con_status" : con_status
         }
     for sub in subscriptions[:]:
         sub.put(msg)
+sp.register_connecting_reply(connected_reply)
+
+@sp.ffi.callback("AccountInfoPushAddr")
+def account_info_push(data):
+    msg = {
+        "id" : "AccountInfoPush",
+        "NAV" : data[0].NAV,
+        "CreditLimit" : data[0].CreditLimit,
+        "ClientId" : sp.ffi.string(data[0].ClientId).decode('utf-8'),
+        "MarginClass" : sp.ffi.string(data[0].MarginClass).decode('utf-8')
+        }
+    for sub in subscriptions[:]:
+        sub.put(msg)
+sp.register_account_info_push(account_info_push)
 
 @app.route("/login", methods=['POST'])
 def login():
@@ -65,7 +80,7 @@ def login():
                       request.json["app_id"],
                       request.json["user_id"],
                       request.json["password"])
-    return jsonify({"retval" : sp.login(login_reply)})
+    return jsonify({"retval" : sp.login()})
 
 @app.route("/get-login-status/<int:host_id>")
 def get_login_status(host_id):
