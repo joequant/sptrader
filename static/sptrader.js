@@ -235,7 +235,16 @@ var SpTraderApp = React.createClass({
 	    this.setState({loginLabel: data.ret_msg});
 	}
     },
-    connectingReply: function(event) {
+    connectedReply: function(event) {
+	data = JSON.parse(event.data);
+	console.log(data);
+	this.setState({log: this.state.log + event.data + "\n"});
+	if (parseInt(data.host_type) == 80 &&
+	    parseInt(data.con_status) == 3) {
+	    this.setState({showModal: false});
+	}
+    },
+    accountInfoPush: function(event) {
 	data = JSON.parse(event.data);
 	console.log(data);
 	this.setState({log: this.state.log + event.data + "\n"});
@@ -244,7 +253,8 @@ var SpTraderApp = React.createClass({
 	var events = {
 	    "ping" : this.addToLog,
 	    "LoginReply" : this.loginReply,
-	    "ConnectingReply" : this.connectingReply
+	    "ConnectedReply" : this.connectedReply,
+	    "AccountInfoPush" : this.accountInfoPush
 	}
 	return(
 	<Tabs id="tabs">
