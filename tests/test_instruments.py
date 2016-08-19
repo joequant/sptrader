@@ -57,10 +57,10 @@ def login_actions(ret_code, ret_msg):
     print(sp.api.SPAPI_GetInstrumentCount());
     print(sp.api.SPAPI_GetProductCount());
 
-
-sp.api.SPAPI_RegisterAccountInfoPush(account_info_func)
-sp.api.SPAPI_RegisterConnectingReply(connected_reply_func)
-print(sp.login(login_actions))
+sp.register_login_reply(login_actions)
+sp.register_account_info_push(account_info_func)
+sp.register_connecting_reply(connected_reply_func)
+print(sp.login())
 input("Press any key to exit")
 sp.logout()
 

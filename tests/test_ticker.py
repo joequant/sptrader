@@ -27,20 +27,16 @@ def ticker_action(data):
 
 @sp.ffi.callback("LoginReplyAddr")
 def login_actions(ret_code, ret_msg):
-    cv.acquire()
     print("login")
     print(sp.get_login_status(81))
     sp.api.SPAPI_RegisterTickerUpdate(ticker_action)
     print(sp.api.SPAPI_SubscribeTicker(
         login['user_id'].encode("utf-8"),
         b"003888", 1))
-    input("Press any key to exit")
-    cv.notify()
-    cv.release()
-
-cv.acquire()
-print(sp.login(login_actions))
-cv.wait()
+    
+sp.register_login_reply(login_actions)
+print(sp.login())
+input("Press any key to exit")
 sp.logout()
-cv.release()
+
 

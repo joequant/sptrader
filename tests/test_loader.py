@@ -31,8 +31,9 @@ def login_actions(ret_code, ret_msg):
     input("Press any key to exit")
     cv.notify()
     cv.release()
+sp.register_login_reply(login_actions)
 
 cv.acquire()
-print(sp.login(login_actions))
+print(sp.login())
 cv.wait()
 cv.release()
