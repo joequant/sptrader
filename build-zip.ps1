@@ -11,7 +11,7 @@ New-Item -ItemType directory sptrader\static
 New-Item -ItemType directory sptrader\tests
 Copy-Item ..\sptrader\*.md sptrader
 Copy-Item ..\sptrader\*.ps1 sptrader
-Copy-Item ..\sptrader\*.psm sptrader
+Copy-Item ..\sptrader\*.psm1 sptrader
 Copy-Item ..\sptrader\*.json sptrader
 Copy-Item ..\sptrader\sptrader\*.py sptrader\sptrader
 Copy-Item ..\sptrader\static\*.html sptrader\static
