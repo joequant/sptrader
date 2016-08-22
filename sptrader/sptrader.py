@@ -1,10 +1,17 @@
 from cffi import FFI
 import atexit
 import os
+import struct
+
+if 8 * struct.calcsize("P") != 64:
+    print("sptrader only supported for 64 bit")
+    print("sptrader_api string needs to be checked for 32-bit")
+    exit
+
 location = os.path.dirname(os.path.realpath(__file__))
 dll_location = os.path.join(location, "..", "dll")
 ffi = FFI()
-ffi.cdef("""
+spapi_cdef = """
 typedef signed long int __int64_t;
 typedef unsigned long int __uint64_t;
 
@@ -247,27 +254,27 @@ typedef struct
     double Rate;
 } SPApiCcyRate;
 
-typedef void (__stdcall *LoginReplyAddr)(long ret_code, char *ret_msg);
-typedef void (__stdcall *ConnectedReplyAddr)(long host_type, long con_status);
-typedef void (__stdcall *ApiOrderRequestFailedAddr)(tinyint action, SPApiOrder *order, long err_code, char *err_msg);
-typedef void (__stdcall *ApiOrderReportAddr)(long rec_no, SPApiOrder *order);
-typedef void (__stdcall *ApiOrderBeforeSendReportAddr)(SPApiOrder *order);
-typedef void (__stdcall *AccountLoginReplyAddr)(char *accNo, long ret_code, char* ret_msg);
-typedef void (__stdcall *AccountLogoutReplyAddr)(long ret_code, char* ret_msg);
-typedef void (__stdcall *AccountInfoPushAddr)(SPApiAccInfo *acc_info);
-typedef void (__stdcall *AccountPositionPushAddr)(SPApiPos *pos);
-typedef void (__stdcall *UpdatedAccountPositionPushAddr)(SPApiPos *pos);
-typedef void (__stdcall *UpdatedAccountBalancePushAddr)(SPApiAccBal *acc_bal);
-typedef void (__stdcall *ApiTradeReportAddr)(long rec_no, SPApiTrade *trade);
-typedef void (__stdcall *ApiPriceUpdateAddr)(SPApiPrice *price);
-typedef void (__stdcall *ApiTickerUpdateAddr)(SPApiTicker *ticker);
-typedef void (__stdcall *PswChangeReplyAddr)(long ret_code, char *ret_msg);
-typedef void (__stdcall *ProductListByCodeReplyAddr)(char *inst_code, bool is_ready, char *ret_msg);
-typedef void (__stdcall *InstrumentListReplyAddr)(bool is_ready, char *ret_msg);
-typedef void (__stdcall *BusinessDateReplyAddr)(long business_date);
-typedef void (__stdcall *ApiMMOrderBeforeSendReportAddr)(SPApiMMOrder *mm_order);
-typedef void (__stdcall *ApiMMOrderRequestFailedAddr)(SPApiMMOrder *mm_order, long err_code, char *err_msg);
-typedef void (__stdcall *ApiQuoteRequestReceivedAddr)(char *product_code, char buy_sell, long qty);
+typedef void (SPDLLCALL *LoginReplyAddr)(long ret_code, char *ret_msg);
+typedef void (SPDLLCALL *ConnectedReplyAddr)(long host_type, long con_status);
+typedef void (SPDLLCALL *ApiOrderRequestFailedAddr)(tinyint action, SPApiOrder *order, long err_code, char *err_msg);
+typedef void (SPDLLCALL *ApiOrderReportAddr)(long rec_no, SPApiOrder *order);
+typedef void (SPDLLCALL *ApiOrderBeforeSendReportAddr)(SPApiOrder *order);
+typedef void (SPDLLCALL *AccountLoginReplyAddr)(char *accNo, long ret_code, char* ret_msg);
+typedef void (SPDLLCALL *AccountLogoutReplyAddr)(long ret_code, char* ret_msg);
+typedef void (SPDLLCALL *AccountInfoPushAddr)(SPApiAccInfo *acc_info);
+typedef void (SPDLLCALL *AccountPositionPushAddr)(SPApiPos *pos);
+typedef void (SPDLLCALL *UpdatedAccountPositionPushAddr)(SPApiPos *pos);
+typedef void (SPDLLCALL *UpdatedAccountBalancePushAddr)(SPApiAccBal *acc_bal);
+typedef void (SPDLLCALL *ApiTradeReportAddr)(long rec_no, SPApiTrade *trade);
+typedef void (SPDLLCALL *ApiPriceUpdateAddr)(SPApiPrice *price);
+typedef void (SPDLLCALL *ApiTickerUpdateAddr)(SPApiTicker *ticker);
+typedef void (SPDLLCALL *PswChangeReplyAddr)(long ret_code, char *ret_msg);
+typedef void (SPDLLCALL *ProductListByCodeReplyAddr)(char *inst_code, bool is_ready, char *ret_msg);
+typedef void (SPDLLCALL *InstrumentListReplyAddr)(bool is_ready, char *ret_msg);
+typedef void (SPDLLCALL *BusinessDateReplyAddr)(long business_date);
+typedef void (SPDLLCALL *ApiMMOrderBeforeSendReportAddr)(SPApiMMOrder *mm_order);
+typedef void (SPDLLCALL *ApiMMOrderRequestFailedAddr)(SPApiMMOrder *mm_order, long err_code, char *err_msg);
+typedef void (SPDLLCALL *ApiQuoteRequestReceivedAddr)(char *product_code, char buy_sell, long qty);
 
 void SPAPI_RegisterLoginReply(LoginReplyAddr addr);
 void SPAPI_RegisterConnectingReply(ConnectedReplyAddr addr);
@@ -344,10 +351,16 @@ int SPAPI_GetAllAccBalByArray(char *user_id, SPApiAccBal* apiAccBalList);
 int SPAPI_GetInstrumentByArray(SPApiInstrument* apiInstList);
 int SPAPI_GetProductByArray(SPApiProduct* apiProdList);
 
-""")
-ffi.dlopen(os.path.join(dll_location, "libeay32.dll"))
-ffi.dlopen(os.path.join(dll_location, "ssleay32.dll"))
-spapi = ffi.dlopen(os.path.join(dll_location, "spapidllm64.dll"))
+"""
+spapi = None
+if os.name == "nt":
+    ffi.cdef(spapi_cdef.replace("SPDLLCALL", "__stdcall"))
+    ffi.dlopen(os.path.join(dll_location, "libeay32.dll"))
+    ffi.dlopen(os.path.join(dll_location, "ssleay32.dll"))
+    spapi = ffi.dlopen(os.path.join(dll_location, "spapidllm64.dll"))
+else:
+    pass
+
 import cffi_to_dict
 # Remember to convert unicode strings to byte strings otherwise
 # ctypes will assume that the characters are wchars and not
