@@ -10,6 +10,8 @@ sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 
 import sptrader
 import config
+import cffi_to_dict
+
 cv = threading.Condition()
 login = config.logininfo;
 sp = sptrader.SPTrader()
@@ -31,12 +33,7 @@ def connected_reply_func(host_type, con_status):
 @sp.ffi.callback("AccountInfoPushAddr")
 def account_info_func(data):
     print("Account")
-    print(data[0].NAV)
-    print(sp.ffi.string(data[0].AccName))
-    print(sp.ffi.string(data[0].ClientId))
-    print(sp.ffi.string(data[0].AEId))
-    print(data[0].CreditLimit)
-    print(sp.ffi.string(data[0].MarginClass))
+    print(cffi_to_dict.convert_to_python(sp.ffi, data[0]))
 
 @sp.ffi.callback("InstrumentListReplyAddr")
 def instrument_list_reply_func(is_ready, ret_msg):
@@ -47,11 +44,7 @@ def instrument_list_reply_func(is_ready, ret_msg):
 @sp.ffi.callback("ApiPriceUpdateAddr")
 def api_price_update_func(data):
     print("api_price_update")
-    print(data[0].Close)
-    print(data[0].Last[0])
-    print(data[0].LastQty[0])
-    print(data[0].LastTime[0])
-    print(data[0].Timestamp)
+    print(cffi_to_dict.convert_to_python(sp.ffi, data[0]))
 
 @sp.ffi.callback("LoginReplyAddr")
 def login_actions(ret_code, ret_msg):
