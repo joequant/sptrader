@@ -359,7 +359,8 @@ if os.name == "nt":
     ffi.dlopen(os.path.join(dll_location, "ssleay32.dll"))
     spapi = ffi.dlopen(os.path.join(dll_location, "spapidllm64.dll"))
 else:
-    pass
+    ffi.cdef(spapi_cdef.replace("SPDLLCALL", ""))
+    spapi = ffi.dlopen(os.path.join(dll_location, "libapiwrapper.so"))
 
 import cffi_to_dict
 # Remember to convert unicode strings to byte strings otherwise
