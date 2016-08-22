@@ -368,6 +368,13 @@ class SPTrader(object):
             return {}
     def get_product_count(self):
         return self.api.SPAPI_GetInstrumentCount()
+    def get_product(self):
+        count = self.get_product_count()
+        buffer = self.ffi.new("SPApiProduct[%d]" % (count + 1))
+        if self.api.SPAPI_GetProductByArray(buffer) == 0:
+            return self.cdata_to_dict(buffer)
+        else:
+            return {}
     def get_acc_bal_count(self):
         return self.api.SPAPI_GetAccBalCount(self.user)
     def get_price_by_code(self, code):
