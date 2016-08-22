@@ -13,7 +13,7 @@ import config
 import cffi_to_dict
 
 cv = threading.Condition()
-login = config.logininfo;
+login = config.logininfo
 sp = sptrader.SPTrader()
 
 sp.set_login_info(login['host'],
@@ -23,19 +23,23 @@ sp.set_login_info(login['host'],
                   login['user_id'],
                   "test1")
 
+
 @sp.ffi.callback("ApiTickerUpdateAddr")
 def ticker_action(data):
     print("Ticker")
     print(sp.cdata_to_dict(data[0]))
-    
+
+
 @sp.ffi.callback("ConnectedReplyAddr")
 def connected_reply_func(host_type, con_status):
     print("connected", host_type, con_status)
+
 
 @sp.ffi.callback("AccountInfoPushAddr")
 def account_info_func(data):
     print("Account")
     print(sp.cdata_to_dict(data[0]))
+
 
 @sp.ffi.callback("InstrumentListReplyAddr")
 def instrument_list_reply_func(is_ready, ret_msg):
@@ -44,10 +48,12 @@ def instrument_list_reply_func(is_ready, ret_msg):
     print(sp.ffi.string(ret_msg))
     print(sp.get_instrument())
 
+
 @sp.ffi.callback("ApiPriceUpdateAddr")
 def api_price_update_func(data):
     print("api_price_update")
     print(sp.cdata_to_dict(data[0]))
+
 
 @sp.ffi.callback("LoginReplyAddr")
 def login_actions(ret_code, ret_msg):
@@ -60,8 +66,8 @@ def login_actions(ret_code, ret_msg):
     print(sp.subscribe_ticker("HSIU6", 1))
     print(sp.subscribe_ticker("HSIZ6", 1))
     print(sp.subscribe_ticker("HSIH7", 1))
-    print(sp.get_instrument_count());
-    print(sp.get_product_count());
+    print(sp.get_instrument_count())
+    print(sp.get_product_count())
 
 sp.register_login_reply(login_actions)
 sp.register_account_info_push(account_info_func)
