@@ -247,65 +247,103 @@ typedef struct
     double Rate;
 } SPApiCcyRate;
 
-typedef void (__stdcall *LoginReplyAddr)(long ret_code, char* ret_msg);
+typedef void (__stdcall *LoginReplyAddr)(long ret_code, char *ret_msg);
 typedef void (__stdcall *ConnectedReplyAddr)(long host_type, long con_status);
+typedef void (__stdcall *ApiOrderRequestFailedAddr)(tinyint action, SPApiOrder *order, long err_code, char *err_msg);
+typedef void (__stdcall *ApiOrderReportAddr)(long rec_no, SPApiOrder *order);
+typedef void (__stdcall *ApiOrderBeforeSendReportAddr)(SPApiOrder *order);
+typedef void (__stdcall *AccountLoginReplyAddr)(char *accNo, long ret_code, char* ret_msg);
+typedef void (__stdcall *AccountLogoutReplyAddr)(long ret_code, char* ret_msg);
+typedef void (__stdcall *AccountInfoPushAddr)(SPApiAccInfo *acc_info);
+typedef void (__stdcall *AccountPositionPushAddr)(SPApiPos *pos);
+typedef void (__stdcall *UpdatedAccountPositionPushAddr)(SPApiPos *pos);
+typedef void (__stdcall *UpdatedAccountBalancePushAddr)(SPApiAccBal *acc_bal);
+typedef void (__stdcall *ApiTradeReportAddr)(long rec_no, SPApiTrade *trade);
 typedef void (__stdcall *ApiPriceUpdateAddr)(SPApiPrice *price);
 typedef void (__stdcall *ApiTickerUpdateAddr)(SPApiTicker *ticker);
-typedef void (__stdcall *AccountLoginReplyAddr)(char *accNo, long ret_code, char* ret_msg);
-typedef void (__stdcall *AccountLogoutReplyAddr)(long ret_code, char *ret_msg);
-typedef void (__stdcall *AccountInfoPushAddr)(SPApiAccInfo *acc_info);
+typedef void (__stdcall *PswChangeReplyAddr)(long ret_code, char *ret_msg);
+typedef void (__stdcall *ProductListByCodeReplyAddr)(char *inst_code, bool is_ready, char *ret_msg);
 typedef void (__stdcall *InstrumentListReplyAddr)(bool is_ready, char *ret_msg);
-
-int SPAPI_SetLanguageId(int langid);
-int SPAPI_Initialize();
-void SPAPI_SetLoginInfo(char *host, int port, char *license, char *app_id, char *user_id, char *password);
-int SPAPI_Login();
-int SPAPI_GetLoginStatus(char *user_id, short host_id);
-int SPAPI_AddOrder(SPApiOrder *order);
-int SPAPI_ChangeOrder(SPApiOrder *order, double org_price, long org_qty);
-int SPAPI_GetOrderCount();
-int SPAPI_GetOrder(int idx, SPApiOrder *order);
-int SPAPI_DeleteOrder(SPApiOrder *order);
-
-int SPAPI_GetPosCount();
-int SPAPI_GetPos(int idx, SPApiPos *pos);
-int SPAPI_GetPosByProduct(char *prod_code, SPApiPos *pos);
-
-int SPAPI_GetTradeCount();
-int SPAPI_GetTrade(int idx, SPApiTrade *trade);
-int SPAPI_GetTradeByTradeNo(long int_order_no, bigint trade_no,
-    SPApiTrade *trade);
-
-int SPAPI_SubscribePrice(char *user_id, char *prod_code, int mode);
-int SPAPI_GetPriceByCode(char *user_id, char *prod_code, SPApiPrice *price);
-
-int SPAPI_LoadInstrumentList();
-
-int SPAPI_GetInstrumentCount();
-int SPAPI_GetInstrumentByArray(SPApiInstrument *apiInstList);
-int SPAPI_GetInstrumentByCode(char *inst_code, SPApiInstrument *inst);
-
-int SPAPI_GetProductCount();
-int SPAPI_GetProductByArray(SPApiProduct *apiProdList);
-int SPAPI_GetProductByCode(char *prod_code, SPApiProduct *prod);
-
-int SPAPI_GetAccBalCount(char *user);
-int SPAPI_GetAccBalByArray(SPApiAccBal *prod);
-int SPAPI_GetAccBalByCurrency(char *inst_code, SPApiAccBal *prod);
-
-int SPAPI_SubscribeTicker(char *user_id, char *prod_code, int mode);
-int SPAPI_GetAccInfo(char *user_id, SPApiAccInfo *acc_info);
-int SPAPI_Logout(char *user_id);
+typedef void (__stdcall *BusinessDateReplyAddr)(long business_date);
+typedef void (__stdcall *ApiMMOrderBeforeSendReportAddr)(SPApiMMOrder *mm_order);
+typedef void (__stdcall *ApiMMOrderRequestFailedAddr)(SPApiMMOrder *mm_order, long err_code, char *err_msg);
+typedef void (__stdcall *ApiQuoteRequestReceivedAddr)(char *product_code, char buy_sell, long qty);
 
 void SPAPI_RegisterLoginReply(LoginReplyAddr addr);
-void SPAPI_RegisterInstrumentListReply(InstrumentListReplyAddr addr);
-void SPAPI_RegisterAccountInfoPush(AccountInfoPushAddr addr);
-void SPAPI_RegisterApiPriceUpdate(ApiPriceUpdateAddr addr);
 void SPAPI_RegisterConnectingReply(ConnectedReplyAddr addr);
-void SPAPI_RegisterTickerUpdate(ApiTickerUpdateAddr addr);
+void SPAPI_RegisterOrderReport(ApiOrderReportAddr addr);
+void SPAPI_RegisterOrderRequestFailed(ApiOrderRequestFailedAddr addr);
+void SPAPI_RegisterOrderBeforeSendReport(ApiOrderBeforeSendReportAddr addr);
 void SPAPI_RegisterAccountLoginReply(AccountLoginReplyAddr addr);
 void SPAPI_RegisterAccountLogoutReply(AccountLogoutReplyAddr addr);
+void SPAPI_RegisterAccountInfoPush(AccountInfoPushAddr addr);
+void SPAPI_RegisterAccountPositionPush(AccountPositionPushAddr addr);
+void SPAPI_RegisterUpdatedAccountPositionPush(UpdatedAccountPositionPushAddr addr);
+void SPAPI_RegisterUpdatedAccountBalancePush(UpdatedAccountBalancePushAddr addr);
+void SPAPI_RegisterTradeReport(ApiTradeReportAddr addr);
+void SPAPI_RegisterApiPriceUpdate(ApiPriceUpdateAddr addr);
+void SPAPI_RegisterTickerUpdate(ApiTickerUpdateAddr addr);
+void SPAPI_RegisterPswChangeReply(PswChangeReplyAddr addr);
+void SPAPI_RegisterProductListByCodeReply(ProductListByCodeReplyAddr addr);
+void SPAPI_RegisterInstrumentListReply(InstrumentListReplyAddr addr);
+void SPAPI_RegisterBusinessDateReply(BusinessDateReplyAddr addr);
+void SPAPI_RegisterMMOrderRequestFailed(ApiMMOrderRequestFailedAddr addr);
+void SPAPI_RegisterMMOrderBeforeSendReport(ApiMMOrderBeforeSendReportAddr addr);
+void SPAPI_RegisterQuoteRequestReceivedReport(ApiQuoteRequestReceivedAddr addr);
+
+int  SPAPI_Initialize();
+void SPAPI_SetLoginInfo(char *host, int port, char *license, char *app_id, char *user_id, char *password);
+int  SPAPI_Login();
+int  SPAPI_GetLoginStatus(char *user_id, short host_id);
+int  SPAPI_AddOrder(SPApiOrder *order);
+int SPAPI_AddInactiveOrder(SPApiOrder* order);
+int SPAPI_ChangeOrder(char *user_id, SPApiOrder* order, double org_price, long org_qty);
+int SPAPI_ChangeOrderBy(char *user_id, char *acc_no, long accOrderNo, double org_price, long org_qty, double newPrice, long newQty);
+int SPAPI_DeleteOrderBy(char *user_id, char *acc_no, long accOrderNo, char* productCode, char* clOrderId);
+int SPAPI_DeleteAllOrders(char *user_id, char *acc_no);
+int SPAPI_ActivateAllOrders(char *user_id, char *acc_no);
+int SPAPI_InactivateAllOrders(char *user_id, char *acc_no);
+int SPAPI_ActivateOrderBy(char *user_id, char *acc_no, long accOrderNo);
+int SPAPI_InactivateOrderBy(char *user_id, char *acc_no, long accOrderNo);
+int  SPAPI_GetOrderCount(char *user_id, char* acc_no);
+int  SPAPI_GetOrderByOrderNo(char *user_id, char *acc_no, long int_order_no, SPApiOrder *order);
+int  SPAPI_GetPosCount(char *user_id);
+int  SPAPI_GetPosByProduct(char *user_id, char *prod_code, SPApiPos *pos);
 void SPAPI_Uninitialize();
+int SPAPI_Logout(char *user_id);
+int SPAPI_AccountLogin(char *user_id, char *acc_no);
+int SPAPI_AccountLogout(char *user_id, char *acc_no);
+int  SPAPI_GetTradeCount(char *user_id, char *acc_no);
+int SPAPI_SubscribePrice(char *user_id, char *prod_code, int mode);
+int SPAPI_SubscribeTicker(char *user_id, char *prod_code, int mode);
+int SPAPI_ChangePassword(char *user_id, char *old_password, char *new_password);
+int SPAPI_GetDllVersion(char *dll_ver_no, char *dll_rel_no, char *dll_suffix);
+int  SPAPI_GetAccBalCount(char* user_id);
+int  SPAPI_GetAccBalByCurrency(char *user_id, char *ccy, SPApiAccBal *acc_bal);
+int  SPAPI_GetCcyRateByCcy(char *user_id, char *ccy, double *rate);
+int SPAPI_GetAccInfo(char *user_id, SPApiAccInfo *acc_info);
+int SPAPI_GetPriceByCode(char *user_id, char *prod_code, SPApiPrice *price);
+int SPAPI_SetApiLogPath(char *path);
+
+int SPAPI_LoadProductInfoListByCode(char *inst_code);
+int SPAPI_GetProductCount();
+int SPAPI_GetProductByCode(char *prod_code, SPApiProduct *prod);
+
+int SPAPI_LoadInstrumentList();
+int SPAPI_GetInstrumentCount();
+int SPAPI_GetInstrumentByCode(char *inst_code, SPApiInstrument *inst);
+int SPAPI_SetLanguageId(int langid);
+
+int SPAPI_SendMarketMakingOrder(char *user_id, SPApiMMOrder *mm_order);
+int SPAPI_SubscribeQuoteRequest(char *user_id, char *prod_code, int mode);
+int SPAPI_SubscribeAllQuoteRequest(char *user_id, int mode);
+
+int SPAPI_GetAllTradesByArray(char *user_id, char *acc_no, SPApiTrade* apiTradeList);
+int SPAPI_GetOrdersByArray(char *user_id, char *acc_no, SPApiOrder* apiOrderList);
+int SPAPI_GetAllAccBalByArray(char *user_id, SPApiAccBal* apiAccBalList);
+int SPAPI_GetInstrumentByArray(SPApiInstrument* apiInstList);
+int SPAPI_GetProductByArray(SPApiProduct* apiProdList);
+
 """)
 ffi.dlopen(os.path.join(dll_location, "libeay32.dll"))
 ffi.dlopen(os.path.join(dll_location, "ssleay32.dll"))
