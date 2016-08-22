@@ -26,7 +26,8 @@ sp.set_login_info(login['host'],
 @sp.ffi.callback("ApiTickerUpdateAddr")
 def ticker_action(data):
     print("Ticker")
-
+    print(sp.cdata_to_dict(data[0]))
+    
 @sp.ffi.callback("ConnectedReplyAddr")
 def connected_reply_func(host_type, con_status):
     print("connected", host_type, con_status)
@@ -39,7 +40,7 @@ def account_info_func(data):
 @sp.ffi.callback("InstrumentListReplyAddr")
 def instrument_list_reply_func(is_ready, ret_msg):
     print("InstrumentListReply")
-    print(sp.ffi.string(is_ready))
+    print(is_ready)
     print(sp.ffi.string(ret_msg))
     print(sp.get_instrument_count());
 
