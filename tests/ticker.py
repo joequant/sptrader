@@ -38,8 +38,10 @@ def ticker_action(data):
 
 @sp.ffi.callback("LoginReplyAddr")
 def login_actions(ret_code, ret_msg):
-    print("login")
+    print("login %d '%s" % (ret_code, sp.ffi.string(ret_msg)))
     print(login['user_id'].encode("utf-8"))
+    if ret_code != 0:
+        return
     for i in instruments:
         sp.subscribe_ticker(i, 1)
 
