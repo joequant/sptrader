@@ -42,7 +42,7 @@ def instrument_list_reply_func(is_ready, ret_msg):
     print("InstrumentListReply")
     print(is_ready)
     print(sp.ffi.string(ret_msg))
-    print(sp.get_instrument_count());
+    print(sp.get_instrument())
 
 @sp.ffi.callback("ApiPriceUpdateAddr")
 def api_price_update_func(data):

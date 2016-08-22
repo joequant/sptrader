@@ -359,6 +359,13 @@ class SPTrader(object):
         return self.api.SPAPI_GetLoginStatus(self.user, status_id)
     def get_instrument_count(self):
         return self.api.SPAPI_GetInstrumentCount()
+    def get_instrument(self):
+        count = self.get_instrument_count()
+        buffer = self.ffi.new("SPApiInstrument[%d]" % (count + 1))
+        if self.api.SPAPI_GetInstrumentByArray(buffer) == 0:
+            return self.cdata_to_dict(buffer)
+        else:
+            return {}
     def get_product_count(self):
         return self.api.SPAPI_GetInstrumentCount()
     def get_acc_bal_count(self):
