@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 import sptrader
 import config
 cv = threading.Condition()
-login = config.logininfo;
+login = config.logininfo
 sp = sptrader.SPTrader()
 sp.set_login_info(login['host'],
                   login['port'],
