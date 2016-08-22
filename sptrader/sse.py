@@ -1,5 +1,7 @@
 import json
 # SSE "protocol" is described here: http://mzl.la/UPFyxY
+
+
 class ServerSentEvent(object):
     def __init__(self, data, event=None, id=None):
         self.data = json.dumps(data)

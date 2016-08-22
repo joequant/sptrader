@@ -1,5 +1,6 @@
 """
-From https://gist.github.com/inactivist/4ef7058c2132fa16759d#file-cffi_to_dict-py
+From
+https://gist.github.com/inactivist/4ef7058c2132fa16759d#file-cffi_to_dict-py
 
 Convert a CFFI cdata structure to Python dict.
 
@@ -20,32 +21,37 @@ Usage example:
 >>> foo.a = 10
 >>> foo.b = "Hey"
 >>> foo_elem = foo[0]
->>> foo_dict = convert_to_python(foo_elem)
->>> print foo_dict
+>>> ffi_convert = FfiConverter(ffi)
+>>> foo_dict = ffi_convert.to_dict(foo_elem)
+>>> print(foo_dict)
 
 {'a': 10, 'b': 'Hey'}
 """
+
+
 class FfiConverter(object):
     """Converts dict to and from ffi cdata objects"""
     def __init__(self, ffi):
         self.ffi = ffi
-    def __convert_struct_field( self, s, fields ):
-        for field,fieldtype in fields:
+
+    def __convert_struct_field(self, s, fields):
+        for field, fieldtype in fields:
             if fieldtype.type.kind == 'primitive':
-                yield (field, getattr( s, field ))
+                yield (field, getattr(s, field))
             else:
-                yield (field, self.to_dict( getattr( s, field ) ))
+                yield (field, self.to_dict(getattr(s, field)))
+
     def to_dict(self, s):
-        type=self.ffi.typeof(s)
+        type = self.ffi.typeof(s)
         if type.kind == 'struct':
-            return dict(self.__convert_struct_field( s, type.fields ) )
+            return dict(self.__convert_struct_field(s, type.fields))
         elif type.kind == 'array':
             if type.item.kind == 'primitive':
                 if type.item.cname == 'char':
                     return self.ffi.string(s)
                 else:
-                    return [ s[i] for i in range(type.length) ]
+                    return [s[i] for i in range(type.length)]
             else:
-                return [ self.to_dict(s[i]) for i in range(type.length) ]
+                return [self.to_dict(s[i]) for i in range(type.length)]
         elif type.kind == 'primitive':
             return int(s)
