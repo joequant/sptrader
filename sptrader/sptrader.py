@@ -310,7 +310,7 @@ void SPAPI_Uninitialize();
 ffi.dlopen(os.path.join(dll_location, "libeay32.dll"))
 ffi.dlopen(os.path.join(dll_location, "ssleay32.dll"))
 spapi = ffi.dlopen(os.path.join(dll_location, "spapidllm64.dll"))
-
+import cffi_to_dict
 # Remember to convert unicode strings to byte strings otherwise
 # ctypes will assume that the characters are wchars and not
 # ordinary characters
@@ -318,6 +318,7 @@ spapi = ffi.dlopen(os.path.join(dll_location, "spapidllm64.dll"))
 class SPTrader(object):
     ffi = ffi
     api = spapi
+    ffi_conv = cffi_to_dict.FfiConverter(ffi)
     def __init__(self):
         self.api.SPAPI_SetLanguageId(0)
         self.api.SPAPI_Initialize()
@@ -330,6 +331,12 @@ class SPTrader(object):
         self.api.SPAPI_RegisterConnectingReply(connected_reply_func)
     def register_instrument_list_reply(self, func):
         self.api.SPAPI_RegisterInstrumentListReply(func)
+    def register_api_price_update(self, func):
+        self.api.SPAPI_RegisterApiPriceUpdate(func)
+    def register_ticker_update(self, func):
+        self.api.SPAPI_RegisterTickerUpdate(func)
+    def load_instrument_list(self):
+        return self.api.SPAPI_LoadInstrumentList()
     def set_login_info(self,
                        host,
                        port,
@@ -350,11 +357,29 @@ class SPTrader(object):
         if self.user == None:
             return -1
         return self.api.SPAPI_GetLoginStatus(self.user, status_id)
+    def get_instrument_count(self):
+        return self.api.SPAPI_GetInstrumentCount()
+    def get_product_count(self):
+        return self.api.SPAPI_GetInstrumentCount()
+    def get_acc_bal_count(self):
+        return self.api.SPAPI_GetAccBalCount(self.user)
+    def get_price_by_code(self, code):
+        price = self.ffi.new("SPApiPrice[1]")
+        self.api.SPAPI_GetPriceByCode(self.user, code.encode("utf-8"), price)
+        return self.cdata_to_dict(price)
+    def subscribe_price(self, prod, value):
+        self.api.SPAPI_SubscribePrice(self.user,
+                                    prod.encode("utf-8"), value)
+    def subscribe_ticker(self, prod, value):
+        self.api.SPAPI_SubscribeTicker(self.user,
+                                     prod.encode("utf-8"), value)
     def logout(self):
         user = self.user
         if user != None:
             self.user = None
             return self.api.SPAPI_Logout(user)
+    def cdata_to_dict(self, s):
+        return self.ffi_conv.to_dict(s)
         
 #def cleanup():
 #    self.api.SPAPI_Uninitialize()

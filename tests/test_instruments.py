@@ -15,6 +15,7 @@ import cffi_to_dict
 cv = threading.Condition()
 login = config.logininfo;
 sp = sptrader.SPTrader()
+
 sp.set_login_info(login['host'],
                   8080,
                   login['license'],
@@ -33,44 +34,39 @@ def connected_reply_func(host_type, con_status):
 @sp.ffi.callback("AccountInfoPushAddr")
 def account_info_func(data):
     print("Account")
-    print(cffi_to_dict.convert_to_python(sp.ffi, data[0]))
+    print(sp.cdata_to_dict(data[0]))
 
 @sp.ffi.callback("InstrumentListReplyAddr")
 def instrument_list_reply_func(is_ready, ret_msg):
     print("InstrumentListReply")
+    print(sp.ffi.string(is_ready))
     print(sp.ffi.string(ret_msg))
-    print(sp.api.SPAPI_GetInstrumentCount());
+    print(sp.get_instrument_count());
 
 @sp.ffi.callback("ApiPriceUpdateAddr")
 def api_price_update_func(data):
     print("api_price_update")
-    print(cffi_to_dict.convert_to_python(sp.ffi, data[0]))
+    print(sp.cdata_to_dict(data[0]))
 
 @sp.ffi.callback("LoginReplyAddr")
 def login_actions(ret_code, ret_msg):
     print("login")
     print(login['user_id'].encode("utf-8"))
-    user = sp.ffi.new("char[]", login['user_id'].encode("utf-8"))
-    print(user)
-    price = sp.ffi.new("SPApiPrice[1]")
-    print("price", sp.api.SPAPI_GetPriceByCode(user, b"HSIQ6", price))
-    print(price[0].Close)
-    print(sp.api.SPAPI_GetAccBalCount(user))
-    print(sp.api.SPAPI_SubscribePrice(user, b"HSIQ6", 1))
-    print(sp.api.SPAPI_SubscribeTicker(
-        user,
-        b"HSIQ6", 1))
-    print(sp.api.SPAPI_GetInstrumentCount());
-    print(sp.api.SPAPI_GetProductCount());
-
+    print("instrument_list", sp.load_instrument_list())
+    print("price", sp.get_price_by_code("HSIQ6"))
+    print(sp.get_acc_bal_count())
+    print(sp.subscribe_price("HSIQ6", 1))
+    print(sp.subscribe_ticker("HSIQ6", 1))
+    print(sp.get_instrument_count());
+    print(sp.get_product_count());
 
 sp.register_login_reply(login_actions)
 sp.register_account_info_push(account_info_func)
 sp.register_connecting_reply(connected_reply_func)
 sp.register_instrument_list_reply(instrument_list_reply_func)
-sp.api.SPAPI_RegisterApiPriceUpdate(api_price_update_func)
-sp.api.SPAPI_RegisterTickerUpdate(ticker_action)
-print("instrument_list", sp.api.SPAPI_LoadInstrumentList());
+sp.register_api_price_update(api_price_update_func)
+sp.register_ticker_update(ticker_action)
 print(sp.login())
+
 input("Press any key to exit")
 sp.logout()

@@ -25,25 +25,27 @@ Usage example:
 
 {'a': 10, 'b': 'Hey'}
 """
-
-def __convert_struct_field( ffi, s, fields ):
-    for field,fieldtype in fields:
-        if fieldtype.type.kind == 'primitive':
-            yield (field,getattr( s, field ))
-        else:
-            yield (field, convert_to_python( ffi, getattr( s, field ) ))
-
-def convert_to_python(ffi, s):
-    type=ffi.typeof(s)
-    if type.kind == 'struct':
-        return dict(__convert_struct_field( ffi, s, type.fields ) )
-    elif type.kind == 'array':
-        if type.item.kind == 'primitive':
-            if type.item.cname == 'char':
-                return ffi.string(s)
+class FfiConverter(object):
+    """Converts dict to and from ffi cdata objects"""
+    def __init__(self, ffi):
+        self.ffi = ffi
+    def __convert_struct_field( self, s, fields ):
+        for field,fieldtype in fields:
+            if fieldtype.type.kind == 'primitive':
+                yield (field, getattr( s, field ))
             else:
-                return [ s[i] for i in range(type.length) ]
-        else:
-            return [ convert_to_python(ffi, s[i]) for i in range(type.length) ]
-    elif type.kind == 'primitive':
-        return int(s)
+                yield (field, self.to_dict( getattr( s, field ) ))
+    def to_dict(self, s):
+        type=self.ffi.typeof(s)
+        if type.kind == 'struct':
+            return dict(self.__convert_struct_field( s, type.fields ) )
+        elif type.kind == 'array':
+            if type.item.kind == 'primitive':
+                if type.item.cname == 'char':
+                    return self.ffi.string(s)
+                else:
+                    return [ s[i] for i in range(type.length) ]
+            else:
+                return [ self.to_dict(s[i]) for i in range(type.length) ]
+        elif type.kind == 'primitive':
+            return int(s)
