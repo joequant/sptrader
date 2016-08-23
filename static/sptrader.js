@@ -242,6 +242,7 @@ var SpTraderApp = React.createClass({
 	if (parseInt(data.host_type) == 80 &&
 	    parseInt(data.con_status) == 3) {
 	    this.setState({showModal: false});
+	    $.get("/get-account-info");
 	}
     },
     accountInfoPush: function(event) {
