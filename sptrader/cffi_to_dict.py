@@ -37,7 +37,11 @@ class FfiConverter(object):
     def __convert_struct_field(self, s, fields):
         for field, fieldtype in fields:
             if fieldtype.type.kind == 'primitive':
-                yield (field, getattr(s, field))
+                d = getattr(s, field)
+                if d == b'\x00':
+                    yield(field, '')
+                else:
+                    yield (field, d)
             else:
                 yield (field, self.to_dict(getattr(s, field)))
 
@@ -48,7 +52,11 @@ class FfiConverter(object):
         elif type.kind == 'array':
             if type.item.kind == 'primitive':
                 if type.item.cname == 'char':
-                    return self.ffi.string(s)
+                    d = self.ffi.string(s).decode('ascii')
+                    if d == b'\x00':
+                        return ''
+                    else:
+                        return d
                 else:
                     return [s[i] for i in range(type.length)]
             else:
