@@ -416,6 +416,18 @@ class SPTrader(object):
     def register_ticker_update(self, func):
         self.api.SPAPI_RegisterTickerUpdate(func)
 
+    def register_account_position_push(self, func):
+        self.api.SPAPI_RegisterAccountPositionPush(func)
+
+    def register_trade_report(self, func):
+        self.api.SPAPI_RegisterTradeReport(func)
+
+    def register_ticker_update(self, func):
+        self.api.SPAPI_RegisterTickerUpdate(func)
+
+    def register_product_list_by_code_reply(self, func):
+        self.api.SPAPI_RegisterProductListByCodeReply(func)
+
     def load_instrument_list(self):
         return self.api.SPAPI_LoadInstrumentList()
 

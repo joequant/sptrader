@@ -60,18 +60,60 @@ def connected_reply(host_type, con_status):
 sp.register_connecting_reply(connected_reply)
 
 
-@sp.ffi.callback("AccountInfoPushAddr")
-def account_info_push(data):
-    msg = {
-        "id": "AccountInfoPush",
-        "NAV": data[0].NAV,
-        "CreditLimit": data[0].CreditLimit,
-        "ClientId": sp.ffi.string(data[0].ClientId).decode('utf-8'),
-        "MarginClass": sp.ffi.string(data[0].MarginClass).decode('utf-8')
-        }
+def send_data(id, data):
+    msg = sp.cdata_to_dict(data[0])
+    msg["id"] = id
     for sub in subscriptions[:]:
         sub.put(msg)
+
+
+@sp.ffi.callback("AccountInfoPushAddr")
+def account_info_push(data):
+    send_data("AccountInfoPush", data)
 sp.register_account_info_push(account_info_push)
+
+
+@sp.ffi.callback("AccountPositionPushAddr")
+def account_position_push(data):
+    send_data("AccountPositionPush", data)
+sp.register_account_position_push(account_position_push)
+
+
+@sp.ffi.callback("ApiTradeReportAddr")
+def trade_report(data):
+    send_data("ApiTradeReport", data)
+sp.register_trade_report(trade_report)
+
+
+@sp.ffi.callback("ApiPriceUpdateAddr")
+def api_price_update(data):
+    send_data("ApiPriceUpdate", data)
+sp.register_api_price_update(api_price_update)
+
+
+@sp.ffi.callback("ApiTickerUpdateAddr")
+def ticker_update(data):
+    send_data("ApiTickerUpdate", data)
+sp.register_ticker_update(ticker_update)
+
+
+@sp.ffi.callback("InstrumentListReplyAddr")
+def instrument_list_reply(is_ready, ret_msg):
+    data = {"is_ready": is_ready,
+            "ret_msg": ret_msg,
+            "data": sp.get_instrument()}
+    send_data("InstrumentListReply", data)
+
+
+@sp.ffi.callback("ProductListByCodeReplyAddr")
+def product_list_by_code(inst_code, is_ready, ret_msg):
+    data = {
+        "inst_code": inst_code,
+        "is_ready": is_ready,
+        "ret_msg": ret_msg,
+        "data": sp.get_product()}
+    send_data("ProductListByCode", data)
+sp.register_product_list_by_code_reply(product_list_by_code)
 
 
 @app.route("/login", methods=['POST'])
