@@ -156,6 +156,31 @@ def logout():
     return "OK"
 
 
+@app.route("/subscribe-ticker/<string:product>")
+def subscribe_ticker(product):
+    sp.subscribe_ticker(product, 1)
+
+
+@app.route("/unsubscribe-ticker/<string:product>")
+def unsubscribe_ticker(product):
+    sp.subscribe_ticker(product, 0)
+
+
+@app.route("/subscribe-price/<string:product>")
+def subscribe_price(product):
+    sp.subscribe_price(product, 1)
+
+
+@app.route("/unsubscribe-price/<string:product>")
+def unsubscribe_price(product):
+    sp.unsubscribe_price(product, 0)
+
+
+@app.route("/get-account-info")
+def get_account_info():
+    sp.get_acc_bal_count()
+
+
 @app.route("/subscribe")
 def subscribe():
     def gen():
