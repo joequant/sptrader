@@ -34,6 +34,7 @@ def login_actions(ret_code, ret_msg):
 sp.register_login_reply(login_actions)
 
 cv.acquire()
+print(sp.fields("SPApiOrder"))
 print(sp.login())
 cv.wait()
 cv.release()

@@ -501,6 +501,8 @@ class SPTrader(object):
     def cdata_to_py(self, s):
         return self.ffi_conv.to_py(s)
 
+    def fields(self, s):
+        return self.ffi_conv.fields(s)
 # def cleanup():
 #     self.api.SPAPI_Uninitialize()
 

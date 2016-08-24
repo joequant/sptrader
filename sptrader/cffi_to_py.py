@@ -45,6 +45,14 @@ class FfiConverter(object):
             else:
                 yield (field, self.to_py(getattr(s, field)))
 
+    def fields(self, s):
+        type = self.ffi.typeof(s)
+        if type.kind == 'struct':
+            return [x[0] for x in type.fields]
+        else:
+            return []
+
+
     def to_py(self, s):
         type = self.ffi.typeof(s)
         if type.kind == 'struct':

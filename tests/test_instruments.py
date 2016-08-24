@@ -39,7 +39,7 @@ def connected_reply_func(host_type, con_status):
 def account_info_func(data):
     print("Account")
     print(sp.cdata_to_py(data[0]))
-
+    print(sp.fields(data[0]))
 
 @sp.ffi.callback("InstrumentListReplyAddr")
 def instrument_list_reply_func(is_ready, ret_msg):
