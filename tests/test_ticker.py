@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 
 import sptrader
 import config
-import cffi_to_dict
+import cffi_to_py
 
 cv = threading.Condition()
 login = config.logininfo
@@ -27,7 +27,7 @@ sp.set_login_info(login['host'],
 @sp.ffi.callback("ApiTickerUpdateAddr")
 def ticker_action(data):
     print("Ticker")
-    print(sp.cdata_to_dict(data[0]))
+    print(sp.cdata_to_py(data[0]))
 
 
 @sp.ffi.callback("ConnectedReplyAddr")
@@ -38,21 +38,21 @@ def connected_reply_func(host_type, con_status):
 @sp.ffi.callback("AccountInfoPushAddr")
 def account_info_func(data):
     print("Account")
-    print(sp.cdata_to_dict(data[0]))
+    print(sp.cdata_to_py(data[0]))
 
 
 @sp.ffi.callback("InstrumentListReplyAddr")
 def instrument_list_reply_func(is_ready, ret_msg):
     print("InstrumentListReply")
     print(is_ready)
-    print(sp.ffi.string(ret_msg))
+    print(sp.cdata_to_py(ret_msg))
     print(sp.get_instrument())
 
 
 @sp.ffi.callback("ApiPriceUpdateAddr")
 def api_price_update_func(data):
     print("api_price_update")
-    print(sp.cdata_to_dict(data[0]))
+    print(sp.cdata_to_py(data[0]))
 
 
 @sp.ffi.callback("LoginReplyAddr")

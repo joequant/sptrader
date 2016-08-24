@@ -1,6 +1,6 @@
 """
 From
-https://gist.github.com/inactivist/4ef7058c2132fa16759d#file-cffi_to_dict-py
+https://gist.github.com/inactivist/4ef7058c2132fa16759d#file-cffi_to_py-py
 
 Convert a CFFI cdata structure to Python dict.
 
@@ -22,7 +22,7 @@ Usage example:
 >>> foo.b = "Hey"
 >>> foo_elem = foo[0]
 >>> ffi_convert = FfiConverter(ffi)
->>> foo_dict = ffi_convert.to_dict(foo_elem)
+>>> foo_dict = ffi_convert.to_py(foo_elem)
 >>> print(foo_dict)
 
 {'a': 10, 'b': 'Hey'}
@@ -43,9 +43,9 @@ class FfiConverter(object):
                 else:
                     yield (field, d)
             else:
-                yield (field, self.to_dict(getattr(s, field)))
+                yield (field, self.to_py(getattr(s, field)))
 
-    def to_dict(self, s):
+    def to_py(self, s):
         type = self.ffi.typeof(s)
         if type.kind == 'struct':
             return dict(self.__convert_struct_field(s, type.fields))
@@ -60,6 +60,6 @@ class FfiConverter(object):
                 else:
                     return [s[i] for i in range(type.length)]
             else:
-                return [self.to_dict(s[i]) for i in range(type.length)]
+                return [self.to_py(s[i]) for i in range(type.length)]
         elif type.kind == 'primitive':
             return int(s)

@@ -2,7 +2,7 @@ from cffi import FFI
 import atexit
 import os
 import struct
-import cffi_to_dict
+import cffi_to_py
 
 if 8 * struct.calcsize("P") != 64:
     print("sptrader only supported for 64 bit")
@@ -391,7 +391,7 @@ else:
 class SPTrader(object):
     ffi = ffi
     api = spapi
-    ffi_conv = cffi_to_dict.FfiConverter(ffi)
+    ffi_conv = cffi_to_py.FfiConverter(ffi)
 
     def __init__(self):
         self.api.SPAPI_SetLanguageId(0)
@@ -461,7 +461,7 @@ class SPTrader(object):
         count = self.get_instrument_count()
         buffer = self.ffi.new("SPApiInstrument[%d]" % (count + 1))
         if self.api.SPAPI_GetInstrumentByArray(buffer) == 0:
-            return self.cdata_to_dict(buffer)
+            return self.cdata_to_py(buffer)
         else:
             return {}
 
@@ -472,7 +472,7 @@ class SPTrader(object):
         count = self.get_product_count()
         buffer = self.ffi.new("SPApiProduct[%d]" % (count + 1))
         if self.api.SPAPI_GetProductByArray(buffer) == 0:
-            return self.cdata_to_dict(buffer)
+            return self.cdata_to_py(buffer)
         else:
             return {}
 
@@ -482,7 +482,7 @@ class SPTrader(object):
     def get_price_by_code(self, code):
         price = self.ffi.new("SPApiPrice[1]")
         self.api.SPAPI_GetPriceByCode(self.user, code.encode("utf-8"), price)
-        return self.cdata_to_dict(price)
+        return self.cdata_to_py(price)
 
     def subscribe_price(self, prod, value):
         self.api.SPAPI_SubscribePrice(self.user,
@@ -498,8 +498,8 @@ class SPTrader(object):
             self.user = None
             return self.api.SPAPI_Logout(user)
 
-    def cdata_to_dict(self, s):
-        return self.ffi_conv.to_dict(s)
+    def cdata_to_py(self, s):
+        return self.ffi_conv.to_py(s)
 
 # def cleanup():
 #     self.api.SPAPI_Uninitialize()

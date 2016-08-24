@@ -61,7 +61,7 @@ sp.register_connecting_reply(connected_reply)
 
 
 def send_data(id, data):
-    msg = sp.cdata_to_dict(data[0])
+    msg = sp.cdata_to_py(data[0])
     msg["id"] = id
     for sub in subscriptions[:]:
         sub.put(msg)

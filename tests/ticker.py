@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 
 import sptrader
 import config
-import cffi_to_dict
+import cffi_to_py
 
 parser = argparse.ArgumentParser(description="Generate ticker.")
 parser.add_argument('--outfile')
@@ -33,7 +33,7 @@ sp.set_login_info(login['host'],
 @sp.ffi.callback("ApiTickerUpdateAddr")
 def ticker_action(data):
     print("Ticker")
-    print(sp.cdata_to_dict(data[0]))
+    print(sp.cdata_to_py(data[0]))
 
 
 @sp.ffi.callback("LoginReplyAddr")
@@ -42,6 +42,7 @@ def login_actions(ret_code, ret_msg):
     print(login['user_id'].encode("utf-8"))
     if ret_code != 0:
         return
+    print (instruments)
     for i in instruments:
         sp.subscribe_ticker(i, 1)
 
