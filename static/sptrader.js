@@ -3,6 +3,7 @@ var ReactDOM = require('react-dom');
 var DataGrid = require('react-datagrid');
 var ReactBootstrap = require('react-bootstrap');
 var ReactAddonsLinkedStateMixin = require('react-addons-linked-state-mixin');
+import {AgGridReact} from 'ag-grid-react';
 
 var Tabs = ReactBootstrap.Tabs;
 var Tab = ReactBootstrap.Tab;
@@ -204,7 +205,13 @@ var SpTraderApp = React.createClass({
 	return {
 	    log: '',
 	    loginLabel: '',
-	    showModal: true
+	    showModal: true,
+	    columnDefs: [
+		{headerName: "Name",
+		 field: "name",
+		 enableRowGroup: true, enablePivot: true,
+		 width: 150, pinned: true}],
+	    rowData: [{name: "foobar"}]
 	};
     },
     submitModal: function(data) {
@@ -270,10 +277,21 @@ var SpTraderApp = React.createClass({
 	<Button bsStyle="success" onClick={publish}>Ping</Button>
 	</ButtonToolbar>
 	<SubscribeBox url="/subscribe" event={events} />
-	<FormControl componentClass="textarea" value={this.state.log} />
-	<DataGrid
-    idProperty='id' emptyText={'No records'} columns={columns} dataSource={data} style={{height:400}} />
+		<FormControl componentClass="textarea" value={this.state.log} />
+		<div className="ag-material">
+		<AgGridReact
+	    // column definitions and row data are immutable, the grid
+	    // will update when these lists change
+	    columnDefs={this.state.columnDefs}
+	    rowData={this.state.rowData}
 
+	    // or provide props the old way with no binding
+	    rowSelection="multiple"
+	    enableSorting="true"
+	    enableFilter="true"
+                   rowHeight="22"
+		/>
+		</div>
     </Tab>
 </Tabs>
 	)

@@ -1,6 +1,6 @@
 {
     "name" : "Sptrader",
-    "version" : "0.0.2",
+    "version" : "0.0.3",
     "author" : "Joseph C Wang <joequant@gmail.com>",
     "license" : "BSD-2-Clause",
     "repository" : {
@@ -12,7 +12,9 @@
 	"react-dom" : "15.x",
 	"react-datagrid" : "latest",
 	"react-bootstrap" : "latest",
-	"react-addons-linked-state-mixin" : "latest"
+	"react-addons-linked-state-mixin" : "latest",
+	"ag-grid": "latest",
+	"ag-grid-react": "latest"
     },
     "devDependencies" : {
 	"browserify" : "latest",
