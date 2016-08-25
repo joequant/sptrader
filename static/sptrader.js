@@ -9,6 +9,7 @@ import SampleTable from './tables/sample-table';
 import OrderTable from './tables/order-table';
 import PositionTable from './tables/position-table';
 import TradeTable from './tables/trade-table';
+import AccountTable from './tables/account-table';
 
 var Tabs = ReactBootstrap.Tabs;
 var Tab = ReactBootstrap.Tab;
@@ -170,7 +171,7 @@ var SpTraderApp = React.createClass({
 	    "AccountInfoPush" : this.accountInfoPush
 	}
 	return(
-	<Tabs id="tabs">
+		<Tabs id="tabs">
 		<Tab eventKey={1} title="Login">
 		<LoginForm show={this.state.showModal}
 	    label={this.state.loginLabel}
@@ -178,18 +179,23 @@ var SpTraderApp = React.createClass({
 		<Button bsStyle="success" onClick={this.logout}>Logout</Button>
 		<ConnectionTable />
 		<Tabs id="tab1">
-		<Tab eventKey={1} title="Order">
+		<Tab eventKey={1} title="Account">
+		<AccountTable />
+		</Tab>
+		<Tab eventKey={2} title="Order">
 		<OrderTable />
 		</Tab>
-		<Tab eventKey={2} title="Position">
+		<Tab eventKey={3} title="Position">
 		<PositionTable />
 		</Tab>
-		<Tab eventKey={3} title="Trade">
+		<Tab eventKey={4} title="Trade">
 		<TradeTable />
 		</Tab>
 		</Tabs>
-    </Tab>
-    <Tab eventKey={2} title="Scratchpad">
+		</Tab>
+		<Tab eventKey={2} title="Strategies">
+		</Tab>
+    <Tab eventKey={3} title="Scratchpad">
       <ButtonToolbar>
 	<Button bsStyle="success" onClick={publish}>Ping</Button>
 	</ButtonToolbar>
