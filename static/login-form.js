@@ -1,4 +1,20 @@
 import React from 'react';
+var ReactBootstrap = require('react-bootstrap');
+var Modal = ReactBootstrap.Modal;
+var Button = ReactBootstrap.Button;
+var FormControl = ReactBootstrap.FormControl;
+var FormGroup = ReactBootstrap.FormGroup;
+var ControlLabel = ReactBootstrap.ControlLabel;
+var HelpBlock = ReactBootstrap.HelpBlock;
+function FieldGroup({ id, label, help, ...props }) {
+  return (
+    <div>
+      <label>{label}</label>
+      <FormControl {...props} />
+      {help && <HelpBlock>{help}</HelpBlock>}
+    </div>
+  );
+}
 
 var LoginForm = React.createClass({
     getInitialState: function() {

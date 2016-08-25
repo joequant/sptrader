@@ -4,6 +4,7 @@ var ReactBootstrap = require('react-bootstrap');
 var ReactAddonsLinkedStateMixin = require('react-addons-linked-state-mixin');
 import {AgGridReact} from 'ag-grid-react';
 import LoginForm from './login-form';
+import ConnectionTable from './connection-table';
 
 var Tabs = ReactBootstrap.Tabs;
 var Tab = ReactBootstrap.Tab;
@@ -13,7 +14,6 @@ var FormControl = ReactBootstrap.FormControl;
 var FormGroup = ReactBootstrap.FormGroup;
 var ControlLabel = ReactBootstrap.ControlLabel;
 var HelpBlock = ReactBootstrap.HelpBlock;
-var Modal = ReactBootstrap.Modal;
 
 var SubscribeBox = React.createClass( {
     getInitialState: function() {
@@ -177,7 +177,8 @@ var SpTraderApp = React.createClass({
 		<LoginForm show={this.state.showModal}
 	    label={this.state.loginLabel}
 	    onSubmit={this.submitModal}/>
-	<Button bsStyle="success" onClick={this.logout}>Logout</Button>
+		<Button bsStyle="success" onClick={this.logout}>Logout</Button>
+		<ConnectionTable />
     </Tab>
     <Tab eventKey={2} title="Scratchpad">
       <ButtonToolbar>
