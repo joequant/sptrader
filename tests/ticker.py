@@ -43,13 +43,18 @@ def login_actions(ret_code, ret_msg):
     if ret_code != 0:
         return
     print (instruments)
-    for i in instruments:
-        sp.subscribe_ticker(i, 1)
+
+@sp.ffi.callback("ConnectedReplyAddr")
+def connected_reply_func(host_type, con_status):
+    print("connected", host_type, con_status)
+    if host_type == 83 and con_status == 2:
+        for i in instruments:
+            sp.subscribe_ticker(i, 1)
 
 
-sp.register_login_reply(login_actions)
 sp.register_ticker_update(ticker_action)
+sp.register_login_reply(login_actions)
+sp.register_connecting_reply(connected_reply_func)
 print(sp.login())
-
 input("Press any key to exit")
 sp.logout()

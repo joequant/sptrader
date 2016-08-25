@@ -33,6 +33,12 @@ def ticker_action(data):
 @sp.ffi.callback("ConnectedReplyAddr")
 def connected_reply_func(host_type, con_status):
     print("connected", host_type, con_status)
+    if host_type == 83 and con_status == 2:
+        sp.register_ticker_update(ticker_action)
+        print(sp.subscribe_ticker("HSIQ6", 1))
+        print(sp.subscribe_ticker("HSIU6", 1))
+        print(sp.subscribe_ticker("HSIZ6", 1))
+        print(sp.subscribe_ticker("HSIH7", 1))
 
 
 @sp.ffi.callback("AccountInfoPushAddr")
@@ -62,10 +68,6 @@ def login_actions(ret_code, ret_msg):
     print("instrument_list", sp.load_instrument_list())
     print("price", sp.get_price_by_code("HSIQ6"))
     print(sp.get_acc_bal_count())
-    print(sp.subscribe_ticker("HSIQ6", 1))
-    print(sp.subscribe_ticker("HSIU6", 1))
-    print(sp.subscribe_ticker("HSIZ6", 1))
-    print(sp.subscribe_ticker("HSIH7", 1))
     print(sp.get_instrument_count())
     print(sp.get_product_count())
 
@@ -74,7 +76,7 @@ sp.register_account_info_push(account_info_func)
 sp.register_connecting_reply(connected_reply_func)
 sp.register_instrument_list_reply(instrument_list_reply_func)
 sp.register_api_price_update(api_price_update_func)
-sp.register_ticker_update(ticker_action)
+
 print(sp.login())
 
 input("Press any key to exit")
