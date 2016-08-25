@@ -201,7 +201,7 @@ var SpTraderApp = React.createClass({
 		/>
 		</div>
     </Tab>
-</Tabs>
+		</Tabs>
 	)
     }
 });

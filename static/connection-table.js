@@ -26,7 +26,6 @@ var ConnectionTable = React.createClass({
     },
     render: function() {
 	return (
-	    	<div className="ag-material">
 		<AgGridReact
 	    // column definitions and row data are immutable, the grid
 	    // will update when these lists change
@@ -39,7 +38,6 @@ var ConnectionTable = React.createClass({
 	    enableFilter="true"
                    rowHeight="22"
 		/>
-		</div>
 	)
     }
 });
