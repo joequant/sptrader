@@ -6,6 +6,9 @@ import {AgGridReact} from 'ag-grid-react';
 import LoginForm from './login-form';
 import ConnectionTable from './tables/connection-table';
 import SampleTable from './tables/sample-table';
+import OrderTable from './tables/order-table';
+import PositionTable from './tables/position-table';
+import TradeTable from './tables/trade-table';
 
 var Tabs = ReactBootstrap.Tabs;
 var Tab = ReactBootstrap.Tab;
@@ -174,6 +177,17 @@ var SpTraderApp = React.createClass({
 	    onSubmit={this.submitModal}/>
 		<Button bsStyle="success" onClick={this.logout}>Logout</Button>
 		<ConnectionTable />
+		<Tabs id="tab1">
+		<Tab eventKey={1} title="Order">
+		<OrderTable />
+		</Tab>
+		<Tab eventKey={2} title="Position">
+		<PositionTable />
+		</Tab>
+		<Tab eventKey={3} title="Trade">
+		<TradeTable />
+		</Tab>
+		</Tabs>
     </Tab>
     <Tab eventKey={2} title="Scratchpad">
       <ButtonToolbar>
