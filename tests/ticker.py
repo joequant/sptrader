@@ -32,7 +32,6 @@ sp.set_login_info(login['host'],
 
 @sp.ffi.callback("ApiTickerUpdateAddr")
 def ticker_action(data):
-    print("Ticker")
     print(sp.cdata_to_py(data[0]))
 
 
@@ -48,11 +47,10 @@ def login_actions(ret_code, ret_msg):
 def connected_reply_func(host_type, con_status):
     print("connected", host_type, con_status)
     if host_type == 83 and con_status == 2:
+        sp.register_ticker_update(ticker_action)
         for i in instruments:
             sp.subscribe_ticker(i, 1)
 
-
-sp.register_ticker_update(ticker_action)
 sp.register_login_reply(login_actions)
 sp.register_connecting_reply(connected_reply_func)
 print(sp.login())

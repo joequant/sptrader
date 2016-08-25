@@ -1,3 +1,6 @@
+# Note: It appears that for tickers to work that you have to register
+# them only when the transaction connection is ready
+
 import cffi
 import os
 import sys
