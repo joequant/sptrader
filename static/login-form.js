@@ -1,11 +1,7 @@
 import React from 'react';
-var ReactBootstrap = require('react-bootstrap');
-var Modal = ReactBootstrap.Modal;
-var Button = ReactBootstrap.Button;
-var FormControl = ReactBootstrap.FormControl;
-var FormGroup = ReactBootstrap.FormGroup;
-var ControlLabel = ReactBootstrap.ControlLabel;
-var HelpBlock = ReactBootstrap.HelpBlock;
+import {Modal, Button, FormControl, FormGroup,
+	ControlLabel, HelpBlock} from 'react-bootstrap';
+
 function FieldGroup({ id, label, help, ...props }) {
   return (
     <div>

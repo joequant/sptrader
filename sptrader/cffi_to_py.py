@@ -60,11 +60,14 @@ class FfiConverter(object):
         elif type.kind == 'array':
             if type.item.kind == 'primitive':
                 if type.item.cname == 'char':
-                    d = self.ffi.string(s).decode('ascii')
-                    if d == b'\x00':
+                    try:
+                        d = self.ffi.string(s).decode('ascii')
+                        if d == b'\x00':
+                            return ''
+                        else:
+                            return d
+                    except:
                         return ''
-                    else:
-                        return d
                 else:
                     return [s[i] for i in range(type.length)]
             else:

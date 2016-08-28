@@ -110,6 +110,7 @@ var SpTraderApp = React.createClass({
 	return {
 	    log: '',
 	    loginLabel: '',
+	    account_info: {},
 	    showModal: true
 	};
     },
@@ -155,6 +156,7 @@ var SpTraderApp = React.createClass({
 	data = JSON.parse(event.data);
 	console.log(data);
 	this.setState({log: this.state.log + event.data + "\n"});
+	this.setState({account_info: data});
     },
     render: function() {
 	var events = {
@@ -173,7 +175,7 @@ var SpTraderApp = React.createClass({
 		<ConnectionTable />
 		<Tabs id="tab1">
 		<Tab eventKey={1} title="Account">
-		<AccountTable />
+		<AccountTable data={this.state.account_info} />
 		</Tab>
 		<Tab eventKey={2} title="Order">
 		<OrderTable />
