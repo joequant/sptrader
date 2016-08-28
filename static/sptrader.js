@@ -111,6 +111,7 @@ var SpTraderApp = React.createClass({
 	    log: '',
 	    loginLabel: '',
 	    account_info: {},
+	    connection_info: {},
 	    showModal: true
 	};
     },
@@ -146,8 +147,13 @@ var SpTraderApp = React.createClass({
 	data = JSON.parse(event.data);
 	console.log(data);
 	this.setState({log: this.state.log + event.data + "\n"});
-	if (parseInt(data.host_type) == 80 &&
-	    parseInt(data.con_status) == 3) {
+	var conn_info = this.state.connection_info;
+	var host_type = parseInt(data.host_type);
+	var con_status = parseInt(data.con_status);
+	conn_info[host_type] = con_status;
+	this.setState({conn_info: conn_info})
+	if (parseInt(host_type) == 80 &&
+	    parseInt(con_status) == 3) {
 	    this.setState({showModal: false});
 	    $.get("/get-account-info");
 	}
@@ -172,7 +178,7 @@ var SpTraderApp = React.createClass({
 	    label={this.state.loginLabel}
 	    onSubmit={this.submitModal}/>
 		<Button bsStyle="success" onClick={this.logout}>Logout</Button>
-		<ConnectionTable />
+		<ConnectionTable data={this.state.connection_info}/>
 		<Tabs id="tab1">
 		<Tab eventKey={1} title="Account">
 		<AccountTable data={this.state.account_info} />

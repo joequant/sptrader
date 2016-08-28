@@ -13,30 +13,26 @@ var ConnectionTable = React.createClass({
 	     enableRowGroup: true, enablePivot: true,
 	     width: 150, pinned: true}
 	    ],
-	    rowData: [{link: "Transaction Link",
-		       status: ''},
-		      {link: "Price Link",
-		      status: ''},
-		      {link: "Long Depth Link",
-		      status: ''},
-		      {link: "Information Link",
-		      status: ''}
-		 ]
+	    ports: [80, 81, 83, 88],
+	    titles: {80: "Transaction Link",
+		     81: "Price Link",
+		     83: "Long Depth Link",
+		     88: "Information Link"}
 	};
     },
     render: function() {
+	var rowData = [];
+	var ports = this.state.ports;
+	for (var i=0, length=ports.length; i < length; i++) {
+	    rowData.push({link: this.state.titles[ports[i]],
+			  status: this.props.data[ports[i]]})
+	};
 	return (
 		<AgGridReact
 	    // column definitions and row data are immutable, the grid
 	    // will update when these lists change
 	    columnDefs={this.state.columnDefs}
-	    rowData={this.state.rowData}
-
-	    // or provide props the old way with no binding
-	    rowSelection="multiple"
-	    enableSorting="true"
-	    enableFilter="true"
-                   rowHeight="22"
+	    rowData={rowData}
 		/>
 	)
     }
