@@ -109,7 +109,7 @@ console.log("New SPTrader");
 var SpTraderApp = React.createClass({
     getInitialState: function() {
 	var l = this;
-	$.getJSON("/get-login-status/80", function(d) {
+	$.getJSON("/login-status/80", function(d) {
 	    if (parseInt(d) != -1) {
 		l.setState({showModal: false});
 	    }
@@ -195,14 +195,14 @@ var SpTraderApp = React.createClass({
 		</Tab>
 		<Tab eventKey={2} title="Strategies">
 		</Tab>
-    <Tab eventKey={3} title="Scratchpad">
-      <ButtonToolbar>
-	<Button bsStyle="success" onClick={publish}>Ping</Button>
-	</ButtonToolbar>
-	<SubscribeBox url="/subscribe" event={events} />
+		<Tab eventKey={3} title="Scratchpad">
+		<ButtonToolbar>
+		<Button bsStyle="success" onClick={publish}>Ping</Button>
+		</ButtonToolbar>
+		<SubscribeBox url="/log/subscribe" event={events} />
 		<FormControl componentClass="textarea" value={this.state.log} />
 		<SampleTable/>
-    </Tab>
+		</Tab>
 		</Tabs>
 	)
     }

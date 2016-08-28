@@ -398,6 +398,12 @@ class SPTrader(object):
         self.api.SPAPI_Initialize()
         self.user = None
 
+    def ready(self):
+        if self.user is None:
+            return -1
+        else:
+            return 0
+
     def register_login_reply(self, login_reply_func):
         self.api.SPAPI_RegisterLoginReply(login_reply_func)
 

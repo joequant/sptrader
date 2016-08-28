@@ -14,7 +14,8 @@ from sse import ServerSentEvent
 import sptrader
 
 sp = sptrader.SPTrader()
-subscriptions = []
+log_subscriptions = []
+tickers = []
 app = Flask(__name__,
             static_url_path="/static",
             static_folder=os.path.join(location, "..",
@@ -43,27 +44,15 @@ def login_reply(ret_code, ret_msg):
         "ret_code": ret_code,
         "ret_msg": ret_msg
         }
-    for sub in subscriptions[:]:
+    for sub in log_subscriptions[:]:
         sub.put(msg)
 sp.register_login_reply(login_reply)
-
-
-@sp.ffi.callback("ConnectedReplyAddr")
-def connected_reply(host_type, con_status):
-    msg = {
-        "id": "ConnectedReply",
-        "host_type": host_type,
-        "con_status": con_status
-        }
-    for sub in subscriptions[:]:
-        sub.put(msg)
-sp.register_connecting_reply(connected_reply)
 
 
 def send_data(id, data):
     msg = sp.cdata_to_py(data[0])
     msg["id"] = id
-    for sub in subscriptions[:]:
+    for sub in log_subscriptions[:]:
         sub.put(msg)
 
 
@@ -94,6 +83,8 @@ sp.register_api_price_update(api_price_update)
 @sp.ffi.callback("ApiTickerUpdateAddr")
 def ticker_update(data):
     send_data("ApiTickerUpdate", data)
+    for t in tickers[:]:
+        t.put(sp.cdata_to_py(data[0]))
 sp.register_ticker_update(ticker_update)
 
 
@@ -116,6 +107,20 @@ def product_list_by_code(inst_code, is_ready, ret_msg):
 sp.register_product_list_by_code_reply(product_list_by_code)
 
 
+@sp.ffi.callback("ConnectedReplyAddr")
+def connected_reply(host_type, con_status):
+    msg = {
+        "id": "ConnectedReply",
+        "host_type": host_type,
+        "con_status": con_status
+        }
+    for sub in log_subscriptions[:]:
+        sub.put(msg)
+    if host_type == 83 and con_status == 2:
+        sp.register_ticker_update(ticker_update)
+sp.register_connecting_reply(connected_reply)
+
+
 @app.route("/login", methods=['POST'])
 def login():
     global sp
@@ -130,7 +135,7 @@ def login():
     return jsonify({"retval": sp.login()})
 
 
-@app.route("/get-login-status/<int:host_id>")
+@app.route("/login-status/<int:host_id>")
 def get_login_status(host_id):
     global sp
     if host_id not in [80, 81, 83, 87, 88]:
@@ -144,7 +149,7 @@ def ping():
         "id": "ping",
         "msg": "Ping"
         }
-    for sub in subscriptions[:]:
+    for sub in log_subscriptions[:]:
         sub.put(msg)
     return "OK"
 
@@ -156,36 +161,58 @@ def logout():
     return "OK"
 
 
-@app.route("/subscribe-ticker/<string:product>")
-def subscribe_ticker(product):
-    sp.subscribe_ticker(product, 1)
+@app.route("/ticker/subscribe/<string:products>")
+def subscribe_ticker(products):
+    if sp.ready() != 0:
+        return "NOT READY"
+    for p in products.split(","):
+        sp.subscribe_ticker(p, 1)
+    return "OK"
 
 
-@app.route("/unsubscribe-ticker/<string:product>")
-def unsubscribe_ticker(product):
-    sp.subscribe_ticker(product, 0)
+@app.route("/ticker/price/<string:products>")
+def unsubscribe_ticker(products):
+    if sp.ready() != 0:
+        return "NOT READY"
+    for p in products.split(","):
+        sp.subscribe_ticker(p, 0)
+    return "OK"
 
 
-@app.route("/subscribe-price/<string:product>")
-def subscribe_price(product):
-    sp.subscribe_price(product, 1)
+@app.route("/price/subscribe/<string:products>")
+def subscribe_price(products):
+    if sp.ready() != 0:
+        return "NOT READY"
+    for p in products.split(","):
+        sp.subscribe_price(p, 1)
+    return "OK"
 
 
-@app.route("/unsubscribe-price/<string:product>")
-def unsubscribe_price(product):
-    sp.unsubscribe_price(product, 0)
+@app.route("/price/unsubscribe/<string:products>")
+def unsubscribe_price(products):
+    if sp.ready() != 0:
+        return "NOT READY"
+    for p in products.split(","):
+        sp.unsubscribe_price(p, 0)
+    return "OK"
 
 
-@app.route("/get-account-info")
+@app.route("/account-info")
 def get_account_info():
+    if sp.ready() != 0:
+        return "NOT READY"
     sp.get_acc_bal_count()
+    return "OK"
 
 
-@app.route("/subscribe")
+@app.route("/log/subscribe")
 def subscribe():
+    if sp.ready() != 0:
+        return "NOT READY"
+
     def gen():
         q = Queue()
-        subscriptions.append(q)
+        log_subscriptions.append(q)
         try:
             while True:
                 result = q.get()
@@ -193,8 +220,30 @@ def subscribe():
                 ev = ServerSentEvent(result, id)
                 yield ev.encode()
         except GeneratorExit:  # Or maybe use flask signals
-            subscriptions.remove(q)
+            log_subscriptions.remove(q)
     return Response(gen(), mimetype="text/event-stream")
+
+
+@app.route("/ticker/get")
+def ticker():
+    if sp.ready() != 0:
+        return "NOT READY"
+
+    def gen():
+        q = Queue()
+        tickers.append(q)
+        try:
+            while True:
+                t = q.get()
+                yield "%f,%d,%d,%d,%s,%s\n" % (t['Price'],
+                                               t['Qty'],
+                                               t['TickerTime'],
+                                               t['DealSrc'],
+                                               t['ProdCode'],
+                                               t['DecInPrice'])
+        except GeneratorExit:  # Or maybe use flask signals
+            tickers.remove(q)
+    return Response(gen(), mimetype="text/plain")
 
 
 if __name__ == "__main__":
