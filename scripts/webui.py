@@ -221,9 +221,6 @@ def get_account_info():
 
 @app.route("/log/subscribe")
 def subscribe():
-    if sp.ready() != 0:
-        return "NOT READY"
-
     def gen():
         q = Queue()
         log_subscriptions.append(q)
@@ -238,11 +235,13 @@ def subscribe():
     return Response(gen(), mimetype="text/event-stream")
 
 
+@app.route("/schema/<string:structure>")
+def schema(structure):
+    return jsonify({"retval": sp.fields(structure)})
+
+
 @app.route("/ticker/get")
 def ticker():
-    if sp.ready() != 0:
-        return "NOT READY"
-
     def gen():
         q = Queue()
         tickers.append(q)

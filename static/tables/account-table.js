@@ -2,13 +2,17 @@ import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
 var AccountTable = React.createClass({
     getInitialState: function() {
+	var l = this;
+	$.getJSON("/schema/SPApiAccInfo", function(d) {
+	    l.setState({field: d.retval});
 	return {
 	    columnDefs: [
 		{headerName: "Name",
-		 field: "name",
-		 enableRowGroup: true, enablePivot: true,
-		 width: 150, pinned: true}],
-	    rowData: [{name: "foobar"}]
+		 field: "name"},
+		{headerName: "Value",
+		 field: "value"}],
+	    rowData: [],
+	    fields: []
 	};
     },
     render: function() {

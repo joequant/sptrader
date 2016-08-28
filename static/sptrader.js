@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-var ReactBootstrap = require('react-bootstrap');
-var ReactAddonsLinkedStateMixin = require('react-addons-linked-state-mixin');
+import {Tabs, Tab, ButtonToolbar, Button, FormControl,
+	FormGroup, ControlLabel, HelpBlock } from 'react-bootstrap';
+import ReactAddonsLinkedStateMixin from 'react-addons-linked-state-mixin';
 import {AgGridReact} from 'ag-grid-react';
 import LoginForm from './login-form';
 import ConnectionTable from './tables/connection-table';
@@ -10,15 +11,7 @@ import OrderTable from './tables/order-table';
 import PositionTable from './tables/position-table';
 import TradeTable from './tables/trade-table';
 import AccountTable from './tables/account-table';
-
-var Tabs = ReactBootstrap.Tabs;
-var Tab = ReactBootstrap.Tab;
-var ButtonToolbar = ReactBootstrap.ButtonToolbar;
-var Button = ReactBootstrap.Button;
-var FormControl = ReactBootstrap.FormControl;
-var FormGroup = ReactBootstrap.FormGroup;
-var ControlLabel = ReactBootstrap.ControlLabel;
-var HelpBlock = ReactBootstrap.HelpBlock;
+import TickerControl from './ticker-control';
 
 var SubscribeBox = React.createClass( {
     getInitialState: function() {
@@ -190,6 +183,9 @@ var SpTraderApp = React.createClass({
 		</Tab>
 		<Tab eventKey={4} title="Trade">
 		<TradeTable />
+		</Tab>
+		<Tab eventKey={5} title="Ticker">
+		<TickerControl />
 		</Tab>
 		</Tabs>
 		</Tab>
