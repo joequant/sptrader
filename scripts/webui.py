@@ -16,6 +16,7 @@ import sptrader
 sp = sptrader.SPTrader()
 log_subscriptions = []
 tickers = []
+ticker_products = set()
 app = Flask(__name__,
             static_url_path="/static",
             static_folder=os.path.join(location, "..",
@@ -118,6 +119,8 @@ def connected_reply(host_type, con_status):
         sub.put(msg)
     if host_type == 83 and con_status == 2:
         sp.register_ticker_update(ticker_update)
+        for p in ticker_products:
+            sp.subscribe_ticker(p, 1)
 sp.register_connecting_reply(connected_reply)
 
 
@@ -163,20 +166,31 @@ def logout():
 
 @app.route("/ticker/subscribe/<string:products>")
 def subscribe_ticker(products):
-    if sp.ready() != 0:
-        return "NOT READY"
     for p in products.split(","):
-        sp.subscribe_ticker(p, 1)
-    return "OK"
+        ticker_products.add(p)
+        if sp.ready() == 0:
+            sp.subscribe_ticker(p, 1)
+    if sp.ready() != 0:
+        return "NOLOGIN"
+    else:
+        return "OK"
 
 
-@app.route("/ticker/price/<string:products>")
+@app.route("/ticker/unsubscribe/<string:products>")
 def unsubscribe_ticker(products):
-    if sp.ready() != 0:
-        return "NOT READY"
     for p in products.split(","):
-        sp.subscribe_ticker(p, 0)
-    return "OK"
+        ticker_products.add(p)
+        if sp.ready() == 0:
+            sp.subscribe_ticker(p, 0)
+    if sp.ready() != 0:
+        return "NOLOGIN"
+    else:
+        return "OK"
+
+
+@app.route("/ticker/list")
+def list_ticker():
+    return jsonify(list(ticker_products))
 
 
 @app.route("/price/subscribe/<string:products>")
