@@ -49,41 +49,43 @@ def login_reply(ret_code, ret_msg):
         sub.put(msg)
 sp.register_login_reply(login_reply)
 
-
-def send_data(id, data):
-    msg = sp.cdata_to_py(data[0])
+def send_dict(id, msg):
     msg["id"] = id
     for sub in log_subscriptions[:]:
         sub.put(msg)
 
 
+def send_cdata(id, data):
+    send_dict(id, sp.cdata_to_py(data[0]))
+
+
 @sp.ffi.callback("AccountInfoPushAddr")
 def account_info_push(data):
-    send_data("AccountInfoPush", data)
+    send_cdata("AccountInfoPush", data)
 sp.register_account_info_push(account_info_push)
 
 
 @sp.ffi.callback("AccountPositionPushAddr")
 def account_position_push(data):
-    send_data("AccountPositionPush", data)
+    send_cdata("AccountPositionPush", data)
 sp.register_account_position_push(account_position_push)
 
 
 @sp.ffi.callback("ApiTradeReportAddr")
 def trade_report(data):
-    send_data("ApiTradeReport", data)
+    send_cdata("ApiTradeReport", data)
 sp.register_trade_report(trade_report)
 
 
 @sp.ffi.callback("ApiPriceUpdateAddr")
 def api_price_update(data):
-    send_data("ApiPriceUpdate", data)
+    send_cdata("ApiPriceUpdate", data)
 sp.register_api_price_update(api_price_update)
 
 
 @sp.ffi.callback("ApiTickerUpdateAddr")
 def ticker_update(data):
-    send_data("ApiTickerUpdate", data)
+    send_cdata("ApiTickerUpdate", data)
     for t in tickers[:]:
         t.put(sp.cdata_to_py(data[0]))
 sp.register_ticker_update(ticker_update)
@@ -94,7 +96,7 @@ def instrument_list_reply(is_ready, ret_msg):
     data = {"is_ready": is_ready,
             "ret_msg": ret_msg,
             "data": sp.get_instrument()}
-    send_data("InstrumentListReply", data)
+    send_cdata("InstrumentListReply", data)
 
 
 @sp.ffi.callback("ProductListByCodeReplyAddr")
@@ -104,7 +106,7 @@ def product_list_by_code(inst_code, is_ready, ret_msg):
         "is_ready": is_ready,
         "ret_msg": ret_msg,
         "data": sp.get_product()}
-    send_data("ProductListByCode", data)
+    send_cdata("ProductListByCode", data)
 sp.register_product_list_by_code_reply(product_list_by_code)
 
 
@@ -173,24 +175,28 @@ def subscribe_ticker(products):
     if sp.ready() != 0:
         return "NOLOGIN"
     else:
+        send_dict("UpdateTickers",
+                  {"data": list(ticker_products)})
         return "OK"
 
 
 @app.route("/ticker/unsubscribe/<string:products>")
 def unsubscribe_ticker(products):
     for p in products.split(","):
-        ticker_products.add(p)
+        ticker_products.discard(p)
         if sp.ready() == 0:
             sp.subscribe_ticker(p, 0)
     if sp.ready() != 0:
         return "NOLOGIN"
     else:
+        send_dict("UpdateTickers",
+                  {"data": list(ticker_products)})
         return "OK"
 
 
 @app.route("/ticker/list")
 def list_ticker():
-    return jsonify(list(ticker_products))
+    return jsonify({"data": list(ticker_products)})
 
 
 @app.route("/price/subscribe/<string:products>")

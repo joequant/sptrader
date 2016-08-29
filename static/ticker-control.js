@@ -12,20 +12,24 @@ var TickerControl = React.createClass({
 	this.setState({tickers_add: e.target.value});
     },
     add_ticker: function() {
+	$.get("/ticker/subscribe/" + this.state.tickers_add);
+    },
+    delete_ticker: function(e) {
+	$.get("/ticker/unsubscribe/" + e.target.name);
     },
     render: function() {
-	var retval = (<div>
-		      <h2>Ticker Control</h2>
-		      <FormControl
-		      name="tickers"
-		      onChange={this.onChange}
-		      value={this.state.tickers_add}
-		      />
-		      <Button bsStyle="success" onClick={this.add_ticker}>Add Ticker</Button>
-		      <br />
-		      <a href="/ticker/get" target="_blank">Show ticker</a>
-		 </div>)
-	return retval;
+	var l = this;
+	var items = this.props.tickers.map(function(i) {
+	    return (<div>{i} - <Button name={i} onClick={l.delete_ticker}>Delete ticker</Button><br/></div>);});
+	return (<div>
+		<h2>Ticker Control</h2>
+		<a href="/ticker/get" target="_blank">Show ticker</a>
+		<FormControl
+		name="tickers"
+		type="text"
+		onChange={this.onChange}
+		value={this.state.tickers_add}
+		/><Button bsStyle="success" onClick={this.add_ticker}>Add Ticker</Button>{items}<br/></div>);
     }
 });
     

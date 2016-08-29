@@ -107,12 +107,17 @@ var SpTraderApp = React.createClass({
 		l.setState({showModal: false});
 	    }
 	});
+	$.getJSON("/ticker/list", function(d) {
+	    l.setState({tickers: d.data});
+	});
+
 	return {
 	    log: '',
 	    loginLabel: '',
 	    account_info: {},
 	    connection_info: {},
-	    showModal: true
+	    showModal: true,
+	    tickers: []
 	};
     },
     submitModal: function(data) {
@@ -164,12 +169,18 @@ var SpTraderApp = React.createClass({
 	this.setState({log: this.state.log + event.data + "\n"});
 	this.setState({account_info: data});
     },
+    updateTickers: function(event) {
+	data = JSON.parse(event.data);
+	console.log(data);
+	this.setState({tickers: data.data});
+    },
     render: function() {
 	var events = {
 	    "ping" : this.addToLog,
 	    "LoginReply" : this.loginReply,
 	    "ConnectedReply" : this.connectedReply,
-	    "AccountInfoPush" : this.accountInfoPush
+	    "AccountInfoPush" : this.accountInfoPush,
+	    "UpdateTickers" : this.updateTickers
 	}
 	return(
 		<Tabs id="tabs">
@@ -193,7 +204,7 @@ var SpTraderApp = React.createClass({
 		<TradeTable />
 		</Tab>
 		<Tab eventKey={5} title="Ticker">
-		<TickerControl />
+		<TickerControl tickers={this.state.tickers}/>
 		</Tab>
 		</Tabs>
 		</Tab>
