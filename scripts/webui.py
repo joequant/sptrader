@@ -72,7 +72,7 @@ sp.register_account_position_push(account_position_push)
 
 
 @sp.ffi.callback("ApiTradeReportAddr")
-def trade_report(data):
+def trade_report(rec_no, data):
     send_cdata("ApiTradeReport", data)
 sp.register_trade_report(trade_report)
 
@@ -197,6 +197,16 @@ def unsubscribe_ticker(products):
 @app.route("/ticker/list")
 def list_ticker():
     return jsonify({"data": list(ticker_products)})
+
+
+@app.route("/trade/list")
+def list_trade():
+    return jsonify({"data": sp.get_all_trades()})
+
+
+@app.route("/order/list")
+def list_order():
+    return jsonify({"data": sp.get_all_orders()})
 
 
 @app.route("/price/subscribe/<string:products>")

@@ -8,6 +8,7 @@ import LoginForm from './login-form';
 import ConnectionTable from './tables/connection-table';
 import SampleTable from './tables/sample-table';
 import OrderTable from './tables/order-table';
+import OrderForm from './order-form';
 import PositionTable from './tables/position-table';
 import TradeTable from './tables/trade-table';
 import AccountTable from './tables/account-table';
@@ -104,11 +105,8 @@ var SpTraderApp = React.createClass({
 	var l = this;
 	$.getJSON("/login-status/80", function(d) {
 	    if (parseInt(d) != -1) {
-		l.setState({showModal: false});
+		l.setState({showLoginForm: false});
 	    }
-	});
-	$.getJSON("/ticker/list", function(d) {
-	    l.setState({tickers: d.data});
 	});
 
 	return {
@@ -116,8 +114,11 @@ var SpTraderApp = React.createClass({
 	    loginLabel: '',
 	    account_info: {},
 	    connection_info: {},
-	    showModal: true,
-	    tickers: []
+	    showLoginForm: true,
+	    showOrderForm: false,
+	    tickers: [],
+	    orders: [],
+	    trades: []
 	};
     },
     submitModal: function(data) {
@@ -129,9 +130,9 @@ var SpTraderApp = React.createClass({
 	});
     },
     logout: function() {
-	$.get("/logout", data);
+	$.get("/logout");
 	this.setState({loginLabel: ''});
-	this.setState({showModal: true});
+	this.setState({showLoginForm: true});
     },
     addToLog: function(event) {
 	data = JSON.parse(event.data);
@@ -142,10 +143,10 @@ var SpTraderApp = React.createClass({
 	data = JSON.parse(event.data);
 	console.log(data);
 	this.setState({log: this.state.log + event.data + "\n"});
-	if (parseInt(data.ret_code) == 0) {
-	    this.setState({showModal: false});
-	} else {
+	if (parseInt(data.ret_code) != 0) {
 	    this.setState({loginLabel: data.ret_msg});
+	} else {
+	    this.setState({showLoginForm: false});
 	}
     },
     connectedReply: function(event) {
@@ -158,10 +159,25 @@ var SpTraderApp = React.createClass({
 	conn_info[host_type] = con_status;
 	this.setState({conn_info: conn_info})
 	if (parseInt(host_type) == 80 &&
-	    parseInt(con_status) == 3) {
-	    this.setState({showModal: false});
-	    $.get("/get-account-info");
+	    parseInt(con_status) == 2) {
+	    var l = this;
+	    $.getJSON("/ticker/list", function(d) {
+		l.setState({tickers: d.data});
+	    });
+	    $.getJSON("/account-info");
+	    $.getJSON("/order/list", function(d) {
+		l.setState({orders: d.data});
+		});
+	    $.getJSON("/trade/list", function(d) {
+		l.setState({trades: d.data});
+	    });
 	}
+    },
+    showOrderForm: function(event) {
+	this.setState({showOrderForm: true});
+    },
+    submitOrder: function(event) {
+	this.setState({showOrderForm: false});
     },
     accountInfoPush: function(event) {
 	data = JSON.parse(event.data);
@@ -185,7 +201,7 @@ var SpTraderApp = React.createClass({
 	return(
 		<Tabs id="tabs">
 		<Tab eventKey={1} title="Login">
-		<LoginForm show={this.state.showModal}
+		<LoginForm show={this.state.showLoginForm}
 	    label={this.state.loginLabel}
 	    onSubmit={this.submitModal}/>
 		<Button bsStyle="success" onClick={this.logout}>Logout</Button>
@@ -195,13 +211,16 @@ var SpTraderApp = React.createClass({
 		<AccountTable data={this.state.account_info} />
 		</Tab>
 		<Tab eventKey={2} title="Order">
-		<OrderTable />
+		<OrderForm show={this.state.showOrderForm}
+	    onSubmit={this.submitOrder}/>
+		<Button bsStyle="success" onClick={this.showOrderForm}>Show Order</Button>
+		<OrderTable data={this.state.orders} />
 		</Tab>
 		<Tab eventKey={3} title="Position">
 		<PositionTable />
 		</Tab>
 		<Tab eventKey={4} title="Trade">
-		<TradeTable />
+		<TradeTable data={this.state.trades}/>
 		</Tab>
 		<Tab eventKey={5} title="Ticker">
 		<TickerControl tickers={this.state.tickers}/>

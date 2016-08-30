@@ -6,7 +6,6 @@ var AccountTable = React.createClass({
 	$.getJSON("/schema/SPApiAccInfo", function(d) {
 	    l.setState({fields: d.retval});
 	});
-	$.getJSON("/account-info");
 	return {
 	    columnDefs: [
 		{headerName: "Name",

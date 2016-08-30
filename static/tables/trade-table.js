@@ -20,7 +20,7 @@ var TradeTable = React.createClass({
 	    // column definitions and row data are immutable, the grid
 	    // will update when these lists change
 	    columnDefs={this.state.columnDefs}
-	    rowData={this.state.rowData}
+	    rowData={this.props.data}
 
 	    // or provide props the old way with no binding
 	    rowSelection="multiple"

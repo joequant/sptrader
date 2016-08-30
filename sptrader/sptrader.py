@@ -492,6 +492,8 @@ class SPTrader(object):
         return self.api.SPAPI_GetOrderCount(self.user, self.acc_no)
 
     def get_all_orders(self):
+        if self.ready() != 0:
+            return []
         count = self.get_order_count()
         if count == 0:
             return []
@@ -506,6 +508,8 @@ class SPTrader(object):
         return self.api.SPAPI_GetTradeCount(self.user, self.acc_no)
 
     def get_all_trades(self):
+        if self.ready() != 0:
+            return []
         count = self.get_trade_count()
         if count == 0:
             return []
