@@ -4,7 +4,11 @@ import json
 
 class ServerSentEvent(object):
     def __init__(self, data, event=None, id=None):
-        self.data = json.dumps(data)
+        try:
+            self.data = json.dumps(data)
+        except:
+            print("Json error %s %s" % (id, event), data)
+            self.data = None
         self.event = event
         self.id = id
         self.desc_map = {

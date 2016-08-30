@@ -40,6 +40,8 @@ class FfiConverter(object):
                 d = getattr(s, field)
                 if d == b'\x00':
                     yield(field, '')
+                elif fieldtype.type.cname == 'char':
+                    yield(field, ord(d))
                 else:
                     yield (field, d)
             else:
