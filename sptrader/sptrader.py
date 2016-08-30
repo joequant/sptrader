@@ -397,6 +397,7 @@ class SPTrader(object):
         self.api.SPAPI_SetLanguageId(0)
         self.api.SPAPI_Initialize()
         self.user = None
+        self.acc_no = None
 
     def ready(self):
         if self.user is None:
@@ -445,6 +446,7 @@ class SPTrader(object):
                        user_id,
                        password):
         self.user = ffi.new("char[]", user_id.encode("utf-8"))
+        self.acc_no = self.user
         self.api.SPAPI_SetLoginInfo(host.encode("utf-8"),
                                     port,
                                     license.encode("utf-8"),
@@ -476,14 +478,46 @@ class SPTrader(object):
 
     def get_product(self):
         count = self.get_product_count()
+        if count == 0:
+            return []
         buffer = self.ffi.new("SPApiProduct[%d]" % (count + 1))
         if self.api.SPAPI_GetProductByArray(buffer) == 0:
-            return self.cdata_to_py(buffer)
-        else:
-            return {}
+            return []
+        return self.cdata_to_py(buffer)
 
     def get_acc_bal_count(self):
         return self.api.SPAPI_GetAccBalCount(self.user)
+
+    def get_order_count(self):
+        return self.api.SPAPI_GetOrderCount(self.user, self.acc_no)
+
+    def get_all_orders(self):
+        count = self.get_order_count()
+        if count == 0:
+            return []
+        buffer = self.ffi.new("SPApiOrder[%d]" % (count + 1))
+        if self.api.SPAPI_GetOrdersByArray(self.user,
+                                           self.acc_no,
+                                           buffer) != 0:
+            return []
+        return self.cdata_to_py(buffer)
+
+    def get_trade_count(self):
+        return self.api.SPAPI_GetTradeCount(self.user, self.acc_no)
+
+    def get_all_trades(self):
+        count = self.get_trade_count()
+        if count == 0:
+            return []
+        buffer = self.ffi.new("SPApiTrade[%d]" % (count + 1))
+        if self.api.SPAPI_GetAllTradesByArray(self.user,
+                                              self.acc_no,
+                                              buffer) != 0:
+            return []
+        return self.cdata_to_py(buffer)
+
+    def get_position_count(self):
+        return SPAPI_GetPosCount(self.user)
 
     def get_price_by_code(self, code):
         price = self.ffi.new("SPApiPrice[1]")
@@ -502,6 +536,7 @@ class SPTrader(object):
         user = self.user
         if user is not None:
             self.user = None
+            self.acc_no = None
             return self.api.SPAPI_Logout(user)
 
     def cdata_to_py(self, s):
