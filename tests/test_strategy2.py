@@ -120,7 +120,9 @@ if __name__ == '__main__':
         todate=datetime.datetime(2016, 9, 1))
 
     # Add the Data Feed to Cerebro
-    cerebro.adddata(data)
+    cerebro.resampledata(data,
+                         timeframe=bt.TimeFrame.Minutes,
+                         compression=5)
 
     # Set our desired cash start
     cerebro.broker.setcash(100000.0)
@@ -133,6 +135,6 @@ if __name__ == '__main__':
 
     # Run over everything
     cerebro.run()
-    cerebro.plot()
+    cerebro.plot(style='candle')
     # Print out the final result
     print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())

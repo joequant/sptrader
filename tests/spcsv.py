@@ -36,7 +36,6 @@ class SharpPointCSVData(feed.CSVDataBase):
             if not line:
                 return False
             line = line.rstrip('\n')
-            print(line)
             linetokens = line.split(self.separator)
             if linetokens[4] == self.p.product:
                 return self._loadline(linetokens)
@@ -55,7 +54,6 @@ class SharpPointCSVData(feed.CSVDataBase):
         self.lines.close[0] = price
         self.lines.volume[0] = volume
         self.lines.openinterest[0] = 0.0
-        print(self.lines)
         return True
 
 
