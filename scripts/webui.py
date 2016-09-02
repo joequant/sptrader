@@ -4,9 +4,11 @@ from flask import Flask, Response, jsonify, request, abort
 import os
 import sys
 import cffi
+import time
 
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(location, "..", "sptrader"))
+ticker_file = os.path.join(location, "..", "data", "ticker.txt")
 
 import config
 from queue import Queue
@@ -83,14 +85,6 @@ def api_price_update(data):
 sp.register_api_price_update(api_price_update)
 
 
-@sp.ffi.callback("ApiTickerUpdateAddr")
-def ticker_update(data):
-    send_cdata("ApiTickerUpdate", data)
-    for t in tickers[:]:
-        t.put(sp.cdata_to_py(data[0]))
-sp.register_ticker_update(ticker_update)
-
-
 @sp.ffi.callback("InstrumentListReplyAddr")
 def instrument_list_reply(is_ready, ret_msg):
     data = {"is_ready": is_ready,
@@ -165,6 +159,15 @@ def logout():
     sp.logout()
     return "OK"
 
+#----------- Ticker code------
+
+@sp.ffi.callback("ApiTickerUpdateAddr")
+def ticker_update(data):
+    send_cdata("ApiTickerUpdate", data)
+    for t in tickers[:]:
+        t.put(sp.cdata_to_py(data[0]))
+sp.register_ticker_update(ticker_update)
+
 
 @app.route("/ticker/subscribe/<string:products>")
 def subscribe_ticker(products):
@@ -199,10 +202,39 @@ def list_ticker():
     return jsonify({"data": list(ticker_products)})
 
 
+@app.route("/ticker/clear")
+def clear_ticker():
+    fo = open(ticker_file, "rw+")
+    fo.truncate()
+    fo.close()
+
+
 @app.route("/trade/list")
 def list_trade():
     return jsonify({"data": sp.get_all_trades()})
 
+
+@app.route("/ticker/get")
+def ticker():
+    try:
+        tickerfile = open(ticker_file)
+    except FileNotFoundError:
+        open(ticker_file, 'a').close()
+        tickerfile = open(ticker_file)
+    def gen():
+        try:
+            while True:
+                line = tickerfile.readline()
+                if not line:
+                    time.sleep(0.1)
+                    continue
+                yield line
+        except GeneratorExit:  # Or maybe use flask signals
+            close(tickerfile)
+
+    return Response(gen(), mimetype="text/plain")
+
+#-----------------
 
 @app.route("/order/list")
 def list_order():
@@ -256,23 +288,6 @@ def schema(structure):
     return jsonify({"retval": sp.fields(structure)})
 
 
-@app.route("/ticker/get")
-def ticker():
-    def gen():
-        q = Queue()
-        tickers.append(q)
-        try:
-            while True:
-                t = q.get()
-                yield "%f,%d,%d,%d,%s,%s\n" % (t['Price'],
-                                               t['Qty'],
-                                               t['TickerTime'],
-                                               t['DealSrc'],
-                                               t['ProdCode'],
-                                               t['DecInPrice'])
-        except GeneratorExit:  # Or maybe use flask signals
-            tickers.remove(q)
-    return Response(gen(), mimetype="text/plain")
 
 
 if __name__ == "__main__":
