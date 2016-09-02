@@ -17,7 +17,6 @@ import sptrader
 
 sp = sptrader.SPTrader()
 log_subscriptions = []
-tickers = []
 ticker_products = set()
 app = Flask(__name__,
             static_url_path="/static",
@@ -164,8 +163,16 @@ def logout():
 @sp.ffi.callback("ApiTickerUpdateAddr")
 def ticker_update(data):
     send_cdata("ApiTickerUpdate", data)
-    for t in tickers[:]:
-        t.put(sp.cdata_to_py(data[0]))
+    pydata = sp.cdata_to_py(data[0])
+    tickerfile = open(ticker_file)
+    tickerfile.write("%f,%d,%d,%d,%s,%s\n" % (t['Price'],
+                                              t['Qty'],
+                                              t['TickerTime'],
+                                              t['DealSrc'],
+                                              t['ProdCode'],
+                                              t['DecInPrice']))
+    tickerfile.close()
+                     
 sp.register_ticker_update(ticker_update)
 
 
@@ -231,7 +238,26 @@ def ticker():
                 yield line
         except GeneratorExit:  # Or maybe use flask signals
             close(tickerfile)
+    return Response(gen(), mimetype="text/plain")
 
+@app.route("/ticker/get-new")
+def ticker_get_new():
+    try:
+        tickerfile = open(ticker_file)
+    except FileNotFoundError:
+        open(ticker_file, 'a').close()
+        tickerfile = open(ticker_file)
+        tickerfile.seek(0, 2)
+    def gen():
+        try:
+            while True:
+                line = tickerfile.readline()
+                if not line:
+                    time.sleep(0.1)
+                    continue
+                yield line
+        except GeneratorExit:  # Or maybe use flask signals
+            close(tickerfile)
     return Response(gen(), mimetype="text/plain")
 
 #-----------------
