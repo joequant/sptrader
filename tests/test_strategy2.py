@@ -109,7 +109,7 @@ def run_strategy():
     # Datas are in a subfolder of the samples. Need to find where the script is
     # because it could have been called from anywhere
     modpath = os.path.dirname(os.path.realpath(__file__))
-    datapath = os.path.join(modpath, 'data/hsi.txt')
+    datapath = os.path.join(modpath, '../data/hsi.txt')
 
     # Create a Data Feed
     data = SharpPointCSVData(

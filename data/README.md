@@ -1,0 +1,1 @@
+ticker.txt - ticker information

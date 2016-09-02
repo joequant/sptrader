@@ -103,7 +103,7 @@ if __name__ == '__main__':
     # because it could have been called from anywhere
     modpath = os.path.dirname(os.path.realpath(__file__))
     print(modpath)
-    datapath = os.path.join(modpath, 'data/orcl-1995-2014.txt')
+    datapath = os.path.join(modpath, '../data/orcl-1995-2014.txt')
 
     # Create a Data Feed
     data = bt.feeds.YahooFinanceCSVData(
