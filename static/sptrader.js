@@ -196,7 +196,12 @@ var SpTraderApp = React.createClass({
 	    "LoginReply" : this.loginReply,
 	    "ConnectedReply" : this.connectedReply,
 	    "AccountInfoPush" : this.accountInfoPush,
-	    "UpdateTickers" : this.updateTickers
+	    "UpdateTickers" : this.updateTickers,
+	    "AccountPositionPush" : this.addToLog,
+	    "ApiTradeReport" : this.addToLog,
+	    "ApiPriceUpdate" : this.addToLog,
+	    "InstrumentListReply" : this.addToLog,
+	    "ProductListByCodeReply" : this.addToLog
 	}
 	return(
 		<Tabs id="tabs">
