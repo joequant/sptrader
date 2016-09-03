@@ -218,7 +218,7 @@ var SpTraderApp = React.createClass({
 		<Tab eventKey={2} title="Order">
 		<OrderForm show={this.state.showOrderForm}
 	    onSubmit={this.submitOrder}/>
-		<Button bsStyle="success" onClick={this.showOrderForm}>Show Order</Button>
+		<Button bsStyle="success" onClick={this.showOrderForm}>Show Order Form</Button>
 		<OrderTable data={this.state.orders} />
 		</Tab>
 		<Tab eventKey={3} title="Position">
