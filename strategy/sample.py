@@ -2,11 +2,12 @@ import backtrader as bt
 import datetime  # For datetime objects
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
+from multiprocessing import Process
 # Create a Stratey
 
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, location)
-sys.path.insert(0, os.path.join(location, ".."))
+sys.path.insert(0, os.path.join(location, "../tests"))
 from spcsv import SharpPointCSVData
 
 class TestStrategy(bt.Strategy):
@@ -101,15 +102,11 @@ class TestStrategy(bt.Strategy):
                 # Keep track of the created order to avoid a 2nd order
                 self.order = self.sell()
 
-def run_strategy():
+def run_strategy(fname):
     retval = ""
     cerebro = bt.Cerebro()
     cerebro.addstrategy(TestStrategy)
                 
-    # Datas are in a subfolder of the samples. Need to find where the script is
-    # because it could have been called from anywhere
-    modpath = os.path.dirname(os.path.realpath(__file__))
-    datapath = os.path.join(modpath, 'data/hsi.txt')
 
     # Create a Data Feed
     data = SharpPointCSVData(
@@ -144,4 +141,12 @@ def run_strategy():
     return retval
 
 if __name__ == '__main__':
-    print(run_strategy())
+    # Datas are in a subfolder of the samples. Need to find where the script is
+    # because it could have been called from anywhere
+    modpath = os.path.dirname(os.path.realpath(__file__))
+    datapath = os.path.join(modpath, '../data/hsi.txt')
+
+    p = Process(target=run_strategy, args=(datapath,))
+    p.start()
+    p.join()
+
