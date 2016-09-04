@@ -143,9 +143,8 @@ def run_strategy(fname):
     cerebro.run()
     plotter = Plot(style='candle')
     cerebro.plot(plotter)
-    fig = plt.figure()
     imgdata = open('out.svg', 'wb')
-    fig.savefig(imgdata, format='svg')
+    plt.savefig(imgdata, format='svg')
     imgdata.close()
     # Print out the final result
     retval = retval + \
