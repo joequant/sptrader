@@ -548,6 +548,15 @@ class SPTrader(object):
 
     def fields(self, s):
         return self.ffi_conv.fields(s)
+
+    def order_add(self, data):
+        buffer = self.ffi.new("SPApiOrder[1]")
+        for k, v in data:
+            setattr(buffer, k, v)
+        buffer.AccNo = self.acc_no
+        buffer.Initiator = self.user
+        return self.api.SPAPI_AddOrder(buffer)
+
 # def cleanup():
 #     self.api.SPAPI_Uninitialize()
 

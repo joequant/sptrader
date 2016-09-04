@@ -121,7 +121,6 @@ sp.register_connecting_reply(connected_reply)
 
 @app.route("/login", methods=['POST'])
 def login():
-    global sp
     if not request.json:
         abort(400)
     sp.set_login_info(request.json["host"],
@@ -263,9 +262,14 @@ def ticker_get_new():
 #-----------------
 
 @app.route("/order/list")
-def list_order():
+def order_list():
     return jsonify({"data": sp.get_all_orders()})
 
+@app.route("/order/add", methods=['POST'])
+def order_add():
+    if not request.json:
+        abort(400)
+    sp.order_add(request.json)
 
 @app.route("/price/subscribe/<string:products>")
 def subscribe_price(products):
