@@ -1,6 +1,6 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
-var ImmediateUi = React.createClass({
+var SampleUi = React.createClass({
     getInitialState: function() {
 	return {
 	    columnDefs: [
@@ -29,4 +29,4 @@ var ImmediateUi = React.createClass({
     }
 });
     
-module.exports = SampleTable;
+module.exports = SampleUi;

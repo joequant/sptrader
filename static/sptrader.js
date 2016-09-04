@@ -13,6 +13,7 @@ import PositionTable from './tables/position-table';
 import TradeTable from './tables/trade-table';
 import AccountTable from './tables/account-table';
 import TickerControl from './ticker-control';
+import StrategyTab from './strategy-tab';
 
 var SubscribeBox = React.createClass( {
     getInitialState: function() {
@@ -232,7 +233,8 @@ var SpTraderApp = React.createClass({
 		</Tab>
 		</Tabs>
 		</Tab>
-		<Tab eventKey={2} title="Strategies">
+		<Tab eventKey={2} title="Strategy">
+		<StrategyTab />
 		</Tab>
 		<Tab eventKey={3} title="Scratchpad">
 		<ButtonToolbar>
