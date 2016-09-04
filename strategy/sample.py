@@ -1,4 +1,10 @@
+import matplotlib
+matplotlib.use('Agg', warn=False, force=True)
+print(matplotlib.get_backend())
 import backtrader as bt
+import matplotlib.pyplot as plt
+from backtrader.plot.plot import Plot
+
 import datetime  # For datetime objects
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
@@ -9,6 +15,7 @@ location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, location)
 sys.path.insert(0, os.path.join(location, "../tests"))
 from spcsv import SharpPointCSVData
+
 
 class TestStrategy(bt.Strategy):
     params = (
@@ -134,7 +141,12 @@ def run_strategy(fname):
 
     # Run over everything
     cerebro.run()
-    cerebro.plot(style='candle')
+    plotter = Plot(style='candle')
+    cerebro.plot(plotter)
+    fig = plt.figure()
+    imgdata = open('out.svg', 'wb')
+    fig.savefig(imgdata, format='svg')
+    imgdata.close()
     # Print out the final result
     retval = retval + \
              ('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
@@ -145,7 +157,6 @@ if __name__ == '__main__':
     # because it could have been called from anywhere
     modpath = os.path.dirname(os.path.realpath(__file__))
     datapath = os.path.join(modpath, '../data/hsi.txt')
-
     p = Process(target=run_strategy, args=(datapath,))
     p.start()
     p.join()
