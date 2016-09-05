@@ -23,7 +23,7 @@ var TickerControl = React.createClass({
     render: function() {
 	var l = this;
 	var items = this.props.tickers.map(function(i) {
-	    return (<div>{i} - <Button name={i} onClick={l.delete_ticker}>Delete ticker</Button><br/></div>);});
+	    return (<div key={i}>{i} - <Button name={i} onClick={l.delete_ticker}>Delete ticker</Button><br/></div>);});
 	return (<div>
 		<h2>Ticker Control</h2>
 		<a href="/ticker/get" target="_blank">Show ticker</a>

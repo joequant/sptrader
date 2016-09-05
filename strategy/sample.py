@@ -19,8 +19,8 @@ from spcsv import SharpPointCSVData
 
 class TestStrategy(bt.Strategy):
     params = (
-        ('exitbars', 5),
-        ('maperiod', 15)
+        ('exitbars', 3),
+        ('maperiod', 10)
     )
 
     def log(self, txt, dt=None):
@@ -117,12 +117,8 @@ def run_strategy(fname):
 
     # Create a Data Feed
     data = SharpPointCSVData(
-        dataname=datapath,
-        product='HSIQ6',
-        # Do not pass values before this date
-        fromdate=datetime.datetime(2016, 8, 31),
-        # Do not pass values after this date
-        todate=datetime.datetime(2016, 9, 1))
+        dataname=fname,
+        product='HSIU6')
 
     # Add the Data Feed to Cerebro
     cerebro.resampledata(data,
@@ -155,7 +151,7 @@ if __name__ == '__main__':
     # Datas are in a subfolder of the samples. Need to find where the script is
     # because it could have been called from anywhere
     modpath = os.path.dirname(os.path.realpath(__file__))
-    datapath = os.path.join(modpath, '../data/hsi.txt')
+    datapath = os.path.join(modpath, '../data/ticker.txt')
     p = Process(target=run_strategy, args=(datapath,))
     p.start()
     p.join()
