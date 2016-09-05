@@ -162,8 +162,8 @@ def logout():
 @sp.ffi.callback("ApiTickerUpdateAddr")
 def ticker_update(data):
     send_cdata("ApiTickerUpdate", data)
-    pydata = sp.cdata_to_py(data[0])
-    tickerfile = open(ticker_file)
+    t = sp.cdata_to_py(data[0])
+    tickerfile = open(ticker_file, "a")
     tickerfile.write("%f,%d,%d,%d,%s,%s\n" % (t['Price'],
                                               t['Qty'],
                                               t['TickerTime'],
@@ -210,9 +210,10 @@ def list_ticker():
 
 @app.route("/ticker/clear")
 def clear_ticker():
-    fo = open(ticker_file, "rw+")
+    fo = open(ticker_file, "w")
     fo.truncate()
     fo.close()
+    return "OK"
 
 
 @app.route("/trade/list")

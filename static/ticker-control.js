@@ -14,6 +14,9 @@ var TickerControl = React.createClass({
     add_ticker: function() {
 	$.get("/ticker/subscribe/" + this.state.tickers_add);
     },
+    clear_ticker: function() {
+	$.get("/ticker/clear");
+    },
     delete_ticker: function(e) {
 	$.get("/ticker/unsubscribe/" + e.target.name);
     },
@@ -29,7 +32,9 @@ var TickerControl = React.createClass({
 		type="text"
 		onChange={this.onChange}
 		value={this.state.tickers_add}
-		/><Button bsStyle="success" onClick={this.add_ticker}>Add Ticker</Button>{items}<br/></div>);
+		/><Button bsStyle="success" onClick={this.add_ticker}>Add Ticker</Button><br/>
+		<Button bsStyle="success" onClick={this.clear_ticker}>Clear Ticker</Button><br/>
+		{items}<br/></div>);
     }
 });
     
