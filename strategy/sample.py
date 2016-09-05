@@ -5,6 +5,7 @@ import backtrader as bt
 import matplotlib.pyplot as plt
 from backtrader.plot.plot import Plot
 
+
 import datetime  # For datetime objects
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
@@ -13,9 +14,9 @@ from multiprocessing import Process
 
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, location)
-sys.path.insert(0, os.path.join(location, "../tests"))
+sys.path.insert(0, os.path.join(location, "../sptrader"))
 from spcsv import SharpPointCSVData
-
+from spbroker import SharpPointBroker
 
 class TestStrategy(bt.Strategy):
     params = (
@@ -113,7 +114,7 @@ def run_strategy(fname):
     retval = ""
     cerebro = bt.Cerebro()
     cerebro.addstrategy(TestStrategy)
-                
+    cerebro.setbroker(SharpPointBroker())
 
     # Create a Data Feed
     data = SharpPointCSVData(
