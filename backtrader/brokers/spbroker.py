@@ -31,7 +31,7 @@ from backtrader.position import Position
 __all__ = ['BackBroker', 'BrokerBack']
 
 
-class BackBroker(bt.BrokerBase):
+class SharpPointBroker(bt.BrokerBase):
     '''Broker Simulator
 
       The simulation supports different order types, checking a submitted order
@@ -197,7 +197,7 @@ class BackBroker(bt.BrokerBase):
     )
 
     def init(self):
-        super(BackBroker, self).init()
+        super(SharpPointBroker, self).init()
         self.startingcash = self.cash = self.p.cash
 
         self.orders = list()  # will only be appending
@@ -732,4 +732,4 @@ class BackBroker(bt.BrokerBase):
 
 
 # Alias
-BrokerBack = BackBroker
+BrokerSharpPoint = SharpPointBroker
