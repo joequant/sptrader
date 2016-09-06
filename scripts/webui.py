@@ -237,7 +237,7 @@ def ticker():
                     continue
                 yield line
         except GeneratorExit:  # Or maybe use flask signals
-            close(tickerfile)
+            tickerfile.close()
     return Response(gen(), mimetype="text/plain")
 
 @app.route("/ticker/get-new")
@@ -247,7 +247,7 @@ def ticker_get_new():
     except FileNotFoundError:
         open(ticker_file, 'a').close()
         tickerfile = open(ticker_file)
-        tickerfile.seek(0, 2)
+    tickerfile.seek(0, 2)
     def gen():
         try:
             while True:
@@ -257,7 +257,7 @@ def ticker_get_new():
                     continue
                 yield line
         except GeneratorExit:  # Or maybe use flask signals
-            close(tickerfile)
+            tickerfile.close()
     return Response(gen(), mimetype="text/plain")
 
 #-----------------
