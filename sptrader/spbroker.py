@@ -24,6 +24,7 @@ from __future__ import (absolute_import, division, print_function,
 import collections
 
 import backtrader as bt
+import io
 from backtrader.comminfo import CommInfoBase
 from backtrader.order import Order, BuyOrder, SellOrder
 from backtrader.position import Position
@@ -131,70 +132,15 @@ class SharpPointBroker(bt.BrokerBase):
           With the default ``None`` orders will be completely executed in a
           single shot
 
-        - ``slip_perc`` (default: ``0.0``) Percentage in absolute termns (and
-          positive) that should be used to slip prices up/down for buy/sell
-          orders
-
-          Note:
-
-            - ``0.01`` is ``1%``
-
-            - ``0.001`` is ``0.1%``
-
-        - ``slip_fixed`` (default: ``0.0``) Percentage in units (and positive)
-          that should be used to slip prices up/down for buy/sell orders
-
-          Note: if ``slip_perc`` is non zero, it takes precendence over this.
-
-        - ``slip_open`` (default: ``False``) whether to slip prices for order
-          execution which would specifically used the *opening* price of the
-          next bar. An example would be ``Market`` order which is executed with
-          the next available tick, i.e: the opening price of the bar.
-
-          This also applies to some of the other executions, because the logic
-          tries to detect if the *opening* price would match the requested
-          price/execution type when moving to a new bar.
-
-        - ``slip_match`` (default: ``True``)
-
-          If ``True`` the broker will offer a match by capping slippage at
-          ``high/low`` prices in case they would be exceeded.
-
-          If ``False`` the broker will not match the order with the current
-          prices and will try execution during the next iteration
-
-        - ``slip_limit`` (default: ``True``)
-
-          ``Limit`` orders, given the exact match price requested, will be
-          matched even if ``slip_match`` is ``False``.
-
-          This option controls that behavior.
-
-          If ``True``, then ``Limit`` orders will be matched by capping prices
-          to the ``limit`` / ``high/low`` prices
-
-          If ``False`` and slippage exceeds the cap, then there will be no
-          match
-
-        - ``slip_out`` (default: ``False``)
-
-          Provide *slippage* even if the price falls outside the ``high`` -
-          ``low`` range.
-
     '''
     params = (
         ('cash', 10000.0),
         ('checksubmit', True),
+        ('dataname', None),
         ('eosbar', False),
         ('filler', None),
-        # slippage options
-        ('slip_perc', 0.0),
-        ('slip_fixed', 0.0),
-        ('slip_open', False),
-        ('slip_match', True),
-        ('slip_limit', True),
-        ('slip_out', False),
     )
+    f = None
 
     def init(self):
         super(SharpPointBroker, self).init()
@@ -207,6 +153,18 @@ class SharpPointBroker(bt.BrokerBase):
         self.notifs = collections.deque()
 
         self.submitted = collections.deque()
+        if self.f is None:
+            if hasattr(self.p.dataname, 'readline'):
+                self.f = self.p.dataname
+            elif self.p.dataname is not None:
+                # Let an exception propagate to let the caller know
+                self.f = io.open(self.p.dataname, 'a')
+
+    def stop(self):
+        super(SharpPointBroker, self).stop()
+        if self.f is not None:
+            self.f.close()
+            self.f = None
 
     def get_notification(self):
         try:
@@ -215,28 +173,6 @@ class SharpPointBroker(bt.BrokerBase):
             pass
 
         return None
-
-    def set_slippage_perc(self, perc,
-                          slip_open=True, slip_limit=True,
-                          slip_match=True, slip_out=False):
-        '''Configure slippage to be percentage based'''
-        self.p.slip_perc = perc
-        self.p.slip_fixed = 0.0
-        self.p.slip_open = slip_open
-        self.p.slip_limit = slip_limit
-        self.p.slip_match = slip_match
-        self.p.slip_out = slip_out
-
-    def set_slippage_fixed(self, fixed,
-                           slip_open=True, slip_limit=True,
-                           slip_match=True, slip_out=False):
-        '''Configure slippage to be fixed points based'''
-        self.p.slip_perc = 0.0
-        self.p.slip_fixed = fixed
-        self.p.slip_open = slip_open
-        self.p.slip_limit = slip_limit
-        self.p.slip_match = slip_match
-        self.p.slip_out = slip_out
 
     def set_filler(self, filler):
         '''Sets a volume filler for volume filling execution'''
@@ -340,6 +276,9 @@ class SharpPointBroker(bt.BrokerBase):
         order.pannotated = None
         order.submit()
         order.accept()
+        if (self.f):
+            self.f.write(str(order))
+            self.f.write("\n\n")
         self.pending.append(order)
         self.notify(order)
 
@@ -492,12 +431,7 @@ class SharpPointBroker(bt.BrokerBase):
         self.notifs.append(order.clone())
 
     def _try_exec_market(self, order, popen, phigh, plow):
-        if order.isbuy():
-            p = self._slip_up(phigh, popen, doslip=self.p.slip_open)
-        else:
-            p = self._slip_down(plow, popen, doslip=self.p.slip_open)
-
-        self._execute(order, ago=0, price=p)
+        self._execute(order, ago=0, price=popen)
 
     def _try_exec_close(self, order, pclose):
         # pannotated allows to keep track of the closing bar if there is no
@@ -530,8 +464,6 @@ class SharpPointBroker(bt.BrokerBase):
             if plimit >= popen:
                 # open smaller/equal than requested - buy cheaper
                 pmax = min(phigh, plimit)
-                p = self._slip_up(pmax, popen, doslip=self.p.slip_open,
-                                  lim=True)
                 self._execute(order, ago=0, price=p)
             elif plimit >= plow:
                 # day low below req price ... match limit price
@@ -541,8 +473,6 @@ class SharpPointBroker(bt.BrokerBase):
             if plimit <= popen:
                 # open greater/equal than requested - sell more expensive
                 pmin = max(plow, plimit)
-                p = self._slip_down(plimit, popen, doslip=self.p.slip_open,
-                                    lim=True)
                 self._execute(order, ago=0, price=p)
             elif plimit <= phigh:
                 # day high above req price ... match limit price
@@ -552,21 +482,17 @@ class SharpPointBroker(bt.BrokerBase):
         if order.isbuy():
             if popen >= pcreated:
                 # price penetrated with an open gap - use open
-                p = self._slip_up(phigh, popen, doslip=self.p.slip_open)
                 self._execute(order, ago=0, price=p)
             elif phigh >= pcreated:
                 # price penetrated during the session - use trigger price
-                p = self._slip_up(phigh, pcreated)
                 self._execute(order, ago=0, price=p)
 
         else:  # Sell
             if popen <= pcreated:
                 # price penetrated with an open gap - use open
-                p = self._slip_down(plow, popen, doslip=self.p.slip_open)
                 self._execute(order, ago=0, price=p)
             elif plow <= pcreated:
                 # price penetrated during the session - use trigger price
-                p = self._slip_down(plow, pcreated)
                 self._execute(order, ago=0, price=p)
 
     def _try_exec_stoplimit(self, order,
@@ -583,13 +509,11 @@ class SharpPointBroker(bt.BrokerBase):
                 # can calculate execution for a few cases - datetime is fixed
                 if popen > pclose:
                     if plimit >= pcreated:  # limit above stop trigger
-                        p = self._slip_up(phigh, pcreated, lim=True)
                         self._execute(order, ago=0, price=p)
                     elif plimit >= pclose:
                         self._execute(order, ago=0, price=plimit)
                 else:  # popen < pclose
                     if plimit >= pcreated:
-                        p = self._slip_up(phigh, pcreated, lim=True)
                         self._execute(order, ago=0, price=p)
         else:  # Sell
             if popen <= pcreated:
@@ -603,61 +527,13 @@ class SharpPointBroker(bt.BrokerBase):
                 # can calculate execution for a few cases - datetime is fixed
                 if popen <= pclose:
                     if plimit <= pcreated:
-                        p = self._slip_down(plow, pcreated, lim=True)
                         self._execute(order, ago=0, price=p)
                     elif plimit <= pclose:
                         self._execute(order, ago=0, price=plimit)
                 else:
                     # popen > pclose
                     if plimit <= pcreated:
-                        p = self._slip_down(plow, pcreated, lim=True)
                         self._execute(order, ago=0, price=p)
-
-    def _slip_up(self, pmax, price, doslip=True, lim=False):
-        if not doslip:
-            return price
-
-        slip_perc = self.p.slip_perc
-        slip_fixed = self.p.slip_fixed
-        if slip_perc:
-            pslip = price * (1 + slip_perc)
-        elif slip_fixed:
-            pslip = price + slip_fixed
-        else:
-            return price
-
-        if pslip <= pmax:  # slipping can return price
-            return pslip
-        elif self.p.slip_match or (lim and self.p.slip_limit):
-            if not self.p.slip_out:
-                return pmax
-
-            return pslip  # non existent price
-
-        return None  # no price can be returned
-
-    def _slip_down(self, pmin, price, doslip=True, lim=False):
-        if not doslip:
-            return price
-
-        slip_perc = self.p.slip_perc
-        slip_fixed = self.p.slip_fixed
-        if slip_perc:
-            pslip = price * (1 - slip_perc)
-        elif slip_fixed:
-            pslip = price - slip_fixed
-        else:
-            return price
-
-        if pslip >= pmin:  # slipping can return price
-            return pslip
-        elif self.p.slip_match or (lim and self.p.slip_limit):
-            if not self.p.slip_out:
-                return pmin
-
-            return pslip  # non existent price
-
-        return None  # no price can be returned
 
     def _try_exec(self, order):
         data = order.data

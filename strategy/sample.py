@@ -109,11 +109,11 @@ class TestStrategy(bt.Strategy):
                 # Keep track of the created order to avoid a 2nd order
                 self.order = self.sell()
 
-def run_strategy(fname, kwargs):
+def run_strategy(fname, oname, kwargs):
     retval = ""
     cerebro = bt.Cerebro()
     cerebro.addstrategy(TestStrategy)
-    cerebro.setbroker(SharpPointBroker())
+    cerebro.setbroker(SharpPointBroker(dataname=oname))
 
     # Create a Data Feed
     data = SharpPointCSVData(
@@ -153,9 +153,11 @@ if __name__ == '__main__':
     # because it could have been called from anywhere
     modpath = os.path.dirname(os.path.realpath(__file__))
     datapath = os.path.join(modpath, '../data/ticker.txt')
-    p = Process(target=run_strategy, args=(datapath, {"newdata": True,
-                                                      "keepalive": True,
-                                                      "debug" : True}))
+    orderpath = os.path.join(modpath, '../data/orders.txt')
+    p = Process(target=run_strategy, args=(datapath, orderpath,
+                                           {"newdata": False,
+                                            "keepalive": False,
+                                            "debug" : True}))
     p.start()
     p.join()
 
