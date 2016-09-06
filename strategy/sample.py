@@ -30,7 +30,7 @@ class TestStrategy(bt.Strategy):
 
     def __init__(self):
         # Keep a reference to the "close" line in the data[0] dataseries
-        self.dataclose = self.datas[0].close
+        self.dataclose = self.datas[1].close
 
         # To keep track of pending orders and buy price/commission
         self.order = None
