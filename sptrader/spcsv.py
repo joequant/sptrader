@@ -11,7 +11,7 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import datetime
-
+import time
 from backtrader.feeds import feed
 from backtrader.utils import date2num
 
@@ -25,7 +25,16 @@ class SharpPointCSVData(feed.CSVDataBase):
       - ``dataname``: The filename to parse or a file-like object
       - ``product`` : Product id
     '''
-    params = (('product', None),)
+    params = (('product', None),
+              ('newdata', False),
+              ('keepalive', False),
+              ('debug', True))
+
+    def start(self):
+        super(SharpPointCSVData, self).start()
+        if self.p.newdata:
+            self.f.seek(0,2)
+
     def _load(self):
         if self.f is None:
             return False
@@ -34,11 +43,21 @@ class SharpPointCSVData(feed.CSVDataBase):
         while True:
             line = self.f.readline()
             if not line:
-                return False
-            line = line.rstrip('\n')
-            linetokens = line.split(self.separator)
-            if linetokens[4] == self.p.product:
-                return self._loadline(linetokens)
+                if not self.p.keepalive:
+                    return False
+                else:
+                    time.sleep(0.1)
+                    continue
+            else:
+                line = line.rstrip('\n')
+                if self.p.debug:
+                    print(line)
+                linetokens = line.split(self.separator)
+                if linetokens[4] == self.p.product:
+                    return self._loadline(linetokens)
+
+    def islive(self):
+        return self.p.keepalive
 
     def _loadline(self, linetokens):
         itoken = iter(linetokens)

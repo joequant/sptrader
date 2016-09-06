@@ -5,12 +5,11 @@ import backtrader as bt
 import matplotlib.pyplot as plt
 from backtrader.plot.plot import Plot
 
-
 import datetime  # For datetime objects
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
 from multiprocessing import Process
-# Create a Stratey
+# Create a Strategy
 
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, location)
@@ -110,7 +109,7 @@ class TestStrategy(bt.Strategy):
                 # Keep track of the created order to avoid a 2nd order
                 self.order = self.sell()
 
-def run_strategy(fname):
+def run_strategy(fname, kwargs):
     retval = ""
     cerebro = bt.Cerebro()
     cerebro.addstrategy(TestStrategy)
@@ -119,7 +118,8 @@ def run_strategy(fname):
     # Create a Data Feed
     data = SharpPointCSVData(
         dataname=fname,
-        product='HSIU6')
+        product='HSIZ6',
+        **kwargs)
 
     # Add the Data Feed to Cerebro
     cerebro.resampledata(data,
@@ -153,7 +153,9 @@ if __name__ == '__main__':
     # because it could have been called from anywhere
     modpath = os.path.dirname(os.path.realpath(__file__))
     datapath = os.path.join(modpath, '../data/ticker.txt')
-    p = Process(target=run_strategy, args=(datapath,))
+    p = Process(target=run_strategy, args=(datapath, {"newdata": True,
+                                                      "keepalive": True,
+                                                      "debug" : True}))
     p.start()
     p.join()
 
