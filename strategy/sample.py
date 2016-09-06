@@ -78,7 +78,7 @@ class TestStrategy(bt.Strategy):
 
     def next(self):
         # Simply log the closing price of the series from the reference
-        self.log('Close, %.2f' % self.dataclose[0])
+        self.log('Close, %.2f %.2f' % (self.dataclose[0],self.datas[1].close[0]))
 
         # Check if an order is pending ... if yes, we cannot send a 2nd one
         if self.order:
@@ -120,11 +120,10 @@ def run_strategy(fname, oname, kwargs):
         dataname=fname,
         product='HSIZ6',
         **kwargs)
-
-    # Add the Data Feed to Cerebro
-    cerebro.resampledata(data,
-                         timeframe=bt.TimeFrame.Minutes,
-                         compression=5)
+    data2 = bt.DataClone(dataname=data)
+    data2.addfilter(bt.ReplayerMinutes, compression=5)
+    cerebro.adddata(data)
+    cerebro.adddata(data2)
 
     # Set our desired cash start
     cerebro.broker.setcash(100000.0)
