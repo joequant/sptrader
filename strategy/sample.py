@@ -147,16 +147,19 @@ def run_strategy(fname, oname, kwargs):
              ('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
     return retval
 
-if __name__ == '__main__':
+def run(args):
     # Datas are in a subfolder of the samples. Need to find where the script is
     # because it could have been called from anywhere
     modpath = os.path.dirname(os.path.realpath(__file__))
     datapath = os.path.join(modpath, '../data/ticker.txt')
     orderpath = os.path.join(modpath, '../data/orders.txt')
-    p = Process(target=run_strategy, args=(datapath, orderpath,
-                                           {"newdata": False,
-                                            "keepalive": False,
-                                            "debug" : True}))
+    p = Process(target=run_strategy, args=(datapath, orderpath, args))
     p.start()
+    return p
+
+if __name__ == '__main__':
+    p = run({"newdata": False,
+             "keepalive": False,
+             "debug" : True})
     p.join()
 
