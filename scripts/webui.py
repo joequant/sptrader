@@ -8,12 +8,15 @@ import time
 
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(location, "..", "sptrader"))
+sys.path.insert(0, os.path.join(location, ".."))
 ticker_file = os.path.join(location, "..", "data", "ticker.txt")
+ticker_file = os.path.join(location, "..", "data", "orders.txt")
 
 import config
 from queue import Queue
 from sse import ServerSentEvent
 import sptrader
+import strategy
 
 sp = sptrader.SPTrader()
 log_subscriptions = []
@@ -216,7 +219,33 @@ def clear_ticker():
     fo.close()
     return "OK"
 
+#----------- Strategy ------
 
+@app.route("/strategy/create/<string:strategy>/<string:id>")
+def strategy_create(strategy, id):
+    strategy.run(strategy, id)
+
+
+@app.route("/strategy/kill/<string:id>")
+def strategy_kill(id):
+    pass
+
+
+@app.route("/strategy/pause/<string:id>")
+def strategy_pause(id):
+    pass
+
+
+@app.route("/strategy/log/<string:id>")
+def strategy_log(id):
+    pass
+
+#---------------------------
+@app.route("/orders/read")
+def orders_read():
+    pass
+
+#---------------------------
 @app.route("/trade/list")
 def list_trade():
     return jsonify({"data": sp.get_all_trades()})

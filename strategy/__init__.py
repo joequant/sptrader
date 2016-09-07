@@ -1,6 +1,6 @@
-import sample
+import strategy.sample
 
-def run(name, action):
+def run(name, id):
     if name == "sample":
         sample.run({"newdata": True,
                     "keepalive": True,
