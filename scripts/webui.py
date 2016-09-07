@@ -10,7 +10,7 @@ location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 sys.path.insert(0, os.path.join(location, ".."))
 ticker_file = os.path.join(location, "..", "data", "ticker.txt")
-ticker_file = os.path.join(location, "..", "data", "orders.txt")
+order_file = os.path.join(location, "..", "data", "orders.txt")
 
 import config
 from queue import Queue
