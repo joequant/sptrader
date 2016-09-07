@@ -11,11 +11,21 @@ var ConnectionTable = React.createClass({
 	    {headerName: "Status",
 	     field: "status",
 	     enableRowGroup: true, enablePivot: true,
-	     width: 150, pinned: true}
-	    ],
-	    ports: [80, 81, 83, 88],
+	     width: 150, pinned: true,
+	     cellRenderer: function(params) {
+		 if (params.data.status == undefined) {
+		     return "";
+		 };
+		 var status = ["In progress",
+			       "Established",
+			       "Error",
+			       "Failed"];
+		 return status[params.data.status-1];
+	     }
+	    }
+	   ],
+	    ports: [80, 83, 88],
 	    titles: {80: "Transaction Link",
-		     81: "Price Link",
 		     83: "Long Depth Link",
 		     88: "Information Link"}
 	};
