@@ -48,7 +48,7 @@ var SampleUi = React.createClass({
 	    // will update when these lists change
 	    columnDefs={this.state.columnDefs}
 	    rowData={this.state.rowData}
-	    onGridReady={this.onGridReady.bind(this)}
+	    onGridReady={this.onGridReady}
 	    // or provide props the old way with no binding
 	    rowSelection="multiple"
 	    enableSorting="true"

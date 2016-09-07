@@ -178,7 +178,17 @@ var SpTraderApp = React.createClass({
     showOrderForm: function(event) {
 	this.setState({showOrderForm: true});
     },
-    submitOrder: function(event) {
+    hideOrderForm: function(event) {
+	this.setState({showOrderForm: false});
+    },
+    submitOrder: function(data) {
+	console.log(data);
+	$.ajax({
+	    type: 'post',
+	    url: '/order/add',
+	    data: JSON.stringify(data),
+	    contentType: "application/json"
+	});
 	this.setState({showOrderForm: false});
     },
     accountInfoPush: function(event) {
@@ -220,7 +230,8 @@ var SpTraderApp = React.createClass({
 		</Tab>
 		<Tab eventKey={2} title="Order">
 		<OrderForm show={this.state.showOrderForm}
-	    onSubmit={this.submitOrder}/>
+	    onSubmit={this.submitOrder}
+	    onCancel={this.hideOrderForm}/>
 		<Button bsStyle="success" onClick={this.showOrderForm}>Show Order Form</Button>
 		<OrderTable data={this.state.orders} />
 		</Tab>

@@ -25,8 +25,18 @@ var OrderForm = React.createClass({
 	change[e.target.name] = e.target.value;
 	this.setState({"data": change});
     },
-    onSubmit: function(e) {
+    onBuy: function(e) {
+	var d = this.state.data;
+	d['BuySell'] = 'B'; 
+	this.props.onSubmit(d);
+    },
+    onSell: function(e) {
+	var d = this.state.data;
+	d['BuySell'] = 'S'; 
 	this.props.onSubmit(this.state.data);
+    },
+    onCancel: function(e) {
+	this.props.onCancel();
     },
     render: function() {
 	return (<Modal show={this.props.show}>
@@ -100,15 +110,15 @@ var OrderForm = React.createClass({
 		</Row>
 		</Grid>
 		<Button
-	    onClick={this.onSubmit}>
+	    onClick={this.onBuy}>
 		Buy
 		</Button>
 		<Button
-	    onClick={this.onSubmit}>
+	    onClick={this.onSell}>
 		Sell
 		</Button>
 		<Button
-	    onClick={this.onSubmit}>
+	    onClick={this.onCancel}>
 		Cancel
 		</Button>
 		</Modal.Body>
