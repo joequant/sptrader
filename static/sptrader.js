@@ -104,10 +104,11 @@ console.log("New SPTrader");
 var SpTraderApp = React.createClass({
     getInitialState: function() {
 	var l = this;
-	$.getJSON("/login-status/80", function(d) {
-	    if (parseInt(d) != -1) {
+	$.getJSON("/login-info", function(d) {
+	    if (parseInt(d.status) != -1) {
 		l.setState({showLoginForm: false});
 	    }
+	    l.setState({info: d.info});
 	});
 
 	return {
@@ -209,6 +210,7 @@ var SpTraderApp = React.createClass({
 		<Tab eventKey={1} title="Login">
 		<LoginForm show={this.state.showLoginForm}
 	    label={this.state.loginLabel}
+	    data={this.state.info}
 	    onSubmit={this.submitModal}/>
 		<Button bsStyle="success" onClick={this.logout}>Logout</Button>
 		<ConnectionTable data={this.state.connection_info}/>

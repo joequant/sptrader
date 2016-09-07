@@ -15,10 +15,6 @@ function FieldGroup({ id, label, help, ...props }) {
 var LoginForm = React.createClass({
     getInitialState: function() {
 	var l = this;
-	$.getJSON("/logininfo", function(d) {
-	    d.password = '';
-	    l.setState({"data" : d});
-	});
 	return {
 	    data: {
 		host: '',
@@ -29,6 +25,13 @@ var LoginForm = React.createClass({
 		password: ''
 	    }
 	};
+    },
+    componentWillReceiveProps: function(nextProps) {
+	var d = nextProps.data;
+	if (d != undefined) {
+	    d.password = '';
+	    this.setState({data: d});
+	}
     },
     onChange: function(e) {
 	var change = this.state.data;

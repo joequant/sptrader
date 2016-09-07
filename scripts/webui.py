@@ -29,9 +29,10 @@ def hello():
     return app.send_static_file("sptrader.html")
 
 
-@app.route("/logininfo")
+@app.route("/login-info")
 def logininfo():
-    return jsonify(config.logininfo)
+    return jsonify({"info": config.logininfo,
+                    "status" : "%d" % sp.get_login_status(80)})
 
 
 @sp.ffi.callback("LoginReplyAddr")
@@ -271,6 +272,7 @@ def order_add():
     if not request.json:
         abort(400)
     sp.order_add(request.json)
+
 
 @app.route("/price/subscribe/<string:products>")
 def subscribe_price(products):

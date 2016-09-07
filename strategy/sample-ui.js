@@ -1,5 +1,6 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
+import {Button} from 'react-bootstrap';
 var SampleUi = React.createClass({
     getInitialState: function() {
 	return {
@@ -7,7 +8,13 @@ var SampleUi = React.createClass({
 		{headerName: "Name",
 		 field: "name",
 		 enableRowGroup: true, enablePivot: true,
-		 width: 150, pinned: true}],
+		 width: 150, pinned: true},
+		{headerName: "operator",
+		 field: "operator",
+		 cellRenderer: function(params) {
+		     return "<Button>Start</Button>";
+		 }
+		}],
 	    rowData: [{name: "foobar"}]
 	};
     },
