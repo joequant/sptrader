@@ -7,9 +7,7 @@ $shell_app = new-object -com shell.application
 function unzip($filename, $url, $dir, $name) {
 Write-Output "Installing $($name)"
 wget "$($url)/$($filename)" -OutFile "$($dir)\\$($filename)"
-$zip_file = $shell_app.namespace((Get-Location).Path + "\" + $dir +"\" + $filename)
-$destination = $shell_app.namespace((Get-Location).Path + "\" + $dir)
-$destination.Copyhere($zip_file.items())
+Expand-Archive -Path "$($dir)\\$($filename)" -Destination "$($dir)" -Force
 Remove-Item "$($dir)\\$($filename)"
 }
 
