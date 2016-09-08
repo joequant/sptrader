@@ -9,7 +9,11 @@ var SampleUi = React.createClass({
 		{headerName: "Id",
 		 field: "id"},
 		{headerName: "Product",
-		 field: "product"},
+		 field: "product",
+		 editable: true },
+		{headerName: "Parameter",
+		 field: "param1",
+		 editable: true },
 		{headerName: "Log",
 		 field: "log",
 		 cellRenderer: function(params) {

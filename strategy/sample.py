@@ -158,8 +158,8 @@ def run(args):
     return p
 
 if __name__ == '__main__':
-    p = run({"newdata": False,
-             "keepalive": False,
+    p = run({"newdata": True,
+             "keepalive": True,
              "debug" : True})
     p.join()
 
