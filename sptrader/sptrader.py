@@ -551,10 +551,16 @@ class SPTrader(object):
 
     def order_add(self, data):
         buffer = self.ffi.new("SPApiOrder[1]")
-        for k, v in data:
-            setattr(buffer, k, v)
-        buffer.AccNo = self.acc_no
-        buffer.Initiator = self.user
+        type = self.ffi_conv.typedefs(buffer[0])
+        print(type)
+        for k, v in data.items():
+            if type[k]['kind'] == 'primitive' and \
+               type[k]['cname'] == 'char':
+                setattr(buffer[0], k, bytes(v, 'utf-8'))
+            else:
+                setattr(buffer[0], k, v)
+        buffer[0].AccNo = self.acc_no.encode("utf-8")
+        buffer[0].Initiator = self.user.encode("utf-8")
         return self.api.SPAPI_AddOrder(buffer)
 
 # def cleanup():

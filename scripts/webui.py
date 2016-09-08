@@ -300,6 +300,7 @@ def order_list():
 def order_add():
     if not request.json:
         abort(400)
+    print(request.json)
     sp.order_add(request.json)
 
 

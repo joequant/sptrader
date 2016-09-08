@@ -33,6 +33,7 @@ class FfiConverter(object):
     """Converts dict to and from ffi cdata objects"""
     def __init__(self, ffi):
         self.ffi = ffi
+        self.debug = True
 
     def __convert_struct_field(self, s, fields):
         for field, fieldtype in fields:
@@ -54,6 +55,18 @@ class FfiConverter(object):
         else:
             return []
 
+    def typedefs(self, s):
+        type = self.ffi.typeof(s)
+        if type.kind == 'struct':
+            retval = {}
+            for x, y in type.fields:
+                if self.debug:
+                    print(x, y)
+                retval[x] = {"kind": y.type.kind,
+                                "cname": y.type.cname}
+            return retval
+        else:
+            return {}
 
     def to_py(self, s):
         type = self.ffi.typeof(s)
