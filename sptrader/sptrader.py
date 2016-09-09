@@ -445,7 +445,7 @@ class SPTrader(object):
                        app_id,
                        user_id,
                        password):
-        self.user = ffi.new("char[]", user_id.encode("utf-8"))
+        self.user = user_id.encode("utf-8")
         self.acc_no = self.user
         self.api.SPAPI_SetLoginInfo(host.encode("utf-8"),
                                     port,
@@ -554,13 +554,12 @@ class SPTrader(object):
         type = self.ffi_conv.typedefs(buffer[0])
         print(type)
         for k, v in data.items():
-            if type[k]['kind'] == 'primitive' and \
-               type[k]['cname'][0:4] == 'char':
+            if type[k]['cname'][0:4] == 'char':
                 setattr(buffer[0], k, bytes(v, 'utf-8'))
             else:
                 setattr(buffer[0], k, v)
-        buffer[0].AccNo = self.acc_no.encode("utf-8")
-        buffer[0].Initiator = self.user.encode("utf-8")
+        buffer[0].AccNo = self.acc_no
+        buffer[0].Initiator = self.user
         return self.api.SPAPI_AddOrder(buffer)
 
 # def cleanup():
