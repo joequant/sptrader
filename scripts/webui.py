@@ -20,6 +20,9 @@ import strategy
 
 sp = sptrader.SPTrader()
 log_subscriptions = []
+empty_cache = {"connected": {},
+               "accountinfo": None}
+info_cache = empty_cache
 ticker_products = set()
 app = Flask(__name__,
             static_url_path="/static",
@@ -34,6 +37,16 @@ def hello():
 
 @app.route("/login-info")
 def logininfo():
+    for k, v in info_cache['connected'].items():
+        msg = {
+            "id": "ConnectedReply",
+            "host_type": k,
+            "con_status": v
+        }
+        for sub in log_subscriptions[:]:
+            sub.put(msg)
+    if info_cache['accountinfo'] is not None:
+        send_cdata("AccountInfoPush", info_cache['accountinfo'])
     return jsonify({"info": config.logininfo,
                     "status" : "%d" % sp.get_login_status(80)})
 
@@ -66,6 +79,7 @@ def send_cdata(id, data):
 
 @sp.ffi.callback("AccountInfoPushAddr")
 def account_info_push(data):
+    info_cache['accountinfo'] = data
     send_cdata("AccountInfoPush", data)
 sp.register_account_info_push(account_info_push)
 
@@ -116,6 +130,7 @@ def connected_reply(host_type, con_status):
         }
     for sub in log_subscriptions[:]:
         sub.put(msg)
+    info_cache['connected'][host_type] = con_status
     if host_type == 83 and con_status == 2:
         sp.register_ticker_update(ticker_update)
         for p in ticker_products:
@@ -136,14 +151,6 @@ def login():
     return jsonify({"retval": sp.login()})
 
 
-@app.route("/login-status/<int:host_id>")
-def get_login_status(host_id):
-    global sp
-    if host_id not in [80, 81, 83, 87, 88]:
-        return "-1"
-    return "%d" % sp.get_login_status(host_id)
-
-
 @app.route("/ping")
 def ping():
     msg = {
@@ -157,7 +164,7 @@ def ping():
 
 @app.route("/logout")
 def logout():
-    global sp
+    info_cache = empty_cache
     sp.logout()
     return "OK"
 

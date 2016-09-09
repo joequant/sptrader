@@ -555,7 +555,7 @@ class SPTrader(object):
         print(type)
         for k, v in data.items():
             if type[k]['kind'] == 'primitive' and \
-               type[k]['cname'] == 'char':
+               type[k]['cname'][0:4] == 'char':
                 setattr(buffer[0], k, bytes(v, 'utf-8'))
             else:
                 setattr(buffer[0], k, v)

@@ -25,15 +25,27 @@ var OrderForm = React.createClass({
 	change[e.target.name] = e.target.value;
 	this.setState({"data": change});
     },
+    onChangeFloat: function(e) {
+	var change = this.state.data;
+	change[e.target.name] = e.target.value;
+	this.setState({"data": change});
+    },
+    onChangeInt: function(e) {
+	var change = this.state.data;
+	change[e.target.name] = parseInt(e.target.value);
+	this.setState({"data": change});
+    },
     onBuy: function(e) {
 	var d = this.state.data;
-	d['BuySell'] = 'B'; 
+	d['BuySell'] = 'B';
+	d['Price'] = parseFloat(d['Price']);
 	this.props.onSubmit(d);
     },
     onSell: function(e) {
 	var d = this.state.data;
-	d['BuySell'] = 'S'; 
-	this.props.onSubmit(this.state.data);
+	d['BuySell'] = 'S';
+	d['Price'] = parseFloat(d['Price']);
+	this.props.onSubmit(d);
     },
     onCancel: function(e) {
 	this.props.onCancel();
@@ -48,62 +60,48 @@ var OrderForm = React.createClass({
 		<Row>
 		<Col sm={6} md={3}>
 		<FieldGroup
-	    name="product"
+	    name="ProdCode"
 	    type="text"
 	    label="Product"
 	    onChange={this.onChange}
-	    value={this.state.data.product}
+	    value={this.state.data.ProdCode}
 		/>
 		<FieldGroup
-	    name="price"
+	    name="Price"
 	    type="text"
 	    label="Price"
-	    onChange={this.onChange}
-	    value={this.state.data.price}
+	    onChange={this.onChangeFloat}
+	    value={this.state.data.Price}
 		/>
 		<FieldGroup
-	    name="qty"
+	    name="Qty"
 	    type="text"
 	    label="Qty"
-	    onChange={this.onChange}
-	    value={this.state.data.qty}
+	    onChange={this.onChangeInt}
+	    value={this.state.data.Qty}
 		/>
 		</Col>
 		<Col sm={6} md={3}>
 				<FieldGroup
-	    name="cond"
+	    name="CondType"
 	    type="text"
 	    label="Cond"
-	    onChange={this.onChange}
-	    value={this.state.data.cond}
+	    onChange={this.onChangeInt}
+	    value={this.state.data.CondType}
 		/>
 		<FieldGroup
-	    name="type"
+	    name="OrderType"
 	    type="text"
 	    label="Type"
-	    onChange={this.onChange}
-	    value={this.state.data.type}
+	    onChange={this.onChangeInt}
+	    value={this.state.data.OrderType}
 		/>
 		<FieldGroup
-	    name="date"
-	    type="text"
-	    label="Date"
-	    onChange={this.onChange}
-	    value={this.state.data.date}
-		/>
-		<FieldGroup
-	    name="Stop"
-	    type="text"
-	    label="Stop/Trigger"
-	    onChange={this.onChange}
-	    value={this.state.data.stoplimit}
-		/>
-		<FieldGroup
-	    name="ref"
+	    name="Ref"
 	    type="text"
 	    label="Ref"
 	    onChange={this.onChange}
-	    value={this.state.data.ref}
+	    value={this.state.data.Ref}
 		/>
 
 		</Col>
