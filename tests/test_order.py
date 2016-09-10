@@ -29,6 +29,28 @@ def login_actions(ret_code, ret_msg):
     print("login")
     print(login['user_id'])
 
+@sp.ffi.callback("ApiOrderRequestFailedAddr")
+def api_order_request_failed(action,
+                             order,
+                             err_code,
+                             err_msg):
+    d = sp.cdata_to_py(order)
+    d['action'] = action
+    d['err_code'] = err_code
+    d['err_msg'] = err_msg
+    print(d)
+
+@sp.ffi.callback("ApiTradeReportAddr")
+def api_order_request_failed(rec_no, trade):
+    d = sp.cdata_to_py(trade)
+    d['rec_no'] = rec_no
+    print(d)
+
+@sp.ffi.callback("ApiOrderBeforeSendReportAddr")
+def api_order_before_send_report(order):
+    d = sp.cdata_to_py(order)
+    print(d)
+
 sp.register_login_reply(login_actions)
 print(sp.login())
 
