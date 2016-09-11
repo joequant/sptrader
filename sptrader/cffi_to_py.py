@@ -39,9 +39,7 @@ class FfiConverter(object):
         for field, fieldtype in fields:
             if fieldtype.type.kind == 'primitive':
                 d = getattr(s, field)
-                if d == b'\x00':
-                    yield(field, '')
-                elif fieldtype.type.cname == 'char':
+                if fieldtype.type.cname == 'char':
                     yield(field, ord(d))
                 else:
                     yield (field, d)
@@ -63,10 +61,26 @@ class FfiConverter(object):
                 if self.debug:
                     print(x, y)
                 retval[x] = {"kind": y.type.kind,
-                                "cname": y.type.cname}
+                             "cname": y.type.cname}
             return retval
         else:
             return {}
+
+    def from_py(self, struct_t, data):
+        buffer = self.ffi.new("%s[1]" % struct_t)
+        type = self.typedefs(buffer[0])
+        for k, v in data.items():
+            try:
+                if type[k]['cname'][0:4] == 'char':
+                    if isinstance(v, str):
+                        v = bytes(v, 'utf-8')
+                    elif isinstance(v, int):
+                        v = bytes([v])
+                setattr(buffer[0], k, v)
+            except TypeError as e:
+                print("failed %s %s %s" % (format(e), k, v))
+                return None
+        return buffer
 
     def to_py(self, s):
         type = self.ffi.typeof(s)

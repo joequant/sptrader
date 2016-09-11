@@ -3,6 +3,7 @@ import atexit
 import os
 import struct
 import cffi_to_py
+import sys
 
 if 8 * struct.calcsize("P") != 64:
     print("sptrader only supported for 64 bit")
@@ -22,8 +23,8 @@ typedef unsigned char   u_char;
 typedef unsigned short  u_short;
 typedef unsigned int    u_int;
 typedef unsigned long   u_long;
-typedef __int64_t          bigint;
-typedef __uint64_t u_bigint;
+typedef long long       bigint;
+typedef unsigned long long u_bigint;
 
 typedef char STR4[4];
 typedef char STR16[16];
@@ -438,6 +439,12 @@ class SPTrader(object):
     def load_instrument_list(self):
         return self.api.SPAPI_LoadInstrumentList()
 
+    def register_order_report(self, func):
+        self.api.SPAPI_RegisterOrderReport(func)
+
+    def register_order_before_send_report(self, func):
+        self.api.SPAPI_RegisterOrderBeforeSendReport(func)
+
     def set_login_info(self,
                        host,
                        port,
@@ -550,16 +557,11 @@ class SPTrader(object):
         return self.ffi_conv.fields(s)
 
     def order_add(self, data):
-        buffer = self.ffi.new("SPApiOrder[1]")
-        type = self.ffi_conv.typedefs(buffer[0])
-        print(type)
-        for k, v in data.items():
-            if type[k]['cname'][0:4] == 'char':
-                setattr(buffer[0], k, bytes(v, 'utf-8'))
-            else:
-                setattr(buffer[0], k, v)
-        buffer[0].AccNo = self.acc_no
-        buffer[0].Initiator = self.user
+        data['AccNo'] = self.acc_no
+        data['Initiator'] = self.user
+        buffer = self.ffi_conv.from_py("SPApiOrder", data)
+        if buffer is None:
+            return -2
         return self.api.SPAPI_AddOrder(buffer)
 
 # def cleanup():

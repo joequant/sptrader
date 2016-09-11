@@ -33,7 +33,7 @@ class SharpPointCSVData(feed.CSVDataBase):
     def start(self):
         super(SharpPointCSVData, self).start()
         if self.p.newdata:
-            self.f.seek(0,2)
+            self.f.seek(0, 2)
 
     def _load(self):
         if self.f is None:
