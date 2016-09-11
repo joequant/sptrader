@@ -64,10 +64,10 @@ def api_order_before_send_report(order):
 def login_actions(ret_code, ret_msg):
     print("login")
     print(login['user_id'])
-    sp.register_connecting_reply(connected_reply_func)
-    sp.register_order_report(api_order_report)
-    sp.register_order_before_send_report(api_order_before_send_report)
 
+sp.register_connecting_reply(connected_reply_func)
+sp.register_order_report(api_order_report)
+sp.register_order_before_send_report(api_order_before_send_report)
 sp.register_login_reply(login_actions)
 
 print(sp.login())
