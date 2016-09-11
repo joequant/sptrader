@@ -564,7 +564,6 @@ class SPTrader(object):
             return -2
         return self.api.SPAPI_AddOrder(buffer)
 
-# def cleanup():
-#     self.api.SPAPI_Uninitialize()
-
-# atexit.register(cleanup)
+    def __del__(self):
+        pass
+#        self.api.SPAPI_Uninitialize()
