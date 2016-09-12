@@ -409,14 +409,38 @@ class SPTrader(object):
     def register_login_reply(self, login_reply_func):
         self.api.SPAPI_RegisterLoginReply(login_reply_func)
 
-    def register_account_info_push(self, account_info_func):
-        self.api.SPAPI_RegisterAccountInfoPush(account_info_func)
-
     def register_connecting_reply(self, connected_reply_func):
         self.api.SPAPI_RegisterConnectingReply(connected_reply_func)
 
-    def register_instrument_list_reply(self, func):
-        self.api.SPAPI_RegisterInstrumentListReply(func)
+    def register_order_report(self, func):
+        self.api.SPAPI_RegisterOrderReport(func)
+
+    def register_order_request_failed(self, func):
+        self.api.SPAPI_RegisterOrderRequestFailed(func)
+
+    def register_order_before_send_report(self, func):
+        self.api.SPAPI_RegisterOrderBeforeSendReport(func)
+
+    def register_account_login_reply(self, func):
+        self.api.SPAPI_RegisterAccountLoginReply(func)
+
+    def register_account_logout_reply(self, func):
+        self.api.SPAPI_ReigsterAccountLogoutReply(func)
+
+    def register_account_info_push(self, account_info_func):
+        self.api.SPAPI_RegisterAccountInfoPush(account_info_func)
+
+    def register_account_position_push(self, func):
+        self.api.SPAPI_RegisterAccountPositionPush(func)
+
+    def register_updated_account_position_push(self, func):
+        self.api.SPAPI_RegisterUpdatedAccountPositionPush(func)
+
+    def register_updated_account_balance_push(self, func):
+        self.api.SPAPI_RegisterUpdatedAccountBalancePush(func)
+
+    def register_trade_report(self, func):
+        self.api.SPAPI_RegisterTradeReport(func)
 
     def register_api_price_update(self, func):
         self.api.SPAPI_RegisterApiPriceUpdate(func)
@@ -424,26 +448,29 @@ class SPTrader(object):
     def register_ticker_update(self, func):
         self.api.SPAPI_RegisterTickerUpdate(func)
 
-    def register_account_position_push(self, func):
-        self.api.SPAPI_RegisterAccountPositionPush(func)
-
-    def register_trade_report(self, func):
-        self.api.SPAPI_RegisterTradeReport(func)
-
-    def register_ticker_update(self, func):
-        self.api.SPAPI_RegisterTickerUpdate(func)
+    def register_psw_change_reply(self, func):
+        self.api.SPAPI_RegisterPswChangeReply(func)
 
     def register_product_list_by_code_reply(self, func):
         self.api.SPAPI_RegisterProductListByCodeReply(func)
 
+    def register_instrument_list_reply(self, func):
+        self.api.SPAPI_RegisterInstrumentListReply(func)
+
+    def register_business_date_reply(self, func):
+        self.api.SPAPI_RegisterBusinessDateReply(func)
+
+    def register_mm_order_request_failed(self, func):
+        self.api.SPAPI_RegisterMMOrderRequestFailed(func)
+
+    def register_mm_order_before_send_report(self, func):
+        self.api.SPAPI_RegisterMMOrderBeforeSendReport(func)
+
+    def register_quote_request_received_report(self, func):
+        self.api.SPAPI_RegisterQuoteRequestReceivedReport(func)
+
     def load_instrument_list(self):
         return self.api.SPAPI_LoadInstrumentList()
-
-    def register_order_report(self, func):
-        self.api.SPAPI_RegisterOrderReport(func)
-
-    def register_order_before_send_report(self, func):
-        self.api.SPAPI_RegisterOrderBeforeSendReport(func)
 
     def set_login_info(self,
                        host,
