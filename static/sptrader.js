@@ -223,7 +223,6 @@ var SpTraderApp = React.createClass({
     accountInfoPush: function(event) {
 	data = JSON.parse(event.data);
 	console.log(data);
-	this.setState({log: this.state.log + event.data + "\n"});
 	this.setState({account_info: data});
     },
     updateTickers: function(event) {
@@ -246,13 +245,30 @@ var SpTraderApp = React.createClass({
 	}
 	this.setState({trades: d});
     },
+    updateOrders: function(event) {
+	var data = JSON.parse(event.data);
+	data = data.data;
+	console.log(data);
+	var d = this.state.orders;
+	var found = false;
+	for (var i =0; i < d.length; i++) {
+	    if (d[i].IntOrderNo == data.IntOrderNo) {
+		d[i] = data;
+		found = true;
+	    }
+	}
+	if (!found) {
+	    d.push(data);
+	}
+	this.setState({orders: d});
+    },
     render: function() {
 	var events = {
 	    "ping" : this.addToLog,
 	    "LoginReply" : this.loginReply,
 	    "ConnectedReply" : this.connectedReply,
 	    "OrderRequestFailed" : this.orderFailed,
-	    "OrderReport" : this.addToLog,
+	    "OrderReport" : this.updateOrders,
 	    "OrderBeforeSendReport" : this.addToLog,
 	    "AccountLoginReply" : this.addToLog,
 	    "AccountInfoPush" : this.accountInfoPush,
