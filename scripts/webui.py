@@ -102,6 +102,30 @@ def api_price_update(data):
 sp.register_api_price_update(api_price_update)
 
 
+@sp.ffi.callback("ApiOrderReportAddr")
+def api_order_report(data):
+    send_cdata("ApiOrderReport", data)
+sp.register_order_report(api_order_report)
+
+
+@sp.ffi.callback("ApiOrderBeforeSendReportAddr")
+def api_order_before_send_report(data):
+    send_cdata("ApiOrderBeforeSendReport", data)
+sp.register_order_before_send_report(api_order_before_send_report)
+
+
+@sp.ffi.callback("ApiOrderRequestFailedAddr")
+def api_order_request_failed(action,
+                             order,
+                             err_code,
+                             err_msg):
+    d = sp.cdata_to_py(order)
+    d['action'] = action
+    d['err_code'] = err_code
+    d['err_msg'] = err_msg
+    print(d)
+sp.register_order_request_failed(api_order_request_failed)
+
 @sp.ffi.callback("InstrumentListReplyAddr")
 def instrument_list_reply(is_ready, ret_msg):
     data = {"is_ready": is_ready,
@@ -308,7 +332,7 @@ def order_add():
     if not request.json:
         abort(400)
     print(request.json)
-    sp.order_add(request.json)
+    return sp.order_add(request.json)
 
 
 @app.route("/price/subscribe/<string:products>")
