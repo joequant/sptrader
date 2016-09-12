@@ -91,7 +91,7 @@ def order_request_failed(action, order, error_code, error_msg):
         "action": ord(action),
         "data": sp.cdata_to_py(order[0]),
         "error_code": error_code,
-        "error_msg": sp.cdata_to_py(error_msg)})
+        "error_msg": sp.ffi.string(error_msg)})
 sp.register_order_request_failed(order_request_failed)
 
 
@@ -156,19 +156,19 @@ sp.register_updated_account_balance_push(updated_account_balance_push)
 
 @sp.ffi.callback("ApiTradeReportAddr")
 def trade_report(rec_no, data):
-    send_cdata("ApiTradeReport", data)
+    send_cdata("TradeReport", data)
 sp.register_trade_report(trade_report)
 
 
 @sp.ffi.callback("ApiPriceUpdateAddr")
 def api_price_update(data):
-    send_cdata("ApiPriceUpdate", data)
+    send_cdata("PriceUpdate", data)
 sp.register_price_update(api_price_update)
 
 
 @sp.ffi.callback("ApiTickerUpdateAddr")
 def api_ticker_update(data):
-    send_cdata("ApiTickerUpdate", data)
+    send_cdata("TickerUpdate", data)
 sp.register_ticker_update(api_ticker_update)
 
 
@@ -185,7 +185,7 @@ def product_list_by_code(inst_code, is_ready, ret_msg):
         "is_ready": is_ready,
         "ret_msg": ret_msg,
         "data": sp.get_product()}
-    send_dict("ProductListByCode", data)
+    send_dict("ProductListByCodeReply", data)
 sp.register_product_list_by_code_reply(product_list_by_code)
 
 

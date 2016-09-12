@@ -120,7 +120,8 @@ var SpTraderApp = React.createClass({
 	    showOrderForm: false,
 	    tickers: [],
 	    orders: [],
-	    trades: []
+	    trades: [],
+	    positions: []
 	};
     },
     submitModal: function(data) {
@@ -202,22 +203,48 @@ var SpTraderApp = React.createClass({
 	console.log(data);
 	this.setState({tickers: data.data});
     },
+    updateTrades: function(event) {
+	data = JSON.parse(event.data);
+	d = this.state.trades;
+	var found = false;
+	for (var i =0; i < d.length; i++) {
+	    if (d[i].IntOrderNo == data.IntOrderNo) {
+		d[i] = data;
+		found = true;
+	    }
+	}
+	if (!found) {
+	    d.push(data);
+	}
+	this.setState({trades: d});
+    },
     render: function() {
 	var events = {
 	    "ping" : this.addToLog,
 	    "LoginReply" : this.loginReply,
 	    "ConnectedReply" : this.connectedReply,
+	    "OrderRequestFailed" : this.addToLog,
+	    "OrderReport" : this.addToLog,
+	    "OrderBeforeSendReport" : this.addToLog,
+	    "AccountLoginReply" : this.addToLog,
 	    "AccountInfoPush" : this.accountInfoPush,
-	    "UpdateTickers" : this.updateTickers,
 	    "AccountPositionPush" : this.addToLog,
-	    "ApiTradeReport" : this.addToLog,
-	    "ApiPriceUpdate" : this.addToLog,
+	    "UpdatedAccountPositionPush" : this.addToLog,
+	    "UpdatedAccountBalancePush" : this.addToLog,
+	    "TradeReport" : this.updateTrades,
+	    "PriceUpdate" : this.addToLog,
+	    "TickerUpdate" : this.updateTickers,
+	    "PswChangeReply" : this.addToLog,
+	    "ProductListByCodeReply" : this.addToLog,
 	    "InstrumentListReply" : this.addToLog,
-	    "ProductListByCodeReply" : this.addToLog
+	    "BusinessDateReply" : this.addToLog,
+	    "MMOrderBeforeSendReport" : this.addToLog,
+	    "MMOrderRequestFailed" : this.addToLog,
+	    "QuoteRequestReceived" : this.addToLog
 	}
 	return(
 		<Tabs id="tabs">
-		<Tab eventKey={1} title="Login">
+		<Tab eventKey={1} title="Account">
 		<LoginForm show={this.state.showLoginForm}
 	    label={this.state.loginLabel}
 	    data={this.state.info}
@@ -236,7 +263,7 @@ var SpTraderApp = React.createClass({
 		<OrderTable data={this.state.orders} />
 		</Tab>
 		<Tab eventKey={3} title="Position">
-		<PositionTable />
+		<PositionTable data={this.state.positions} />
 		</Tab>
 		<Tab eventKey={4} title="Trade">
 		<TradeTable data={this.state.trades}/>
