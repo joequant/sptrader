@@ -88,10 +88,10 @@ sp.register_connecting_reply(connected_reply)
 @sp.ffi.callback("ApiOrderRequestFailedAddr")
 def order_request_failed(action, order, error_code, error_msg):
     send_dict("OrderRequestFailed", {
-        "action": action,
+        "action": ord(action),
         "data": sp.cdata_to_py(order[0]),
         "error_code": error_code,
-        "error_msg": error_msg})
+        "error_msg": sp.cdata_to_py(error_msg)})
 sp.register_order_request_failed(order_request_failed)
 
 
@@ -216,8 +216,8 @@ sp.register_mm_order_before_send_report(api_mm_order_before_send_report)
 def api_mm_order_request_failed(mm_order, err_code, err_msg):
     send_dict("MMOrderRequestFailed",
               {"data": sp.cdata_to_py(mm_order[0]),
-               "err_code": err_code,
-               "err_msg": err_msg})
+               "err_code": sp.cdata_to_py(err_code),
+               "err_msg": sp.cdata_to_py(err_msg)})
 sp.register_mm_order_request_failed(api_mm_order_request_failed)
 
 
