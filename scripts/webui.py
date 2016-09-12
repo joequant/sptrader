@@ -91,7 +91,7 @@ def order_request_failed(action, order, error_code, error_msg):
         "action": ord(action),
         "data": sp.cdata_to_py(order[0]),
         "error_code": error_code,
-        "error_msg": sp.ffi.string(error_msg)})
+        "error_msg": sp.ffi.string(error_msg).encode('utf-8')})
 sp.register_order_request_failed(order_request_failed)
 
 
