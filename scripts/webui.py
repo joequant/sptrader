@@ -35,38 +35,6 @@ def hello():
     return app.send_static_file("sptrader.html")
 
 
-@app.route("/login-info")
-def logininfo():
-    for k, v in info_cache['connected'].items():
-        msg = {
-            "id": "ConnectedReply",
-            "host_type": k,
-            "con_status": v
-        }
-        for sub in log_subscriptions[:]:
-            sub.put(msg)
-    if info_cache['accountinfo'] is not None:
-        send_cdata("AccountInfoPush", info_cache['accountinfo'])
-    return jsonify({"info": config.logininfo,
-                    "status" : "%d" % sp.get_login_status(80)})
-
-
-@sp.ffi.callback("LoginReplyAddr")
-def login_reply(ret_code, ret_msg):
-    if ret_code == 0:
-        ret_msg = ''
-    else:
-        ret_msg = sp.ffi.string(ret_msg).decode('utf-8')
-
-    msg = {
-        "id": "LoginReply",
-        "ret_code": ret_code,
-        "ret_msg": ret_msg
-        }
-    for sub in log_subscriptions[:]:
-        sub.put(msg)
-sp.register_login_reply(login_reply)
-
 def send_dict(id, msg):
     msg["id"] = id
     for sub in log_subscriptions[:]:
@@ -75,6 +43,90 @@ def send_dict(id, msg):
 
 def send_cdata(id, data):
     send_dict(id, sp.cdata_to_py(data[0]))
+
+
+@app.route("/login-info")
+def logininfo():
+    for k, v in info_cache['connected'].items():
+        send_dict("ConnectedReply", {
+            "host_type": k,
+            "con_status": v
+        })
+    if info_cache['accountinfo'] is not None:
+        send_cdata("AccountInfoPush", info_cache['accountinfo'])
+    return jsonify({"info": config.logininfo,
+                    "status": "%d" % sp.get_login_status(80)})
+
+
+@sp.ffi.callback("LoginReplyAddr")
+def login_reply(ret_code, ret_msg):
+    if ret_code == 0:
+        ret_msg = ''
+    else:
+        ret_msg = sp.ffi.string(ret_msg).decode('utf-8')
+    send_dict("LoginReply", {
+        "ret_code": ret_code,
+        "ret_msg": ret_msg
+        })
+sp.register_login_reply(login_reply)
+
+
+@sp.ffi.callback("ConnectedReplyAddr")
+def connected_reply(host_type, con_status):
+    send_dict("ConnectedReply", {
+        "host_type": host_type,
+        "con_status": con_status
+        })
+    info_cache['connected'][host_type] = con_status
+    if host_type == 83 and con_status == 2:
+        sp.register_ticker_update(ticker_update)
+        for p in ticker_products:
+            sp.subscribe_ticker(p, 1)
+sp.register_connecting_reply(connected_reply)
+
+
+@sp.ffi.callback("ApiOrderRequestFailedAddr")
+def order_request_failed(action, order, error_code, error_msg):
+    send_dict("OrderRequestFailed", {
+        "action": action,
+        "data": sp.cdata_to_py(order[0]),
+        "error_code": error_code,
+        "error_msg": error_msg})
+sp.register_order_request_failed(order_request_failed)
+
+
+@sp.ffi.callback("ApiOrderReportAddr")
+def order_report(rec_no, data):
+    send_dict("OrderReport", {
+        "rec_no": rec_no,
+        "data": sp.cdata_to_py(data[0])
+        })
+sp.register_order_report(order_report)
+
+
+@sp.ffi.callback("ApiOrderBeforeSendReportAddr")
+def api_order_before_send_report(data):
+    send_cdata("OrderBeforeSendReport", data)
+sp.register_order_before_send_report(api_order_before_send_report)
+
+
+@sp.ffi.callback("AccountLoginReplyAddr")
+def account_login_reply(accNo, ret_code, ret_msg):
+    send_dict("AccountLoginReply", {
+        "accNo": accNo,
+        "ret_code": ret_code,
+        "ret_msg": ret_msg
+        })
+sp.register_account_login_reply(account_login_reply)
+
+
+@sp.ffi.callback("AccountLogoutReplyAddr")
+def account_logout_reply(ret_code, ret_msg):
+    send_dict("AccountLogoutReply", {
+        "ret_code": ret_code,
+        "ret_msg": ret_msg
+        })
+sp.register_account_logout_reply(account_logout_reply)
 
 
 @sp.ffi.callback("AccountInfoPushAddr")
@@ -90,6 +142,18 @@ def account_position_push(data):
 sp.register_account_position_push(account_position_push)
 
 
+@sp.ffi.callback("UpdatedAccountPositionPushAddr")
+def updated_account_position_push(data):
+    send_cdata("UpdatedAccountPositionPush", data)
+sp.register_updated_account_position_push(updated_account_position_push)
+
+
+@sp.ffi.callback("UpdatedAccountBalancePushAddr")
+def updated_account_balance_push(data):
+    send_cdata("UpdatedAccountBalancePush", data)
+sp.register_updated_account_balance_push(updated_account_balance_push)
+
+
 @sp.ffi.callback("ApiTradeReportAddr")
 def trade_report(rec_no, data):
     send_cdata("ApiTradeReport", data)
@@ -99,39 +163,19 @@ sp.register_trade_report(trade_report)
 @sp.ffi.callback("ApiPriceUpdateAddr")
 def api_price_update(data):
     send_cdata("ApiPriceUpdate", data)
-sp.register_api_price_update(api_price_update)
+sp.register_price_update(api_price_update)
 
 
-@sp.ffi.callback("ApiOrderReportAddr")
-def api_order_report(data):
-    send_cdata("ApiOrderReport", data)
-sp.register_order_report(api_order_report)
+@sp.ffi.callback("ApiTickerUpdateAddr")
+def api_ticker_update(data):
+    send_cdata("ApiTickerUpdate", data)
+sp.register_ticker_update(api_ticker_update)
 
 
-@sp.ffi.callback("ApiOrderBeforeSendReportAddr")
-def api_order_before_send_report(data):
-    send_cdata("ApiOrderBeforeSendReport", data)
-sp.register_order_before_send_report(api_order_before_send_report)
-
-
-@sp.ffi.callback("ApiOrderRequestFailedAddr")
-def api_order_request_failed(action,
-                             order,
-                             err_code,
-                             err_msg):
-    d = sp.cdata_to_py(order)
-    d['action'] = action
-    d['err_code'] = err_code
-    d['err_msg'] = err_msg
-    print(d)
-sp.register_order_request_failed(api_order_request_failed)
-
-@sp.ffi.callback("InstrumentListReplyAddr")
-def instrument_list_reply(is_ready, ret_msg):
-    data = {"is_ready": is_ready,
-            "ret_msg": ret_msg,
-            "data": sp.get_instrument()}
-    send_cdata("InstrumentListReply", data)
+@sp.ffi.callback("PswChangeReplyAddr")
+def psw_change_reply(ret_code, ret_msg):
+    send_cdata("PswChangeReply", data)
+sp.register_psw_change_reply(psw_change_reply)
 
 
 @sp.ffi.callback("ProductListByCodeReplyAddr")
@@ -141,25 +185,49 @@ def product_list_by_code(inst_code, is_ready, ret_msg):
         "is_ready": is_ready,
         "ret_msg": ret_msg,
         "data": sp.get_product()}
-    send_cdata("ProductListByCode", data)
+    send_dict("ProductListByCode", data)
 sp.register_product_list_by_code_reply(product_list_by_code)
 
 
-@sp.ffi.callback("ConnectedReplyAddr")
-def connected_reply(host_type, con_status):
-    msg = {
-        "id": "ConnectedReply",
-        "host_type": host_type,
-        "con_status": con_status
-        }
-    for sub in log_subscriptions[:]:
-        sub.put(msg)
-    info_cache['connected'][host_type] = con_status
-    if host_type == 83 and con_status == 2:
-        sp.register_ticker_update(ticker_update)
-        for p in ticker_products:
-            sp.subscribe_ticker(p, 1)
-sp.register_connecting_reply(connected_reply)
+@sp.ffi.callback("InstrumentListReplyAddr")
+def instrument_list_reply(is_ready, ret_msg):
+    data = {"is_ready": is_ready,
+            "ret_msg": ret_msg,
+            "data": sp.get_instrument()}
+    send_dict("InstrumentListReply", data)
+sp.register_instrument_list_reply(instrument_list_reply)
+
+
+@sp.ffi.callback("BusinessDateReplyAddr")
+def business_date_reply(business_date):
+    send_dict("BusinessDateReply", {
+        "business_date": business_date
+        })
+sp.register_business_date_reply(business_date_reply)
+
+
+@sp.ffi.callback("ApiMMOrderBeforeSendReportAddr")
+def api_mm_order_before_send_report(mm_order):
+    send_cdata("MMOrderBeforeSendReport", mm_order)
+sp.register_mm_order_before_send_report(api_mm_order_before_send_report)
+
+
+@sp.ffi.callback("ApiMMOrderRequestFailedAddr")
+def api_mm_order_request_failed(mm_order, err_code, err_msg):
+    send_dict("MMOrderRequestFailed",
+              {"data": sp.cdata_to_py(mm_order[0]),
+               "err_code": err_code,
+               "err_msg": err_msg})
+sp.register_mm_order_request_failed(api_mm_order_request_failed)
+
+
+@sp.ffi.callback("ApiQuoteRequestReceivedAddr")
+def quote_request_received(product_code, buy_sell, qty):
+    send_dict("QuoteRequestReceived",
+              {"product_code": product_code,
+               "buy_sell": buy_sell,
+               "qty": qty})
+sp.register_quote_request_received_report(quote_request_received)
 
 
 @app.route("/login", methods=['POST'])
@@ -192,7 +260,8 @@ def logout():
     sp.logout()
     return "OK"
 
-#----------- Ticker code------
+# ----------- Ticker code------
+
 
 @sp.ffi.callback("ApiTickerUpdateAddr")
 def ticker_update(data):
@@ -206,7 +275,6 @@ def ticker_update(data):
                                               t['ProdCode'],
                                               t['DecInPrice']))
     tickerfile.close()
-                     
 sp.register_ticker_update(ticker_update)
 
 
@@ -250,7 +318,8 @@ def clear_ticker():
     fo.close()
     return "OK"
 
-#----------- Strategy ------
+# ----------- Strategy ------
+
 
 @app.route("/strategy/create/<string:strategy>/<string:id>")
 def strategy_create(strategy, id):
@@ -271,12 +340,14 @@ def strategy_pause(id):
 def strategy_log(id):
     pass
 
-#---------------------------
+
+# ---------------------------
 @app.route("/orders/read")
 def orders_read():
     pass
 
-#---------------------------
+
+# ---------------------------
 @app.route("/trade/list")
 def list_trade():
     return jsonify({"data": sp.get_all_trades()})
@@ -289,6 +360,7 @@ def ticker():
     except FileNotFoundError:
         open(ticker_file, 'a').close()
         tickerfile = open(ticker_file)
+
     def gen():
         try:
             while True:
@@ -300,6 +372,7 @@ def ticker():
         except GeneratorExit:  # Or maybe use flask signals
             tickerfile.close()
     return Response(gen(), mimetype="text/plain")
+
 
 @app.route("/ticker/get-new")
 def ticker_get_new():
@@ -309,6 +382,7 @@ def ticker_get_new():
         open(ticker_file, 'a').close()
         tickerfile = open(ticker_file)
     tickerfile.seek(0, 2)
+
     def gen():
         try:
             while True:
@@ -321,18 +395,20 @@ def ticker_get_new():
             tickerfile.close()
     return Response(gen(), mimetype="text/plain")
 
-#-----------------
+
+# -----------------
 
 @app.route("/order/list")
 def order_list():
     return jsonify({"data": sp.get_all_orders()})
+
 
 @app.route("/order/add", methods=['POST'])
 def order_add():
     if not request.json:
         abort(400)
     print(request.json)
-    return sp.order_add(request.json)
+    return str(sp.order_add(request.json))
 
 
 @app.route("/price/subscribe/<string:products>")
@@ -380,8 +456,6 @@ def subscribe():
 @app.route("/schema/<string:structure>")
 def schema(structure):
     return jsonify({"retval": sp.fields(structure)})
-
-
 
 
 if __name__ == "__main__":

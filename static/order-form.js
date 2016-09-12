@@ -58,6 +58,7 @@ var OrderForm = React.createClass({
 		       "confirm_text" : JSON.stringify(d)});
     },
     onConfirm: function(e) {
+	this.setState({"confirm_show": false});
 	this.props.onSubmit(this.state.data);
     },
     onCancel: function(e) {

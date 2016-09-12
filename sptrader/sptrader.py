@@ -425,7 +425,7 @@ class SPTrader(object):
         self.api.SPAPI_RegisterAccountLoginReply(func)
 
     def register_account_logout_reply(self, func):
-        self.api.SPAPI_ReigsterAccountLogoutReply(func)
+        self.api.SPAPI_RegisterAccountLogoutReply(func)
 
     def register_account_info_push(self, account_info_func):
         self.api.SPAPI_RegisterAccountInfoPush(account_info_func)
@@ -442,7 +442,7 @@ class SPTrader(object):
     def register_trade_report(self, func):
         self.api.SPAPI_RegisterTradeReport(func)
 
-    def register_api_price_update(self, func):
+    def register_price_update(self, func):
         self.api.SPAPI_RegisterApiPriceUpdate(func)
 
     def register_ticker_update(self, func):
