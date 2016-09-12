@@ -17,7 +17,9 @@ var OrderForm = React.createClass({
 	var l = this;
 	return {
 	    data: {
-	    }
+	    },
+	    confirm_text: '',
+	    confirm_show: false
 	};
     },
     onChange: function(e) {
@@ -38,20 +40,48 @@ var OrderForm = React.createClass({
     onBuy: function(e) {
 	var d = this.state.data;
 	d['BuySell'] = 'B';
+	d['CondType'] = 0;
+	d['OrderType'] = 0;
 	d['Price'] = parseFloat(d['Price']);
-	this.props.onSubmit(d);
+	this.setState({"confirm_show": true,
+		       "data": d,
+		       "confirm_text" : JSON.stringify(d)});
     },
     onSell: function(e) {
 	var d = this.state.data;
 	d['BuySell'] = 'S';
+	d['CondType'] = 0;
+	d['OrderType'] = 0;
 	d['Price'] = parseFloat(d['Price']);
-	this.props.onSubmit(d);
+	this.setState({"confirm_show": true,
+		       "data": d,
+		       "confirm_text" : JSON.stringify(d)});
+    },
+    onConfirm: function(e) {
+	this.props.onSubmit(this.state.data);
     },
     onCancel: function(e) {
+	this.setState({"confirm_show": false});
 	this.props.onCancel();
     },
     render: function() {
-	return (<Modal show={this.props.show}>
+	return (<div>
+		<Modal show={this.state.confirm_show}>
+		<Modal.Header>
+		</Modal.Header>
+		<Modal.Body>
+		{this.state.confirm_text}
+		<Button
+		onClick={this.onConfirm}>
+		Confirm
+		</Button>
+		<Button
+		onClick={this.onCancel}>
+		Cancel
+		</Button>
+		</Modal.Body>
+		</Modal>
+		<Modal show={this.props.show}>
 		<Modal.Header>
 		<Modal.Title>Order</Modal.Title>
 		</Modal.Header>
@@ -82,20 +112,25 @@ var OrderForm = React.createClass({
 		/>
 		</Col>
 		<Col sm={6} md={3}>
-				<FieldGroup
-	    name="CondType"
-	    type="text"
-	    label="Cond"
-	    onChange={this.onChangeInt}
-	    value={this.state.data.CondType}
-		/>
-		<FieldGroup
-	    name="OrderType"
-	    type="text"
-	    label="Type"
-	    onChange={this.onChangeInt}
-	    value={this.state.data.OrderType}
-		/>
+<FormGroup controlId="formControlsSelect">
+      <ControlLabel>CondType</ControlLabel>
+		<FormControl componentClass="select" placeholder="select"
+		name="CondType"
+		onChange={this.onChangeInt}
+		value={this.state.data.CondType}
+		>
+        <option value="0">Normal order</option>
+      </FormControl>
+    </FormGroup>
+<FormGroup controlId="formControlsSelect">
+<ControlLabel>Order Type</ControlLabel>
+<FormControl componentClass="select" placeholder="select"
+		name="OrderType" onChange={this.onChangeInt}
+		value={this.state.data.CondType}
+		>
+<option value="0">Limit</option>
+</FormControl>
+</FormGroup>
 		<FieldGroup
 	    name="Ref"
 	    type="text"
@@ -104,7 +139,7 @@ var OrderForm = React.createClass({
 	    value={this.state.data.Ref}
 		/>
 
-		</Col>
+		</Col> */
 		</Row>
 		</Grid>
 		<Button
@@ -123,6 +158,7 @@ var OrderForm = React.createClass({
 		<Modal.Footer>
 		</Modal.Footer>
 		</Modal>
+		</div>
 	);
     }
 });
