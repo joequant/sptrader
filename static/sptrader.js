@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Tabs, Tab, ButtonToolbar, Button, FormControl,
-	FormGroup, ControlLabel, HelpBlock } from 'react-bootstrap';
+	FormGroup, ControlLabel, HelpBlock, Modal } from 'react-bootstrap';
 import ReactAddonsLinkedStateMixin from 'react-addons-linked-state-mixin';
 import {AgGridReact} from 'ag-grid-react';
 import LoginForm from './login-form';
@@ -14,6 +14,25 @@ import TradeTable from './tables/trade-table';
 import AccountTable from './tables/account-table';
 import TickerControl from './ticker-control';
 import StrategyTab from './strategy-tab';
+
+var AlertBox = React.createClass( {
+    ok() {
+	this.props.ok();
+    },
+    render() {
+	return (<Modal show={this.props.show}>
+		<Modal.Header>
+		</Modal.Header>
+		<Modal.Body>
+		{this.props.text}
+		<Button
+		onClick={this.ok}>
+		OK
+		</Button>
+		</Modal.Body>
+		</Modal>);
+    }
+});
 
 var SubscribeBox = React.createClass( {
     getInitialState: function() {
@@ -118,6 +137,8 @@ var SpTraderApp = React.createClass({
 	    connection_info: {},
 	    showLoginForm: true,
 	    showOrderForm: false,
+	    showAlertBox: false,
+	    alertText: '',
 	    tickers: [],
 	    orders: [],
 	    trades: [],
@@ -182,6 +203,13 @@ var SpTraderApp = React.createClass({
     hideOrderForm: function(event) {
 	this.setState({showOrderForm: false});
     },
+    hideAlertBox: function(event) {
+	this.setState({showAlertBox: false});
+    },
+    orderFailed: function(event) {
+	this.setState({alertText: JSON.stringify(event.data),
+		       showAlertBox: true});
+    },
     submitOrder: function(data) {
 	console.log(data);
 	$.ajax({
@@ -204,8 +232,8 @@ var SpTraderApp = React.createClass({
 	this.setState({tickers: data.data});
     },
     updateTrades: function(event) {
-	data = JSON.parse(event.data);
-	d = this.state.trades;
+	var data = JSON.parse(event.data);
+	var d = this.state.trades;
 	var found = false;
 	for (var i =0; i < d.length; i++) {
 	    if (d[i].IntOrderNo == data.IntOrderNo) {
@@ -223,7 +251,7 @@ var SpTraderApp = React.createClass({
 	    "ping" : this.addToLog,
 	    "LoginReply" : this.loginReply,
 	    "ConnectedReply" : this.connectedReply,
-	    "OrderRequestFailed" : this.addToLog,
+	    "OrderRequestFailed" : this.orderFailed,
 	    "OrderReport" : this.addToLog,
 	    "OrderBeforeSendReport" : this.addToLog,
 	    "AccountLoginReply" : this.addToLog,
@@ -256,6 +284,9 @@ var SpTraderApp = React.createClass({
 		<AccountTable data={this.state.account_info} />
 		</Tab>
 		<Tab eventKey={2} title="Order">
+		<AlertBox show={this.state.showAlertBox}
+	    text={this.state.alertText}
+	    ok={this.hideAlertBox} />
 		<OrderForm show={this.state.showOrderForm}
 	    onSubmit={this.submitOrder}
 	    onCancel={this.hideOrderForm}/>
