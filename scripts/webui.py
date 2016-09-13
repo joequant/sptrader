@@ -320,24 +320,28 @@ def clear_ticker():
 
 # ----------- Strategy ------
 
+stratlist = {}
 
-@app.route("/strategy/create/<string:strategy>/<string:id>")
-def strategy_create(strategy, id):
-    strategy.run(strategy, id)
+@app.route("/strategy/start/<string:stratname>/<string:id>")
+def strategy_create(stratname, id):
+     stratlist[(stratname, id)] = \
+                               strategy.run(stratname, id)
+     stratlist[(stratname, id)].start()
+     return "OK"
 
 
-@app.route("/strategy/kill/<string:id>")
-def strategy_kill(id):
+@app.route("/strategy/stop/<string:stratname>/<string:id>")
+def strategy_stop(stratname, id):
+     stratlist[(stratname, id)].stop()
+
+
+@app.route("/strategy/pause/<string:stratname>/<string:id>")
+def strategy_pause(stratname, id):
     pass
 
 
-@app.route("/strategy/pause/<string:id>")
-def strategy_pause(id):
-    pass
-
-
-@app.route("/strategy/log/<string:id>")
-def strategy_log(id):
+@app.route("/strategy/log/<string:stratname>/<string:id>")
+def strategy_log(stratname, id):
     pass
 
 

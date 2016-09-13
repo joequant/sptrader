@@ -1,8 +1,21 @@
 import React from 'react';
-import {AgGridReact} from 'ag-grid-react';
+import {AgGridReact, reactCellRendererFactory} from 'ag-grid-react';
 import {Button} from 'react-bootstrap';
+
+var StrategyControl = React.createClass({
+    render() {
+	return (
+		<div>
+		<Button>Start</Button>
+		<Button>Pause</Button>
+		<Button>Stop</Button>
+		</div>
+	);
+    }
+});
+
 var SampleUi = React.createClass({
-    getInitialState: function() {
+    getInitialState() {
 	return {
 	    counter:0,
 	    columnDefs: [
@@ -22,19 +35,17 @@ var SampleUi = React.createClass({
 		 }},
 		{headerName: "operator",
 		 field: "start",
-		 cellRenderer: function(params) {
-		     return "<Button>Start</Button>";
-		 }
+		 cellRenderer: reactCellRendererFactory(StrategyControl)
 		}],
 	    rowData: [{id:0, product: "a"}]
 	};
     },
     // in onGridReady, store the api for later use
-    onGridReady: function(params) {
+    onGridReady(params) {
 	this.api = params.api;
 	this.columnApi = params.columnApi;
     },
-    addRow: function() {
+    addRow() {
 	var r = this.state.rowData;
 	var c = this.state.counter;
 	c = c+1;
@@ -43,7 +54,7 @@ var SampleUi = React.createClass({
 		       counter: c});
 	this.api.setRowData(r);
     },
-    render: function() {
+    render() {
 	return (
 	    <div>
 		<Button onClick={this.addRow}>Add Row</Button>

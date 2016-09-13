@@ -154,12 +154,12 @@ def run(args):
     datapath = os.path.join(modpath, '../data/ticker.txt')
     orderpath = os.path.join(modpath, '../data/orders.txt')
     p = Process(target=run_strategy, args=(datapath, orderpath, args))
-    p.start()
     return p
 
 if __name__ == '__main__':
     p = run({"newdata": True,
              "keepalive": True,
              "debug" : True})
+    p.start()
     p.join()
 
