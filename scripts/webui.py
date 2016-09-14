@@ -9,8 +9,9 @@ import time
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 sys.path.insert(0, os.path.join(location, ".."))
-ticker_file = os.path.join(location, "..", "data", "ticker.txt")
-order_file = os.path.join(location, "..", "data", "orders.txt")
+data_dir = os.path.join(location, "..", "data")
+ticker_file = os.path.join(data_dir, "ticker.txt")
+order_file = os.path.join(data_dir, "orders.txt")
 
 import config
 from queue import Queue
@@ -229,7 +230,29 @@ def quote_request_received(product_code, buy_sell, qty):
                "qty": qty})
 sp.register_quote_request_received_report(quote_request_received)
 
+def monitor_file(filename, newdata=False):
+    try:
+        tickerfile = open(filename)
+    except FileNotFoundError:
+        open(filename, 'a').close()
+        tickerfile = open(filename)
+    if newdata:
+        tickerfile.seek(0, 2)
 
+    def gen():
+        try:
+            while True:
+                line = tickerfile.readline()
+                if not line:
+                    time.sleep(0.1)
+                    continue
+                yield line
+        except GeneratorExit:  # Or maybe use flask signals
+            tickerfile.close()
+    return Response(gen(), mimetype="text/plain")
+
+
+# -------
 @app.route("/login", methods=['POST'])
 def login():
     if not request.json:
@@ -342,7 +365,8 @@ def strategy_pause(stratname, id):
 
 @app.route("/strategy/log/<string:stratname>/<string:id>")
 def strategy_log(stratname, id):
-    pass
+    monitor_file(os.path.join(data_dir,
+                              "log-%s-%s.txt" % (stratname, str(id))))
 
 
 # ---------------------------
@@ -359,45 +383,12 @@ def list_trade():
 
 @app.route("/ticker/get")
 def ticker():
-    try:
-        tickerfile = open(ticker_file)
-    except FileNotFoundError:
-        open(ticker_file, 'a').close()
-        tickerfile = open(ticker_file)
-
-    def gen():
-        try:
-            while True:
-                line = tickerfile.readline()
-                if not line:
-                    time.sleep(0.1)
-                    continue
-                yield line
-        except GeneratorExit:  # Or maybe use flask signals
-            tickerfile.close()
-    return Response(gen(), mimetype="text/plain")
+    return monitor_file(ticker_file)
 
 
 @app.route("/ticker/get-new")
 def ticker_get_new():
-    try:
-        tickerfile = open(ticker_file)
-    except FileNotFoundError:
-        open(ticker_file, 'a').close()
-        tickerfile = open(ticker_file)
-    tickerfile.seek(0, 2)
-
-    def gen():
-        try:
-            while True:
-                line = tickerfile.readline()
-                if not line:
-                    time.sleep(0.1)
-                    continue
-                yield line
-        except GeneratorExit:  # Or maybe use flask signals
-            tickerfile.close()
-    return Response(gen(), mimetype="text/plain")
+    return monitor_file(ticker_file, True)
 
 
 # -----------------

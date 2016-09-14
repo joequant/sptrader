@@ -110,6 +110,12 @@ class TestStrategy(bt.Strategy):
                 self.order = self.sell()
 
 def run_strategy(fname, oname, kwargs):
+    modpath = os.path.dirname(os.path.realpath(__file__))
+    logpath = os.path.join(modpath, '../data/log-%s-%s.txt' % \
+                           (args['name'],
+                            str(args['id'])))
+    f = open(logpath, "w")
+    sys.stdout = f
     retval = ""
     cerebro = bt.Cerebro()
     cerebro.addstrategy(TestStrategy)
@@ -132,8 +138,7 @@ def run_strategy(fname, oname, kwargs):
     cerebro.broker.setcommission(commission=0.001)
 
     # Print out the starting conditions
-    retval = retval + \
-             ('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
     # Run over everything
     cerebro.run()
@@ -143,8 +148,8 @@ def run_strategy(fname, oname, kwargs):
     plt.savefig(imgdata, format='svg')
     imgdata.close()
     # Print out the final result
-    retval = retval + \
-             ('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    f.close()
     return retval
 
 def run(args):
