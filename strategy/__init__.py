@@ -1,5 +1,6 @@
 import strategy.sample
 import sys
+import os
 
 def run(name, id):
     if name == "sample":

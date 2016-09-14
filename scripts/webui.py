@@ -347,16 +347,19 @@ stratlist = {}
 
 @app.route("/strategy/start/<string:stratname>/<string:id>")
 def strategy_create(stratname, id):
-     stratlist[(stratname, id)] = \
-                               strategy.run(stratname, id)
-     stratlist[(stratname, id)].start()
-     return "OK"
+    if (stratname, id) not in stratlist: 
+        stratlist[(stratname, id)] = \
+                              strategy.run(stratname, id)
+        stratlist[(stratname, id)].start()
+        return "OK"
+    else:
+        return "STARTED"
 
 
 @app.route("/strategy/stop/<string:stratname>/<string:id>")
 def strategy_stop(stratname, id):
-     stratlist[(stratname, id)].stop()
-
+    stratlist[(stratname, id)].stop()
+    stratlist.pop((stratname, id), None)
 
 @app.route("/strategy/pause/<string:stratname>/<string:id>")
 def strategy_pause(stratname, id):
@@ -365,8 +368,8 @@ def strategy_pause(stratname, id):
 
 @app.route("/strategy/log/<string:stratname>/<string:id>")
 def strategy_log(stratname, id):
-    monitor_file(os.path.join(data_dir,
-                              "log-%s-%s.txt" % (stratname, str(id))))
+    return monitor_file(os.path.join(data_dir,
+                                     "log-%s-%s.txt" % (stratname, str(id))))
 
 
 # ---------------------------

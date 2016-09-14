@@ -134,6 +134,7 @@ class SharpPointBroker(bt.BrokerBase):
 
     '''
     params = (
+        ('href', 'http://localhost:5000/'),
         ('cash', 10000.0),
         ('checksubmit', True),
         ('dataname', None),

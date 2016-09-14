@@ -3,12 +3,21 @@ import {AgGridReact, reactCellRendererFactory} from 'ag-grid-react';
 import {Button} from 'react-bootstrap';
 
 var StrategyControl = React.createClass({
+    start() {
+	$.get("/strategy/start/"+this.props.params.strategy+"/" + this.props.params.id);
+    },
+    pause() {
+	$.get("/strategy/pause/"+this.props.params.strategy+"/" + this.props.params.id);
+    },
+    stop() {
+	$.get("/strategy/stop/"+this.props.params.strategy+"/" + this.props.params.id);
+    },
     render() {
 	return (
 		<div>
-		<Button>Start</Button>
-		<Button>Pause</Button>
-		<Button>Stop</Button>
+		<Button onClick={this.start}>Start</Button>
+		<Button onClick={this.pause}>Pause</Button>
+		<Button onClick={this.stop}>Stop</Button>
 		</div>
 	);
     }
@@ -31,13 +40,14 @@ var SampleUi = React.createClass({
 		 field: "log",
 		 cellRenderer: function(params) {
 		     return "<a href='/strategy/log/" +
+			 params.data.strategy + "/" +
 			 params.data.id + "'>Log</a>";
 		 }},
 		{headerName: "operator",
 		 field: "start",
 		 cellRenderer: reactCellRendererFactory(StrategyControl)
 		}],
-	    rowData: [{id:0, product: "a"}]
+	    rowData: []
 	};
     },
     // in onGridReady, store the api for later use
@@ -49,7 +59,8 @@ var SampleUi = React.createClass({
 	var r = this.state.rowData;
 	var c = this.state.counter;
 	c = c+1;
-	r.push({id: c});
+	r.push({id: c,
+		strategy: "sample"});
 	this.setState({rowData: r,
 		       counter: c});
 	this.api.setRowData(r);
