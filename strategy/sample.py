@@ -112,8 +112,8 @@ class TestStrategy(bt.Strategy):
 def run_strategy(fname, oname, kwargs):
     modpath = os.path.dirname(os.path.realpath(__file__))
     logpath = os.path.join(modpath, '../data/log-%s-%s.txt' % \
-                           (args['name'],
-                            str(args['id'])))
+                           (kwargs['name'],
+                            str(kwargs['id'])))
     f = open(logpath, "w")
     sys.stdout = f
     retval = ""
@@ -162,7 +162,10 @@ def run(args):
     return p
 
 if __name__ == '__main__':
-    p = run({"newdata": True,
+    p = run({
+        "name" : "sample",
+        "id" : 1,
+        "newdata": True,
              "keepalive": True,
              "debug" : True})
     p.start()

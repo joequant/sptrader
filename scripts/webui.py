@@ -310,7 +310,7 @@ def subscribe_ticker(products):
     if sp.ready() != 0:
         return "NOLOGIN"
     else:
-        send_dict("UpdateTickers",
+        send_dict("TickerUpdate",
                   {"data": list(ticker_products)})
         return "OK"
 
@@ -324,7 +324,7 @@ def unsubscribe_ticker(products):
     if sp.ready() != 0:
         return "NOLOGIN"
     else:
-        send_dict("UpdateTickers",
+        send_dict("TickerUpdate",
                   {"data": list(ticker_products)})
         return "OK"
 
