@@ -25,6 +25,7 @@ import collections
 
 import backtrader as bt
 import io
+import spstore
 from backtrader.comminfo import CommInfoBase
 from backtrader.order import Order, BuyOrder, SellOrder
 from backtrader.position import Position
@@ -143,11 +144,12 @@ class SharpPointBroker(bt.BrokerBase):
     )
     f = None
 
-    def init(self):
+    def init(self, **kwargs):
         super(SharpPointBroker, self).init()
+        self.o = spstore.SharpPointStore(**kwargs)
         self.startingcash = self.cash = self.p.cash
 
-        self.orders = list()  # will only be appending
+        self.orders = collections.OrderedDict()  # orders by order id
         self.pending = collections.deque()  # popleft and append(right)
 
         self.positions = collections.defaultdict(Position)
@@ -161,8 +163,13 @@ class SharpPointBroker(bt.BrokerBase):
                 # Let an exception propagate to let the caller know
                 self.f = io.open(self.p.dataname, 'a')
 
+    def start(self):
+        super(SharpPointBroker, self).start()
+        self.o.start(broker=self)
+
     def stop(self):
         super(SharpPointBroker, self).stop()
+        self.o.stop()
         if self.f is not None:
             self.f.close()
             self.f = None
@@ -201,32 +208,11 @@ class SharpPointBroker(bt.BrokerBase):
 
     setcash = set_cash
 
-    def cancel(self, order):
-        try:
-            self.pending.remove(order)
-        except ValueError:
-            # If the list didn't have the element we didn't cancel anything
-            return False
-
-        order.cancel()
-        self.notify(order)
-        return True
-
     def get_value(self, datas=None):
         '''Returns the portfolio value of the given datas (if datas is ``None``, then
         the total portfolio value will be returned (alias: ``getvalue``)
         '''
-        pos_value = 0.0
-
-        for data in datas or self.positions:
-            comminfo = self.getcommissioninfo(data)
-            position = self.positions[data]
-            dvalue = comminfo.getvalue(position, data.close[0])
-            if datas and len(datas) == 1:
-                return dvalue  # raw data value requested, short selling is neg
-            pos_value += abs(dvalue)  # short selling adds value
-
-        return self.cash + pos_value
+        return 0.0
 
     getvalue = get_value
 
@@ -234,11 +220,7 @@ class SharpPointBroker(bt.BrokerBase):
         return self.positions[data]
 
     def orderstatus(self, order):
-        try:
-            o = self.orders.index(order)
-        except ValueError:
-            o = order
-
+        o = self.orders[order.ref]
         return o.status
 
     def submit(self, order):
@@ -249,38 +231,57 @@ class SharpPointBroker(bt.BrokerBase):
             self.notify(order)
         else:
             self.submit_accept(order)
-
         return order
 
-    def check_submitted(self):
-        cash = self.cash
-        positions = dict()
+    def _submit(self, oref):
+        order = self.orders[oref]
+        order.submit(self)
+        self.notify(order)
 
-        while self.submitted:
-            order = self.submitted.popleft()
-            comminfo = self.getcommissioninfo(order.data)
+    def _reject(self, oref):
+        order = self.orders[oref]
+        order.reject(self)
+        self.notify(order)
 
-            position = positions.setdefault(
-                order.data, self.positions[order.data].clone())
-
-            # pseudo-execute the order to get the remaining cash after exec
-            cash = self._execute(order, cash=cash, position=position)
-
-            if cash >= 0.0:
-                self.submit_accept(order)
-                continue
-
-            order.margin()
-            self.notify(order)
-
-    def submit_accept(self, order):
-        order.pannotated = None
-        order.submit()
+    def _accept(self, oref):
+        order = self.orders[oref]
         order.accept()
-        if (self.f):
-            self.f.write(str(order))
-            self.f.write("\n\n")
-        self.pending.append(order)
+        self.notify(order)
+
+    def _cancel(self, oref):
+        order = self.orders[oref]
+        order.cancel(self)
+        self.notify(order)
+
+    def _expire(self, oref):
+        order = self.orders[oref]
+        order.expire(self)
+        self.notify(order)
+
+    def _fill(self, oref, size, price, **kwargs):
+        order = self.orders[oref]
+
+        data = order.data
+        pos = self.getposition(data, clone=False)
+        psize, pprice, opened, closed = pos.update(size, price)
+
+        comminfo = self.getcommissioninfo(data)
+
+        closedvalue = closedcomm = 0.0
+        openedvalue = openedcomm = 0.0
+        margin = pnl = 0.0
+
+        order.execute(data.datetime[0], size, price,
+                      closed, closedvalue, closedcomm,
+                      opened, openedvalue, openedcomm,
+                      margin, pnl,
+                      psize, pprice)
+
+        if order.executed.remsize:
+            order.partial()
+        else:
+            order.completed()
+
         self.notify(order)
 
     def buy(self, owner, data,
@@ -293,8 +294,8 @@ class SharpPointBroker(bt.BrokerBase):
                          exectype=exectype, valid=valid, tradeid=tradeid)
 
         order.addinfo(**kwargs)
-
-        return self.submit(order)
+        self.orders[order.ref] = order
+        return self.o.order_create(order)
 
     def sell(self, owner, data,
              size, price=None, plimit=None,
@@ -306,307 +307,31 @@ class SharpPointBroker(bt.BrokerBase):
                           exectype=exectype, valid=valid, tradeid=tradeid)
 
         order.addinfo(**kwargs)
+        self.orders[order.ref] = order
+        return self.o.order_create(order)
 
-        return self.submit(order)
+    def cancel(self, order):
+        o = self.orders[order.ref]
+        if order.status == Order.Cancelled:  # already cancelled
+            return
 
-    def _execute(self, order, ago=None, price=None, cash=None, position=None):
-        # ago = None is used a flag for pseudo execution
-        if ago is not None and price is None:
-            return  # no psuedo exec no price - no execution
-
-        if self.p.filler is None or ago is None:
-            # Order gets full size or pseudo-execution
-            size = order.executed.remsize
-        else:
-            # Execution depends on volume filler
-            size = self.p.filler(order, price, ago)
-            if not order.isbuy():
-                size = -size
-
-        # Get comminfo object for the data
-        comminfo = self.getcommissioninfo(order.data)
-
-        # Adjust position with operation size
-        if ago is not None:
-            # Real execution with date
-            position = self.positions[order.data]
-            pprice_orig = position.price
-
-            psize, pprice, opened, closed = position.pseudoupdate(size, price)
-
-            # if part/all of a position has been closed, then there has been
-            # a profitandloss ... record it
-            pnl = comminfo.profitandloss(-closed, pprice_orig, price)
-            cash = self.cash
-        else:
-            pnl = 0
-            price = pprice_orig = order.created.price
-            psize, pprice, opened, closed = position.update(size, price)
-
-        # "Closing" totally or partially is possible. Cash may be re-injected
-        if closed:
-            # Adjust to returned value for closed items & acquired opened items
-            closedvalue = comminfo.getoperationcost(closed, pprice_orig)
-            cash += closedvalue + pnl * comminfo.stocklike
-            # Calculate and substract commission
-            closedcomm = comminfo.getcommission(closed, price)
-            cash -= closedcomm
-
-            if ago is not None:
-                # Cashadjust closed contracts: prev close vs exec price
-                # The operation can inject or take cash out
-                cash += comminfo.cashadjust(-closed,
-                                            position.adjbase,
-                                            price)
-
-                # Update system cash
-                self.cash = cash
-        else:
-            closedvalue = closedcomm = 0.0
-
-        popened = opened
-        if opened:
-            openedvalue = comminfo.getoperationcost(opened, price)
-            cash -= openedvalue
-
-            openedcomm = comminfo.getcommission(opened, price)
-            cash -= openedcomm
-
-            if cash < 0.0:
-                # execution is not possible - nullify
-                opened = 0
-                openedvalue = openedcomm = 0.0
-
-            elif ago is not None:  # real execution
-                if abs(psize) > abs(opened):
-                    # some futures were opened - adjust the cash of the
-                    # previously existing futures to the operation price and
-                    # use that as new adjustment base, because it already is
-                    # for the new futures At the end of the cycle the
-                    # adjustment to the close price will be done for all open
-                    # futures from a common base price with regards to the
-                    # close price
-                    adjsize = psize - opened
-                    cash += comminfo.cashadjust(adjsize,
-                                                position.adjbase, price)
-
-                # record adjust price base for end of bar cash adjustment
-                position.adjbase = price
-
-                # update system cash - checking if opened is still != 0
-                self.cash = cash
-        else:
-            openedvalue = openedcomm = 0.0
-
-        if ago is None:
-            # return cash from pseudo-execution
-            return cash
-
-        execsize = closed + opened
-
-        if execsize:
-            # Confimrm the operation to the comminfo object
-            comminfo.confirmexec(execsize, price)
-
-            # do a real position update if something was executed
-            position.update(execsize, price, order.data.datetime.datetime())
-
-            # Execute and notify the order
-            order.execute(order.data.datetime[ago],
-                          execsize, price,
-                          closed, closedvalue, closedcomm,
-                          opened, openedvalue, openedcomm,
-                          comminfo.margin, pnl,
-                          psize, pprice)
-
-            order.addcomminfo(comminfo)
-
-            self.notify(order)
-
-        if popened and not opened:
-            # opened was not executed - not enough cash
-            order.margin()
-            self.notify(order)
+        return self.o.order_cancel(order)
 
     def notify(self, order):
         self.notifs.append(order.clone())
 
-    def _try_exec_market(self, order, popen, phigh, plow):
-        self._execute(order, ago=0, price=popen)
-
-    def _try_exec_close(self, order, pclose):
-        # pannotated allows to keep track of the closing bar if there is no
-        # information which lets us know that the current bar is the closing
-        # bar (like matching end of session bar)
-        # The actual matching will be done one bar afterwards but using the
-        # information from the actual closing bar
-
-        dt0 = order.data.datetime[0]
-        # don't use "len" -> in replay the close can be reached with same len
-        if dt0 > order.created.dt:  # can only execute after creation time
-            # or (self.p.eosbar and dt0 == order.dteos):
-            if dt0 >= order.dteos:
-                # past the end of session or right at it and eosbar is True
-                if order.pannotated and dt0 > order.dteos:
-                    ago = -1
-                    execprice = order.pannotated
-                else:
-                    ago = 0
-                    execprice = pclose
-
-                self._execute(order, ago=ago, price=execprice)
-                return
-
-        # If no exexcution has taken place ... annotate the closing price
-        order.pannotated = pclose
-
-    def _try_exec_limit(self, order, popen, phigh, plow, plimit):
-        if order.isbuy():
-            if plimit >= popen:
-                # open smaller/equal than requested - buy cheaper
-                pmax = min(phigh, plimit)
-                self._execute(order, ago=0, price=p)
-            elif plimit >= plow:
-                # day low below req price ... match limit price
-                self._execute(order, ago=0, price=plimit)
-
-        else:  # Sell
-            if plimit <= popen:
-                # open greater/equal than requested - sell more expensive
-                pmin = max(plow, plimit)
-                self._execute(order, ago=0, price=p)
-            elif plimit <= phigh:
-                # day high above req price ... match limit price
-                self._execute(order, ago=0, price=plimit)
-
-    def _try_exec_stop(self, order, popen, phigh, plow, pcreated):
-        if order.isbuy():
-            if popen >= pcreated:
-                # price penetrated with an open gap - use open
-                self._execute(order, ago=0, price=p)
-            elif phigh >= pcreated:
-                # price penetrated during the session - use trigger price
-                self._execute(order, ago=0, price=p)
-
-        else:  # Sell
-            if popen <= pcreated:
-                # price penetrated with an open gap - use open
-                self._execute(order, ago=0, price=p)
-            elif plow <= pcreated:
-                # price penetrated during the session - use trigger price
-                self._execute(order, ago=0, price=p)
-
-    def _try_exec_stoplimit(self, order,
-                            popen, phigh, plow, pclose,
-                            pcreated, plimit):
-        if order.isbuy():
-            if popen >= pcreated:
-                order.triggered = True
-                self._try_exec_limit(order, popen, phigh, plow, plimit)
-
-            elif phigh >= pcreated:
-                # price penetrated upwards during the session
-                order.triggered = True
-                # can calculate execution for a few cases - datetime is fixed
-                if popen > pclose:
-                    if plimit >= pcreated:  # limit above stop trigger
-                        self._execute(order, ago=0, price=p)
-                    elif plimit >= pclose:
-                        self._execute(order, ago=0, price=plimit)
-                else:  # popen < pclose
-                    if plimit >= pcreated:
-                        self._execute(order, ago=0, price=p)
-        else:  # Sell
-            if popen <= pcreated:
-                # price penetrated downwards with an open gap
-                order.triggered = True
-                self._try_exec_limit(order, popen, phigh, plow, plimit)
-
-            elif plow <= pcreated:
-                # price penetrated downwards during the session
-                order.triggered = True
-                # can calculate execution for a few cases - datetime is fixed
-                if popen <= pclose:
-                    if plimit <= pcreated:
-                        self._execute(order, ago=0, price=p)
-                    elif plimit <= pclose:
-                        self._execute(order, ago=0, price=plimit)
-                else:
-                    # popen > pclose
-                    if plimit <= pcreated:
-                        self._execute(order, ago=0, price=p)
-
-    def _try_exec(self, order):
-        data = order.data
-
-        popen = data.tick_open or data.open[0]
-        phigh = data.tick_high or data.high[0]
-        plow = data.tick_low or data.low[0]
-        pclose = data.tick_close or data.close[0]
-
-        pcreated = order.created.price
-        plimit = order.created.pricelimit
-
-        if order.exectype == Order.Market:
-            self._try_exec_market(order, popen, phigh, plow)
-
-        elif order.exectype == Order.Close:
-            self._try_exec_close(order, pclose)
-
-        elif order.exectype == Order.Limit:
-            self._try_exec_limit(order, popen, phigh, plow, pcreated)
-
-        elif order.exectype == Order.StopLimit and order.triggered:
-            self._try_exec_limit(order, popen, phigh, plow, plimit)
-
-        elif order.exectype == Order.Stop:
-            self._try_exec_stop(order, popen, phigh, plow, pcreated)
-
-        elif order.exectype == Order.StopLimit:
-            self._try_exec_stoplimit(order,
-                                     popen, phigh, plow, pclose,
-                                     pcreated, plimit)
+    def get_notification(self):
+        if not self.notifs:
+            return None
+        return self.notifs.popleft()
 
     def next(self):
-        if self.p.checksubmit:
-            self.check_submitted()
-
-        # Discount any cash for positions hold
-        credit = 0.0
-        for data, pos in self.positions.items():
-            if pos:
-                comminfo = self.getcommissioninfo(data)
-                dt0 = data.datetime.datetime()
-                credit += comminfo.get_credit_interest(data, pos, dt0)
-                pos.datetime = dt0  # mark last credit operation
-
-        self.cash -= credit
-
-        # Iterate once over all elements of the pending queue
-        for i in range(len(self.pending)):
-
-            order = self.pending.popleft()
-
-            if order.expire():
-                self.notify(order)
-                continue
-
-            self._try_exec(order)
-
-            if order.alive():
-                self.pending.append(order)
-
-        # Operations have been executed ... adjust cash end of bar
-        for data, pos in self.positions.items():
-            # futures change cash every bar
-            if pos:
-                comminfo = self.getcommissioninfo(data)
-                self.cash += comminfo.cashadjust(pos.size,
-                                                 pos.adjbase,
-                                                 data.close[0])
-                # record the last adjustment price
-                pos.adjbase = data.close[0]
-
+        self.notifs.append(None)  # mark notification boundary
 
 # Alias
 BrokerSharpPoint = SharpPointBroker
+
+if __name__ == '__main__':
+    s = SharpPointBroker()
+    s.start()
+

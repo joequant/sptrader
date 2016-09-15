@@ -26,6 +26,8 @@ from datetime import datetime, timedelta
 import time as _time
 import json
 import threading
+import requests
+import sseclient
 
 import requests  # oandapy depdendency
 
@@ -68,6 +70,7 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
     DataCls = None  # data class will auto register
 
     params = (
+        ('gateway', 'http://localhost:5000/'),
         ('token', ''),
         ('account', ''),
         ('practice', False),
@@ -124,7 +127,6 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         elif broker is not None:
             self.broker = broker
             self.streaming_events()
-            self.broker_threads()
 
     def stop(self):
         # signal end of thread
@@ -158,87 +160,11 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         t.daemon = True
         t.start()
 
-        t = threading.Thread(target=self._t_streaming_events, kwargs=kwargs)
-        t.daemon = True
-        t.start()
-        return q
-
     def _t_streaming_listener(self, q, tmout=None):
-        while True:
-            trans = q.get()
-            self._transaction(trans)
-
-    def _t_streaming_events(self, q, tmout=None):
-        if tmout is not None:
-            _time.sleep(tmout)
-
-        streamer = Streamer(q,
-                            environment=self._oenv,
-                            access_token=self.p.token,
-                            headers={'X-Accept-Datetime-Format': 'UNIX'})
-
-        streamer.events(ignore_heartbeat=False)
-
-    def candles(self, dataname, dtbegin, dtend, timeframe, compression,
-                candleFormat, includeFirst):
-
-        kwargs = locals().copy()
-        kwargs.pop('self')
-        kwargs['q'] = q = queue.Queue()
-        t = threading.Thread(target=self._t_candles, kwargs=kwargs)
-        t.daemon = True
-        t.start()
-        return q
-
-    def _t_candles(self, dataname, dtbegin, dtend, timeframe, compression,
-                   candleFormat, includeFirst, q):
-
-        granularity = self.get_granularity(timeframe, compression)
-        if granularity is None:
-            e = SharpPointTimeFrameError()
-            q.put(e.error_response)
-            return
-
-        dtkwargs = {}
-        if dtbegin is not None:
-            dtkwargs['start'] = int((dtbegin - self._DTEPOCH).total_seconds())
-
-        if dtend is not None:
-            dtkwargs['end'] = int((dtend - self._DTEPOCH).total_seconds())
-
-        try:
-            response = self.oapi.get_history(instrument=dataname,
-                                             granularity=granularity,
-                                             candleFormat=candleFormat,
-                                             **dtkwargs)
-
-        except oandapy.SharpPointError as e:
-            q.put(e.error_response)
-            q.put(None)
-            return
-
-        for candle in response.get('candles', []):
-            q.put(candle)
-
-        q.put({})  # end of transmission
-
-    def streaming_prices(self, dataname, tmout=None):
-        q = queue.Queue()
-        kwargs = {'q': q, 'dataname': dataname, 'tmout': tmout}
-        t = threading.Thread(target=self._t_streaming_prices, kwargs=kwargs)
-        t.daemon = True
-        t.start()
-        return q
-
-    def _t_streaming_prices(self, dataname, q, tmout):
-        if tmout is not None:
-            _time.sleep(tmout)
-
-        streamer = Streamer(q, environment=self._oenv,
-                            access_token=self.p.token,
-                            headers={'X-Accept-Datetime-Format': 'UNIX'})
-
-        streamer.rates(self.p.account, instruments=dataname)
+        r = requests.get(self.p.gateway + "subscribe")
+        client = sseclient.SSEClient(response)
+        for event in client.events():
+            pprint.pprint(json.loads(event))
 
     def get_cash(self):
         return self._cash
@@ -252,49 +178,6 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         bt.Order.Stop: 'stop',
         bt.Order.StopLimit: 'stop',
     }
-
-    def broker_threads(self):
-        self.q_account = queue.Queue()
-        self.q_account.put(True)  # force an immediate update
-        t = threading.Thread(target=self._t_account)
-        t.daemon = True
-        t.start()
-
-        self.q_ordercreate = queue.Queue()
-        t = threading.Thread(target=self._t_order_create)
-        t.daemon = True
-        t.start()
-
-        self.q_orderclose = queue.Queue()
-        t = threading.Thread(target=self._t_order_cancel)
-        t.daemon = True
-        t.start()
-
-        # Wait once for the values to be set
-        self._evt_acct.wait(self.p.account_tmout)
-
-    def _t_account(self):
-        while True:
-            try:
-                msg = self.q_account.get(timeout=self.p.account_tmout)
-                if msg is None:
-                    break  # end of thread
-            except queue.Empty:  # tmout -> time to refresh
-                pass
-
-            try:
-                accinfo = self.oapi.get_account(self.p.account)
-            except Exception as e:
-                self.put_notification(e)
-                continue
-
-            try:
-                self._cash = accinfo['marginAvail']
-                self._value = accinfo['balance']
-            except KeyError:
-                pass
-
-            self._evt_acct.set()
 
     def order_create(self, order, **kwargs):
         okwargs = dict()
@@ -454,5 +337,5 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
             else:  # default action ... if nothing else
                 self.broker._reject(oref)
 
-if __name__ == '__name__':
+if __name__ == '__main__':
     s = SharpPointStore()
