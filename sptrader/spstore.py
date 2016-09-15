@@ -74,6 +74,7 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         ('token', ''),
         ('account', ''),
         ('practice', False),
+        ('debug', True),
         ('account_tmout', 10.0),  # account balance refresh timeout
     )
 
@@ -127,6 +128,7 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         elif broker is not None:
             self.broker = broker
             self.streaming_events()
+            self.broker_threads()
 
     def stop(self):
         # signal end of thread
@@ -161,8 +163,8 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         t.start()
 
     def _t_streaming_listener(self, q, tmout=None):
-        r = requests.get(self.p.gateway + "subscribe")
-        client = sseclient.SSEClient(response)
+        r = requests.get(self.p.gateway + "log/subscribe")
+        client = sseclient.SSEClient(r)
         for event in client.events():
             pprint.pprint(json.loads(event))
 
@@ -172,6 +174,23 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
     def get_value(self):
         return self._value
 
+    def broker_threads(self):
+        self.q_account = queue.Queue()
+        self.q_account.put(True)  # force an immediate update
+        t = threading.Thread(target=self._t_account)
+        t.daemon = True
+        t.start()
+
+        self.q_ordercreate = queue.Queue()
+        t = threading.Thread(target=self._t_order_create)
+        t.daemon = True
+        t.start()
+
+        self.q_orderclose = queue.Queue()
+        t = threading.Thread(target=self._t_order_cancel)
+        t.daemon = True
+        t.start()
+
     _ORDEREXECS = {
         bt.Order.Market: 'market',
         bt.Order.Limit: 'limit',
@@ -179,81 +198,42 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         bt.Order.StopLimit: 'stop',
     }
 
+    def _t_account(self):
+        pass
+
     def order_create(self, order, **kwargs):
-        okwargs = dict()
-        okwargs['instrument'] = order.data._dataname
-        okwargs['units'] = abs(order.created.size)
-        okwargs['side'] = 'buy' if order.isbuy() else 'sell'
-        okwargs['type'] = self._ORDEREXECS[order.exectype]
-        if order.exectype != bt.Order.Market:
-            okwargs['price'] = order.created.price
-            if order.valid is None:
-                # 1 year and datetime.max fail ... 1 month works
-                valid = datetime.utcnow() + timedelta(days=30)
-            else:
-                valid = order.data.num2date(order.valid)
-                # To timestamp with seconds precision
-            okwargs['expiry'] = int((valid - self._DTEPOCH).total_seconds())
-
-        if order.exectype == bt.Order.StopLimit:
-            okwargs['lowerBound'] = order.created.pricelimit
-            okwargs['upperBound'] = order.created.pricelimit
-
-        okwargs.update(**kwargs)  # anything from the user
-
-        self.q_ordercreate.put((order.ref, okwargs,))
+        self.q_ordercreate.put((order.ref, kwargs,))
         return order
-
-    _OIDSINGLE = ['orderOpened', 'tradeOpened', 'tradeReduced']
-    _OIDMULTIPLE = ['tradesClosed']
 
     def _t_order_create(self):
         while True:
             msg = self.q_ordercreate.get()
             if msg is None:
                 break
-
             oref, okwargs = msg
+            if self.p.debug:
+                print(msg)
             try:
-                o = self.oapi.create_order(self.p.account, **okwargs)
+                order = {"BuySell": "B",
+                         "Qty": 1,
+                         "ProdCode": "HSIZ6",
+                         "DecInPrice": 0,
+                         "Ref": "test",
+                         "Ref2": "",
+                         "ClOrderId": "test2",
+                         "OpenClose": 0,
+                         "CondType": 0,
+                         "OrderType": 0,
+                         "ValidType": 0,
+                         "StopType": 0,
+                         "OrderOptions": 0,
+                         "Price": 24000.0 }
+                r = requests.post(self.p.gateway + "order/add",
+                                  json=order)
             except Exception as e:
                 self.put_notification(e)
                 self.broker._reject(order.ref)
                 return
-
-            # Ids are delivered in different fields and all must be fetched to
-            # match them (as executions) to the order generated here
-            _o = {'id': None}
-            oids = list()
-            for oidfield in self._OIDSINGLE:
-                if oidfield in o and 'id' in o[oidfield]:
-                    oids.append(o[oidfield]['id'])
-
-            for oidfield in self._OIDMULTIPLE:
-                if oidfield in o:
-                    for suboidfield in o[oidfield]:
-                        oids.append(suboidfield['id'])
-
-            if not oids:
-                self.broker._reject(oref)
-                return
-
-            self._orders[oref] = oids[0]
-            self.broker._submit(oref)
-            if okwargs['type'] == 'market':
-                self.broker._accept(oref)  # taken immediately
-
-            for oid in oids:
-                self._ordersrev[oid] = oref  # maps ids to backtrader order
-
-                # An transaction may have happened and was stored
-                tpending = self._transpend[oid]
-                tpending.append(None)  # eom marker
-                while True:
-                    trans = tpending.popleft()
-                    if trans is None:
-                        break
-                    self._process_transaction(oid, trans)
 
     def order_cancel(self, order):
         self.q_orderclose.put(order.ref)
@@ -274,68 +254,6 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
                 continue  # not cancelled - FIXME: notify
 
             self.broker._cancel(oref)
-
-    def _transaction(self, trans):
-        # Invoked from Streaming Events. May actually receive an event for an
-        # oid which has not yet been returned after creating an order. Hence
-        # store if not yet seen, else forward to processer
-        ttype = trans['type']
-        if ttype == 'MARKET_ORDER_CREATE':
-            try:
-                oid = trans['tradeReduced']['id']
-            except KeyError:
-                try:
-                    oid = trans['tradeOpened']['id']
-                except KeyError:
-                    return  # cannot do anythin else
-
-        elif ttype == 'ORDER_FILLED':
-            oid = trans['orderId']
-
-        elif ttype == 'ORDER_CANCEL':
-            oid = trans['orderId']
-
-        try:
-            oref = self._ordersrev[oid]
-            self._process_transaction(oid, trans)
-        except KeyError:  # not yet seen, keep as pending
-            self._transpend[oid].append(trans)
-
-    _X_ORDER_CREATE = ('STOP_ORDER_CREATE',
-                       'LIMIT_ORDER_CREATE', 'MARKET_IF_TOUCHED_ORDER_CREATE',)
-
-    _X_ORDER_FILLED = ('MARKET_ORDER_CREATE',
-                       'ORDER_FILLED', 'TAKE_PROFIT_FILLED',
-                       'STOP_LOSS_FILLED', 'TRAILING_STOP_FILLED',)
-
-    def _process_transaction(self, oid, trans):
-        try:
-            oref = self._ordersrev.pop(oid)
-        except KeyError:
-            return
-
-        ttype = trans['type']
-
-        if ttype in self._X_ORDER_FILLED:
-            size = trans['units']
-            if trans['side'] == 'sell':
-                size = -size
-            price = trans['price']
-            self.broker._fill(oref, size, price)
-
-        elif ttype in self._X_ORDER_CREATE:
-            self.broker._accept(oref)
-
-        elif ttype in 'ORDER_CANCEL':
-            reason = trans['reason']
-            if reason == 'ORDER_FILLED':
-                pass  # individual execs have done the job
-            elif reason == 'TIME_IN_FORCE_EXPIRED':
-                self.broker._expire(oref)
-            elif reason == 'CLIENT_REQUEST':
-                self.broker._cancel(oref)
-            else:  # default action ... if nothing else
-                self.broker._reject(oref)
 
 if __name__ == '__main__':
     s = SharpPointStore()
