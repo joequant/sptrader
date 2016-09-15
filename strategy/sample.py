@@ -109,13 +109,23 @@ class TestStrategy(bt.Strategy):
                 # Keep track of the created order to avoid a 2nd order
                 self.order = self.sell()
 
+
+class Unbuffered(object):
+    def __init__(self, stream):
+        self.stream = stream
+    def write(self, data):
+        self.stream.write(data)
+        self.stream.flush()
+    def __getattr__(self, attr):
+        return getattr(self.stream, attr)
+
 def run_strategy(fname, oname, kwargs):
     modpath = os.path.dirname(os.path.realpath(__file__))
     logpath = os.path.join(modpath, '../data/log-%s-%s.txt' % \
                            (kwargs['name'],
                             str(kwargs['id'])))
     f = open(logpath, "w")
-    sys.stdout = f
+    sys.stdout = Unbuffered(f)
     retval = ""
     cerebro = bt.Cerebro()
     cerebro.addstrategy(TestStrategy)
