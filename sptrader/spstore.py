@@ -28,8 +28,7 @@ import json
 import threading
 import requests
 import sseclient
-
-import requests  # oandapy depdendency
+import urllib3
 
 import backtrader as bt
 from backtrader.metabase import MetaParams
@@ -163,10 +162,13 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         t.start()
 
     def _t_streaming_listener(self, q, tmout=None):
-        r = requests.get(self.p.gateway + "log/subscribe")
-        client = sseclient.SSEClient(r)
+        http = urllib3.PoolManager()
+        response = http.request("GET",
+                                self.p.gateway + "log/subscribe",
+                                preload_content=False)
+        client = sseclient.SSEClient(response)
         for event in client.events():
-            pprint.pprint(json.loads(event))
+            print(str(event))
 
     def get_cash(self):
         return self._cash
