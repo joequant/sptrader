@@ -268,32 +268,6 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
         order.expire(self)
         self.notify(order)
 
-    def _fill(self, oref, size, price, **kwargs):
-        order = self.orders[oref]
-
-        data = order.data
-        pos = self.getposition(data, clone=False)
-        psize, pprice, opened, closed = pos.update(size, price)
-
-        comminfo = self.getcommissioninfo(data)
-
-        closedvalue = closedcomm = 0.0
-        openedvalue = openedcomm = 0.0
-        margin = pnl = 0.0
-
-        order.execute(data.datetime[0], size, price,
-                      closed, closedvalue, closedcomm,
-                      opened, openedvalue, openedcomm,
-                      margin, pnl,
-                      psize, pprice)
-
-        if order.executed.remsize:
-            order.partial()
-        else:
-            order.completed()
-
-        self.notify(order)
-
     def buy(self, owner, data,
             size, price=None, plimit=None,
             exectype=None, valid=None, tradeid=0,
