@@ -128,8 +128,8 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
 
         elif broker is not None:
             self.broker = broker
-            self.streaming_events()
             self.broker_threads()
+            self.streaming_events()
 
     def stop(self):
         # signal end of thread
@@ -200,6 +200,8 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
     }
 
     def _t_account(self):
+        if self.p.debug:
+            print("t_account")
         while True:
             try:
                 msg = self.q_account.get(timeout=self.p.account_tmout)
@@ -208,7 +210,9 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
             except queue.Empty:  # tmout -> time to refresh
                 pass
             try:
-                if login is not None:
+                if self.p.debug:
+                    print("login", self.p.login)
+                if self.p.debug is not None:
                     r = requests.post(self.p.gateway + "login",
                                       json=self.p.login)
             except Exception as e:
