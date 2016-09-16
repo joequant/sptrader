@@ -59,6 +59,9 @@ class SharpPointCSVData(feed.CSVDataBase):
     def islive(self):
         return self.p.keepalive
 
+    def product(self):
+        return self.p.product
+
     def _loadline(self, linetokens):
         itoken = iter(linetokens)
 

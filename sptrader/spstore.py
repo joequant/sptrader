@@ -216,7 +216,7 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
                 if self.p.debug:
                     print("login", self.p.login)
                     print(login_info)
-                if login_info['status'] != "2":
+                if int(login_info['status']) != -1:
                     continue
                 if self.p.debug is not None:
                     r = requests.post(self.p.gateway + "login",
@@ -227,7 +227,29 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
 
 
     def order_create(self, order, **kwargs):
-        self.q_ordercreate.put((order.ref, kwargs,))
+        okwargs = {"DecInPrice": 0,
+                   "Ref": "test",
+                   "ClOrderId": "test2",
+                   "OpenClose": 0,
+                   "CondType": 0,
+                   "OrderType": 0,
+                   "ValidType": 0,
+                   "StopType": 0,
+                   "OrderOptions": 0}
+        if order.isbuy():
+            okwargs['BuySell'] = "B"
+        elif order.issell():
+            okwargs['BuySell'] = "S"
+        okwargs['Price'] = order.created.price
+        okwargs['Qty'] = abs(order.created.size)
+        if hasattr(order.data, "product"):
+            okwargs['ProdCode'] = order.data.product()
+        else:
+            okwargs['ProdCode'] = order.data._dataname
+        okwargs['Ref2'] = str(order.ref)
+        if self.p.debug:
+            print(okwargs)
+        self.q_ordercreate.put((order.ref, okwargs,))
         return order
 
     def _t_order_create(self):
@@ -239,22 +261,8 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
             if self.p.debug:
                 print(msg)
             try:
-                order = {"BuySell": "B",
-                         "Qty": 1,
-                         "ProdCode": "HSIZ6",
-                         "DecInPrice": 0,
-                         "Ref": "test",
-                         "Ref2": "",
-                         "ClOrderId": "test2",
-                         "OpenClose": 0,
-                         "CondType": 0,
-                         "OrderType": 0,
-                         "ValidType": 0,
-                         "StopType": 0,
-                         "OrderOptions": 0,
-                         "Price": 24000.0 }
                 r = requests.post(self.p.gateway + "order/add",
-                                  json=order)
+                                  json=okwargs)
             except Exception as e:
                 self.put_notification(e)
                 self.broker._reject(order.ref)
