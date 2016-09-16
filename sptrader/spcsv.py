@@ -28,7 +28,7 @@ class SharpPointCSVData(feed.CSVDataBase):
     params = (('product', None),
               ('newdata', False),
               ('keepalive', False),
-              ('debug', True))
+              ('debug', False))
 
     def start(self):
         super(SharpPointCSVData, self).start()
