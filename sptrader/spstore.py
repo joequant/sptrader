@@ -76,7 +76,6 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         ('login', None),
         ('practice', False),
         ('debug', True),
-        ('account_tmout', 10.0),  # account balance refresh timeout
     )
 
     _DTEPOCH = datetime(1970, 1, 1)
@@ -204,7 +203,7 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
             print("t_account")
         while True:
             try:
-                msg = self.q_account.get(timeout=self.p.account_tmout)
+                msg = self.q_account.get()
                 if msg is None:
                     break  # end of thread
             except queue.Empty:  # tmout -> time to refresh
