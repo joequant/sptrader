@@ -1,6 +1,5 @@
 import matplotlib
 matplotlib.use('Agg', warn=False, force=True)
-print(matplotlib.get_backend())
 import backtrader as bt
 import matplotlib.pyplot as plt
 from backtrader.plot.plot import Plot
