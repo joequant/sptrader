@@ -28,7 +28,6 @@ import json
 import threading
 import requests
 import sseclient
-import urllib3
 
 import backtrader as bt
 from backtrader.metabase import MetaParams
@@ -163,13 +162,27 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         t.start()
 
     def _t_streaming_listener(self, q, tmout=None):
-        http = urllib3.PoolManager()
-        response = http.request("GET",
-                                self.p.gateway + "log/subscribe",
-                                preload_content=False)
+        response = requests.get(self.p.gateway + "log/subscribe",
+                                stream=True)
         client = sseclient.SSEClient(response)
         for event in client.events():
-            print(str(event))
+            if self.p.debug:
+                print(str(event))
+            data = json.loads(event.data)
+            if event.event == "OrderBeforeSendReport":
+                if self.p.debug:
+                    print(data)
+                self.broker._submit(int(data['data']['Ref2']))
+            elif event.event == "OrderRequestFailed":
+                if self.p.debug:
+                    print(data)
+                self.broker._reject(int(data['data']['Ref2']))
+            elif event.event == "OrderReport":
+                if self.p.debug:
+                    print(data)
+            elif event.event == "TradeReport":
+                if self.p.debug:
+                    print(data)
 
     def get_cash(self):
         return self._cash
@@ -214,11 +227,12 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
             try:
                 login_info = requests.get(self.p.gateway + "login-info").json()
                 if self.p.debug:
-                    print("login", self.p.login)
-                    print(login_info)
+                    print("login-info", login_info)
                 if int(login_info['status']) != -1:
                     continue
-                if self.p.debug is not None:
+                if self.p.login is not None:
+                    if self.p.debug:
+                        print("login", self.p.login)
                     r = requests.post(self.p.gateway + "login",
                                       json=self.p.login)
             except Exception as e:
