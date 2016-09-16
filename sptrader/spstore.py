@@ -75,6 +75,7 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         ('login', None),
         ('practice', False),
         ('debug', True),
+        ('account_tmout', 30.0),
     )
 
     _DTEPOCH = datetime(1970, 1, 1)
@@ -205,14 +206,18 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
             print("t_account")
         while True:
             try:
-                msg = self.q_account.get()
+                msg = self.q_account.get(timeout=self.p.account_tmout)
                 if msg is None:
                     break  # end of thread
             except queue.Empty:  # tmout -> time to refresh
                 pass
             try:
+                login_info = requests.get(self.p.gateway + "login-info").json()
                 if self.p.debug:
                     print("login", self.p.login)
+                    print(login_info)
+                if login_info['status'] != "2":
+                    continue
                 if self.p.debug is not None:
                     r = requests.post(self.p.gateway + "login",
                                       json=self.p.login)
