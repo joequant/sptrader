@@ -33,7 +33,7 @@ class FfiConverter(object):
     """Converts dict to and from ffi cdata objects"""
     def __init__(self, ffi):
         self.ffi = ffi
-        self.debug = True
+        self.debug = False
 
     def __convert_struct_field(self, s, fields):
         for field, fieldtype in fields:
