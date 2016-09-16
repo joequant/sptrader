@@ -16,23 +16,7 @@ import spcsv
 
 cv = threading.Condition()
 login = config.logininfo
-spbroker = spbroker.SharpPointBroker()
-
-d = {"BuySell": "B",
-     "Qty": 1,
-     "ProdCode": "HSIZ6",
-     "DecInPrice": 0,
-     "Ref": "test",
-     "Ref2": "",
-     "ClOrderId": "test2",
-     "OpenClose": 0,
-     "CondType": 0,
-     "OrderType": 0,
-     "ValidType": 0,
-     "StopType": 0,
-     "OrderOptions": 0,
-     "Price": 24000.0 }
-print(d)
+spbroker = spbroker.SharpPointBroker(login=login)
 cerebro = bt.Cerebro()
 data = spcsv.SharpPointCSVData(dataname=os.path.join(location, "../data/ticker.txt"),
                          product = "HSIZ6")

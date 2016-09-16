@@ -389,6 +389,7 @@ else:
 # ctypes will assume that the characters are wchars and not
 # ordinary characters
 
+
 class SPTrader(object):
     ffi = ffi
     api = spapi

@@ -73,6 +73,7 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         ('gateway', 'http://localhost:5000/'),
         ('token', ''),
         ('account', ''),
+        ('login', None),
         ('practice', False),
         ('debug', True),
         ('account_tmout', 10.0),  # account balance refresh timeout
@@ -199,7 +200,21 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
     }
 
     def _t_account(self):
-        pass
+        while True:
+            try:
+                msg = self.q_account.get(timeout=self.p.account_tmout)
+                if msg is None:
+                    break  # end of thread
+            except queue.Empty:  # tmout -> time to refresh
+                pass
+            try:
+                if login is not None:
+                    r = requests.post(self.p.gateway + "login",
+                                      json=self.p.login)
+            except Exception as e:
+                self.put_notification(e)
+                continue
+
 
     def order_create(self, order, **kwargs):
         self.q_ordercreate.put((order.ref, kwargs,))

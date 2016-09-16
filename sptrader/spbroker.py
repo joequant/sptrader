@@ -29,11 +29,22 @@ import spstore
 from backtrader.comminfo import CommInfoBase
 from backtrader.order import Order, BuyOrder, SellOrder
 from backtrader.position import Position
+from backtrader.metabase import MetaParams
+from backtrader.utils.py3 import with_metaclass
+
 
 __all__ = ['BackBroker', 'BrokerBack']
 
 
-class SharpPointBroker(bt.BrokerBase):
+class MetaSharpPointBroker(MetaParams):
+    def __init__(cls, name, bases, dct):
+        '''Class has already been created ... register'''
+        # Initialize the class
+        super(MetaSharpPointBroker, cls).__init__(name, bases, dct)
+        spstore.SharpPointStore.BrokerCls = cls
+
+
+class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
     '''Broker Simulator
 
       The simulation supports different order types, checking a submitted order
@@ -135,7 +146,6 @@ class SharpPointBroker(bt.BrokerBase):
 
     '''
     params = (
-        ('href', 'http://localhost:5000/'),
         ('cash', 10000.0),
         ('checksubmit', True),
         ('dataname', None),
@@ -144,8 +154,8 @@ class SharpPointBroker(bt.BrokerBase):
     )
     f = None
 
-    def init(self, **kwargs):
-        super(SharpPointBroker, self).init()
+    def __init__(self, **kwargs):
+        super(SharpPointBroker, self).__init__()
         self.o = spstore.SharpPointStore(**kwargs)
         self.startingcash = self.cash = self.p.cash
 
