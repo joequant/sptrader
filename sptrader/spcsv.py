@@ -25,7 +25,8 @@ class SharpPointCSVData(feed.CSVDataBase):
       - ``dataname``: The filename to parse or a file-like object
       - ``product`` : Product id
     '''
-    params = (('product', None),
+    params = (('nullvalue', float('NaN')),
+              ('product', None),
               ('newdata', False),
               ('keepalive', False),
               ('debug', False))
@@ -34,6 +35,15 @@ class SharpPointCSVData(feed.CSVDataBase):
         super(SharpPointCSVData, self).start()
         if self.p.newdata:
             self.f.seek(0, 2)
+            self.forward()
+            dt = datetime.datetime.now()
+            self.lines.datetime[0] = date2num(dt)
+            self.lines.open[0] = self.p.nullvalue
+            self.lines.high[0] = self.p.nullvalue
+            self.lines.low[0] = self.p.nullvalue
+            self.lines.close[0] = self.p.nullvalue
+            self.lines.volume[0] = self.p.nullvalue
+            self.lines.openinterest[0] = self.p.nullvalue
 
     def _load(self):
         if self.f is None:

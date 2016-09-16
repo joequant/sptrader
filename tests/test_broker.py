@@ -22,7 +22,8 @@ login['password'] = passwd
 spbroker = spbroker.SharpPointBroker(login=login)
 cerebro = bt.Cerebro()
 data = spcsv.SharpPointCSVData(dataname=os.path.join(location, "../data/ticker.txt"),
-                         product = "HSIZ6")
+                               product = "HSIZ6",
+                               newdata=True)
 cerebro.adddata(data)
 cerebro.run()
 spbroker.start()
