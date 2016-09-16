@@ -43,7 +43,7 @@ def send_dict(id, msg):
 
 
 def send_cdata(id, data):
-    send_dict(id, sp.cdata_to_py(data[0]))
+    send_dict(id, {"data": sp.cdata_to_py(data[0])})
 
 
 @app.route("/login-info")

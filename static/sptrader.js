@@ -223,7 +223,7 @@ var SpTraderApp = React.createClass({
     accountInfoPush: function(event) {
 	data = JSON.parse(event.data);
 	console.log(data);
-	this.setState({account_info: data});
+	this.setState({account_info: data.data});
     },
     updateTickers: function(event) {
 	data = JSON.parse(event.data);
@@ -232,6 +232,7 @@ var SpTraderApp = React.createClass({
     },
     updateTrades: function(event) {
 	var data = JSON.parse(event.data);
+	data = data.data;
 	var d = this.state.trades;
 	var found = false;
 	for (var i =0; i < d.length; i++) {
