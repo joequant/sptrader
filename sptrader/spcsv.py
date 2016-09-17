@@ -12,11 +12,21 @@ from __future__ import (absolute_import, division, print_function,
 
 import datetime
 import time
+import spstore
 from backtrader.feeds import feed
 from backtrader.utils import date2num
+from backtrader.metabase import MetaParams
+from backtrader.utils.py3 import with_metaclass
+
+class MetaSharpPointData(feed.MetaCSVDataBase):
+    def __init__(cls, name, bases, dct):
+        '''Class has already been created ... register'''
+        # Initialize the class
+        super(MetaSharpPointData, cls).__init__(name, bases, dct)
+        spstore.SharpPointStore.DataCls = cls
 
 
-class SharpPointCSVData(feed.CSVDataBase):
+class SharpPointCSVData(with_metaclass(MetaSharpPointData, feed.CSVDataBase)):
     '''
     Parses a self-defined CSV Data used for testing.
 
@@ -29,7 +39,12 @@ class SharpPointCSVData(feed.CSVDataBase):
               ('product', None),
               ('newdata', False),
               ('keepalive', False),
-              ('debug', False))
+              ('debug', False),
+              ('streaming', False))
+
+    def __init__(self, **kwargs):
+        super(SharpPointCSVData, self).__init__()
+        self.o = spstore.SharpPointStore(**kwargs)
 
     def start(self):
         super(SharpPointCSVData, self).start()
@@ -44,6 +59,8 @@ class SharpPointCSVData(feed.CSVDataBase):
             self.lines.close[0] = self.p.nullvalue
             self.lines.volume[0] = self.p.nullvalue
             self.lines.openinterest[0] = self.p.nullvalue
+        if self.p.streaming:
+            self.o.streaming_prices(self.p.product)
 
     def _load(self):
         if self.f is None:

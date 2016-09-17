@@ -12,22 +12,27 @@ sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 
 import config
 import cffi_to_py
-import spbroker
+import spstore
 import spcsv
+import spbroker
 
 cv = threading.Condition()
 login = config.logininfo
 passwd = getpass.getpass()
 login['password'] = passwd
-spbroker = spbroker.SharpPointBroker(login=login)
 cerebro = bt.Cerebro()
-data = spcsv.SharpPointCSVData(dataname=os.path.join(location, "../data/ticker.txt"),
-                               product = "HSIZ6",
-                               newdata=True)
+store = spstore.SharpPointStore(login=login)
+broker = store.getbroker()
+
+data = store.getdata(dataname=os.path.join(location, "../data/ticker.txt"),
+                     product = "HSIZ6",
+                     newdata=True,
+                     streaming=True)
+
 cerebro.adddata(data)
 cerebro.run()
-spbroker.start()
+broker.start()
 input("Wait to buy")
-spbroker.buy(None, data, 5, price=23500.0)
+broker.buy(None, data, 5, price=23500.0)
 input("Press any key to logout")
 

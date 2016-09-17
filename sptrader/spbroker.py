@@ -2,7 +2,7 @@
 # -*- coding: utf-8; py-indent-offset:4 -*-
 ###############################################################################
 #
-# Copyright (C) 2015, 2016 Daniel Rodriguez
+# Copyright (C) 2016 Bitquant Research Laboratories (Asia) Limited
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -274,7 +274,7 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
             return
 
         data = order.data
-        pos = self.getposition(data, clone=False)
+        pos = self.getposition(data)
         psize, pprice, opened, closed = pos.update(size, price)
 
         closedvalue = closedcomm = 0.0

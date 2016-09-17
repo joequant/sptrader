@@ -195,6 +195,17 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
                 price = float(info['Price'])
                 self.broker._fill(oref, qty, price)
 
+    def streaming_prices(self, dataname, tmout=None):
+        q = queue.Queue()
+        kwargs = {'q': q, 'dataname': dataname, 'tmout': tmout}
+        t = threading.Thread(target=self._t_streaming_prices, kwargs=kwargs)
+        t.daemon = True
+        t.start()
+        return q
+
+    def _t_streaming_prices(self, dataname, q, tmout):
+        r = requests.get(self.p.gateway + "ticker/subscribe/" + dataname)
+
     def get_cash(self):
         return self._cash
 
@@ -250,6 +261,11 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
                 self.put_notification(e)
                 continue
 
+    def _get_product(self, data):
+        if hasattr(data, "product"):
+            return data.product()
+        else:
+            return data._dataname
 
     def order_create(self, order, **kwargs):
         okwargs = {"DecInPrice": 0,
@@ -267,10 +283,7 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
             okwargs['BuySell'] = "S"
         okwargs['Price'] = order.created.price
         okwargs['Qty'] = abs(order.created.size)
-        if hasattr(order.data, "product"):
-            okwargs['ProdCode'] = order.data.product()
-        else:
-            okwargs['ProdCode'] = order.data._dataname
+        okwargs['ProdCode'] = self._get_product(order.data)
         okwargs['Ref2'] = str(order.ref)
         if self.p.debug:
             print(okwargs)
