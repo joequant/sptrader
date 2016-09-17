@@ -109,6 +109,9 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         self._cash = 0.0
         self._value = 0.0
         self._evt_acct = threading.Event()
+        self.q_account = queue.Queue()
+        self.q_ordercreate = queue.Queue()
+        self.q_orderclose = queue.Queue()
 
     def start(self, data=None, broker=None):
         # Datas require some processing to kickstart data reception
@@ -213,18 +216,15 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         return self._value
 
     def broker_threads(self):
-        self.q_account = queue.Queue()
         self.q_account.put(True)  # force an immediate update
         t = threading.Thread(target=self._t_account)
         t.daemon = True
         t.start()
 
-        self.q_ordercreate = queue.Queue()
         t = threading.Thread(target=self._t_order_create)
         t.daemon = True
         t.start()
 
-        self.q_orderclose = queue.Queue()
         t = threading.Thread(target=self._t_order_cancel)
         t.daemon = True
         t.start()
@@ -235,6 +235,16 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         bt.Order.Stop: 'stop',
         bt.Order.StopLimit: 'stop',
     }
+
+    def isloggedin(self):
+        login_info = requests.get(self.p.gateway + "login-info").json()
+        if self.p.debug:
+            print("login-info", login_info)
+        return int(login_info['status']) != -1
+
+    def setlogin(self, login):
+        self.p.login = login
+        self.q_account.put(True)  # force an immediate update
 
     def _t_account(self):
         if self.p.debug:
@@ -247,12 +257,7 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
             except queue.Empty:  # tmout -> time to refresh
                 pass
             try:
-                login_info = requests.get(self.p.gateway + "login-info").json()
-                if self.p.debug:
-                    print("login-info", login_info)
-                if int(login_info['status']) != -1:
-                    continue
-                if self.p.login is not None:
+                if self.p.login is not None and not self.isloggedin():
                     if self.p.debug:
                         print("login", self.p.login)
                     r = requests.post(self.p.gateway + "login",

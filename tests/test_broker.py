@@ -17,17 +17,20 @@ import spcsv
 import spbroker
 
 cv = threading.Condition()
-login = config.logininfo
-passwd = getpass.getpass()
-login['password'] = passwd
-cerebro = bt.Cerebro()
-store = spstore.SharpPointStore(login=login)
-broker = store.getbroker()
 
+cerebro = bt.Cerebro()
+store = spstore.SharpPointStore()
+broker = store.getbroker()
 data = store.getdata(dataname=os.path.join(location, "../data/ticker.txt"),
                      product = "HSIZ6",
                      newdata=True,
                      streaming=True)
+
+if not store.isloggedin():
+    login = config.logininfo
+    passwd = getpass.getpass()
+    login['password'] = passwd
+    store.setlogin(login)
 
 cerebro.adddata(data)
 cerebro.run()
