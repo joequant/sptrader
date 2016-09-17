@@ -169,20 +169,31 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
             if self.p.debug:
                 print(str(event))
             data = json.loads(event.data)
+            info = data.get('data', None)
             if event.event == "OrderBeforeSendReport":
                 if self.p.debug:
                     print(data)
-                self.broker._submit(int(data['data']['Ref2']))
+                self.broker._submit(int(info['Ref2']))
             elif event.event == "OrderRequestFailed":
                 if self.p.debug:
                     print(data)
-                self.broker._reject(int(data['data']['Ref2']))
+                self.broker._reject(int(info['Ref2']))
             elif event.event == "OrderReport":
                 if self.p.debug:
                     print(data)
+                status = int(info['Status'])
+                oref = int(info['Ref2'])
+                if status == 4:
+                    self.broker._accept(oref)
+                elif status == 6:
+                    self.broker._cancel(oref)
             elif event.event == "TradeReport":
                 if self.p.debug:
                     print(data)
+                oref = int(info['Ref2'])
+                qty = int(info['Qty'])
+                price = float(info['Price'])
+                self.broker._fill(oref, qty, price)
 
     def get_cash(self):
         return self._cash
