@@ -3,14 +3,25 @@ import {AgGridReact, reactCellRendererFactory} from 'ag-grid-react';
 import {Button} from 'react-bootstrap';
 
 var StrategyControl = React.createClass({
+    post(url, data) {
+	$.ajax({
+	    type: 'post',
+	    url: url,
+	    data: JSON.stringify(data),
+	    contentType: "application/json"
+	});
+    },
     start() {
-	$.get("/strategy/start/"+this.props.params.strategy+"/" + this.props.params.id);
+	var data = this.props.params.data;
+	this.post("/strategy/start", data);
     },
     pause() {
-	$.get("/strategy/pause/"+this.props.params.strategy+"/" + this.props.params.id);
+	var data = this.props.params.data;
+	this.post("/strategy/pause", data);
     },
     stop() {
-	$.get("/strategy/stop/"+this.props.params.strategy+"/" + this.props.params.id);
+	var data = this.props.params.data;
+	this.post("/strategy/stop", data);
     },
     render() {
 	return (
@@ -41,7 +52,7 @@ var SampleUi = React.createClass({
 		 cellRenderer: function(params) {
 		     return "<a href='/strategy/log/" +
 			 params.data.strategy + "/" +
-			 params.data.id + "'>Log</a>";
+			 params.data.id + "' target='_blank'>Log</a>";
 		 }},
 		{headerName: "operator",
 		 field: "start",

@@ -122,7 +122,7 @@ class Unbuffered(object):
 def run_strategy(fname, kwargs):
     modpath = os.path.dirname(os.path.realpath(__file__))
     logpath = os.path.join(modpath, '../data/log-%s-%s.txt' % \
-                           (kwargs['name'],
+                           (kwargs['strategy'],
                             str(kwargs['id'])))
     f = open(logpath, "w")
     sys.stdout = Unbuffered(f)
@@ -172,7 +172,7 @@ def run(args):
 
 if __name__ == '__main__':
     p = run({
-        "name" : "sample",
+        "strategy" : "sample",
         "id" : 1,
         "product" : "HSIZ6",
         "newdata": True,

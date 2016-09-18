@@ -345,25 +345,40 @@ def clear_ticker():
 
 stratlist = {}
 
-@app.route("/strategy/start/<string:stratname>/<string:id>")
-def strategy_create(stratname, id):
-    if (stratname, id) not in stratlist: 
-        stratlist[(stratname, id)] = \
-                              strategy.run(stratname, id)
-        stratlist[(stratname, id)].start()
+@app.route("/strategy/start", methods=['POST'])
+def strategy_start():
+    if not request.json:
+        abort(400)
+    s = request.json['strategy']
+    id = request.json['id']
+
+    if (s, id) not in stratlist: 
+        stratlist[(s, id)] = \
+                              strategy.run(s, id, request.json)
+        stratlist[(s, id)].start()
         return "OK"
     else:
         return "STARTED"
 
 
-@app.route("/strategy/stop/<string:stratname>/<string:id>")
-def strategy_stop(stratname, id):
-    stratlist[(stratname, id)].stop()
-    stratlist.pop((stratname, id), None)
+@app.route("/strategy/stop", methods=['POST'])
+def strategy_stop():
+    if not request.json:
+        abort(400)
+    s = request.json['strategy']
+    id = request.json['id']
 
-@app.route("/strategy/pause/<string:stratname>/<string:id>")
-def strategy_pause(stratname, id):
-    pass
+    stratlist[(s, id)].stop()
+    stratlist.pop((s, id), None)
+
+@app.route("/strategy/pause", methods=['POST'])
+def strategy_pause():
+    if not request.json:
+        abort(400)
+    s = request.json['strategy']
+    id = request.json['id']
+
+
 
 
 @app.route("/strategy/log/<string:stratname>/<string:id>")
