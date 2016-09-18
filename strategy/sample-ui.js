@@ -24,11 +24,27 @@ var StrategyControl = React.createClass({
 	this.post("/strategy/stop", data);
     },
     render() {
+	var status = this.props.params.data.status;
+	var start_disabled = true;
+	var pause_disabled = true;
+	var stop_disabled = true;
+	console.log(this.props.params);
+	if (status == undefined || status == "stopped") {
+	    start_disabled = false;
+	} else if (status == "paused") {
+	    start_disabled = false;
+	} else if (status == "running") {
+	    pause_disabled = false;
+	    stop_disabled = false;
+	}
 	return (
 		<div>
-		<Button onClick={this.start}>Start</Button>
-		<Button onClick={this.pause}>Pause</Button>
-		<Button onClick={this.stop}>Stop</Button>
+		<Button onClick={this.start}
+	    disabled={start_disabled}>Start</Button>
+		<Button onClick={this.pause}
+	    disabled={pause_disabled}>Pause</Button>
+		<Button onClick={this.stop}
+	    disabled={stop_disabled}>Stop</Button>
 		</div>
 	);
     }
@@ -41,6 +57,8 @@ var SampleUi = React.createClass({
 	    columnDefs: [
 		{headerName: "Id",
 		 field: "id"},
+		{headerName: "Status",
+		 field: "status"},
 		{headerName: "Product",
 		 field: "product",
 		 editable: true },
@@ -54,7 +72,7 @@ var SampleUi = React.createClass({
 			 params.data.strategy + "/" +
 			 params.data.id + "' target='_blank'>Log</a>";
 		 }},
-		{headerName: "operator",
+		{headerName: "Actions",
 		 field: "start",
 		 cellRenderer: reactCellRendererFactory(StrategyControl)
 		}],
@@ -62,6 +80,20 @@ var SampleUi = React.createClass({
 	};
     },
     // in onGridReady, store the api for later use
+    componentWillReceiveProps(newprops) {
+	if (newprops.status['sample'] == undefined) {
+	    return;
+	}
+	var r = this.state.rowData;
+	console.log(r);
+	console.log(newprops.status['sample']);
+	for(var i=0; i < r.length; i++) {
+	    if (newprops.status['sample'][r[i]['id']] != undefined) {
+		r[i]['status'] = newprops.status['sample'][r[i]['id']];
+	    }
+	}
+	this.setState({rowData: r});
+    },
     onGridReady(params) {
 	this.api = params.api;
 	this.columnApi = params.columnApi;
@@ -71,10 +103,13 @@ var SampleUi = React.createClass({
 	var c = this.state.counter;
 	c = c+1;
 	r.push({id: c,
+		status: "stopped",
 		strategy: "sample"});
 	this.setState({rowData: r,
 		       counter: c});
 	this.api.setRowData(r);
+    },
+    status() {
     },
     render() {
 	return (
@@ -86,11 +121,6 @@ var SampleUi = React.createClass({
 	    columnDefs={this.state.columnDefs}
 	    rowData={this.state.rowData}
 	    onGridReady={this.onGridReady}
-	    // or provide props the old way with no binding
-	    rowSelection="multiple"
-	    enableSorting="true"
-	    enableFilter="true"
-                   rowHeight="22"
 		/></div>
 	)
     }

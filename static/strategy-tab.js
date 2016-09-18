@@ -6,7 +6,7 @@ var StrategyTab = React.createClass( {
 	return {};
     },
     render: function() {
-	return(<SampleUi/>);
+	return(<SampleUi status={this.props.status}/>);
     }
 });
 

@@ -360,6 +360,10 @@ def strategy_start():
                    "status" : "running"})
         return "OK"
     else:
+        send_dict("LocalStrategyStatus",
+                  {"strategy" : s,
+                   "id" : id,
+                   "status" : "running"})
         return "STARTED"
 
 

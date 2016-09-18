@@ -142,7 +142,8 @@ var SpTraderApp = React.createClass({
 	    tickers: [],
 	    orders: [],
 	    trades: [],
-	    positions: []
+	    positions: [],
+	    strategy_status: {}
 	};
     },
     submitModal: function(data) {
@@ -263,6 +264,17 @@ var SpTraderApp = React.createClass({
 	}
 	this.setState({orders: d});
     },
+    strategyStatus: function(event) {
+	var data = JSON.parse(event.data);
+	console.log(data);
+	var d = this.state.strategy_status;
+	if (d[data['strategy']] == undefined) {
+	    d[data['strategy']] = {};
+	}
+	console.log(d);
+	d[data['strategy']][data['id']] = data['status'];
+	this.setState({strategy_status: d});
+    },
     render: function() {
 	var events = {
 	    "ping" : this.addToLog,
@@ -285,7 +297,8 @@ var SpTraderApp = React.createClass({
 	    "BusinessDateReply" : this.addToLog,
 	    "MMOrderBeforeSendReport" : this.addToLog,
 	    "MMOrderRequestFailed" : this.addToLog,
-	    "QuoteRequestReceived" : this.addToLog
+	    "QuoteRequestReceived" : this.addToLog,
+	    "LocalStrategyStatus" : this.strategyStatus
 	}
 	return(
 		<Tabs id="tabs">
@@ -322,7 +335,7 @@ var SpTraderApp = React.createClass({
 		</Tabs>
 		</Tab>
 		<Tab eventKey={2} title="Strategy">
-		<StrategyTab />
+		<StrategyTab status={this.state.strategy_status}/>
 		</Tab>
 		<Tab eventKey={3} title="Scratchpad">
 		<ButtonToolbar>
