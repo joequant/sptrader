@@ -329,7 +329,6 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
 
 # Alias
 BrokerSharpPoint = SharpPointBroker
-
 if __name__ == '__main__':
     s = SharpPointBroker()
     s.start()

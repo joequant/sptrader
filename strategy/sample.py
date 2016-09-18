@@ -126,11 +126,10 @@ def run_strategy(fname, kwargs):
                             str(kwargs['id'])))
     f = open(logpath, "w")
     sys.stdout = Unbuffered(f)
-    retval = ""
     cerebro = bt.Cerebro()
     cerebro.addstrategy(TestStrategy)
     store = spstore.SharpPointStore()
-    broker = store.getbroker()
+    broker = store.getbroker(backtest=kwargs.get('backtest', False))
     cerebro.setbroker(broker)
 
     # Create a Data Feed
@@ -161,7 +160,7 @@ def run_strategy(fname, kwargs):
     # Print out the final result
     print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
     f.close()
-    return retval
+    return None
 
 def run(args):
     # Datas are in a subfolder of the samples. Need to find where the script is
@@ -178,8 +177,8 @@ if __name__ == '__main__':
         "product" : "HSIZ6",
         "newdata": True,
         "keepalive": True,
-        "streaming" : True,
-        "debug" : True})
+        "debug" : True,
+        'backtest' : False})
     p.start()
     p.join()
 

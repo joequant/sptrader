@@ -33,6 +33,7 @@ import backtrader as bt
 from backtrader.metabase import MetaParams
 from backtrader.utils.py3 import queue, with_metaclass
 from backtrader.utils import AutoDict
+from backtrader.brokers.bbroker import BackBroker
 
 
 class MetaSingleton(MetaParams):
@@ -66,6 +67,7 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
 
     BrokerCls = None  # broker class will autoregister
     DataCls = None  # data class will auto register
+    BackTestCls = BackBroker
 
     params = (
         ('gateway', 'http://localhost:5000/'),
@@ -88,7 +90,12 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
 
     @classmethod
     def getbroker(cls, *args, **kwargs):
-        '''Returns broker with *args, **kwargs from registered ``BrokerCls``'''
+        '''Returns broker with *args, **kwargs from registered ``BrokerCls``
+or ``BackTestCls``
+        '''
+        backtest = kwargs.pop('backtest', False)
+        if backtest:
+            return cls.BackTestCls(*args, **kwargs)
         return cls.BrokerCls(*args, **kwargs)
 
     def __init__(self):
@@ -328,7 +335,6 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
                 o = self.oapi.close_order(self.p.account, oid)
             except Exception as e:
                 continue  # not cancelled - FIXME: notify
-
             self.broker._cancel(oref)
 
 if __name__ == '__main__':
