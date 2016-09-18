@@ -7,7 +7,7 @@ from backtrader.plot.plot import Plot
 import datetime  # For datetime objects
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
-from multiprocessing import Process
+import threading
 # Create a Strategy
 
 location = os.path.dirname(os.path.realpath(__file__))
@@ -167,7 +167,7 @@ def run(args):
     # because it could have been called from anywhere
     modpath = os.path.dirname(os.path.realpath(__file__))
     datapath = os.path.join(modpath, '../data/ticker.txt')
-    p = Process(target=run_strategy, args=(datapath, args))
+    p = threading.Thread(target=run_strategy, args=(datapath, args))
     return p
 
 if __name__ == '__main__':
