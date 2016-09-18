@@ -37,9 +37,8 @@ def hello():
 
 
 def send_dict(id, msg):
-    msg["id"] = id
     for sub in log_subscriptions[:]:
-        sub.put(msg)
+        sub.put((id, msg))
 
 
 def send_cdata(id, data):
@@ -269,11 +268,10 @@ def login():
 @app.route("/ping")
 def ping():
     msg = {
-        "id": "ping",
         "msg": "Ping"
         }
     for sub in log_subscriptions[:]:
-        sub.put(msg)
+        sub.put(("ping", msg))
     return "OK"
 
 
@@ -356,6 +354,10 @@ def strategy_start():
         stratlist[(s, id)] = \
                               strategy.run(s, id, request.json)
         stratlist[(s, id)].start()
+        send_dict("LocalStrategyStatus",
+                  {"strategy" : s,
+                   "id" : id,
+                   "status" : "running"})
         return "OK"
     else:
         return "STARTED"
@@ -369,7 +371,12 @@ def strategy_stop():
     id = request.json['id']
 
     stratlist[(s, id)].stop()
+    send_dict("LocalStrategyStatus",
+              {"strategy" : s,
+               "id" : id,
+               "status" : "stopped"})
     stratlist.pop((s, id), None)
+
 
 @app.route("/strategy/pause", methods=['POST'])
 def strategy_pause():
@@ -377,8 +384,10 @@ def strategy_pause():
         abort(400)
     s = request.json['strategy']
     id = request.json['id']
-
-
+    send_dict("LocalStrategyStatus",
+              {"strategy" : s,
+               "id" : id,
+               "status" : "paused"})
 
 
 @app.route("/strategy/log/<string:stratname>/<string:id>")
@@ -457,8 +466,7 @@ def subscribe():
         log_subscriptions.append(q)
         try:
             while True:
-                result = q.get()
-                id = result['id']
+                (id, result) = q.get()
                 ev = ServerSentEvent(result, id)
                 yield ev.encode()
         except GeneratorExit:  # Or maybe use flask signals
