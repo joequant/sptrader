@@ -13,7 +13,7 @@ from multiprocessing import Process
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, location)
 sys.path.insert(0, os.path.join(location, "../sptrader"))
-from spcsv import SharpPointCSVData
+from spfeed import SharpPointCSVData
 from spbroker import SharpPointBroker
 
 class TestStrategy(bt.Strategy):
@@ -128,6 +128,8 @@ def run_strategy(fname, oname, kwargs):
     retval = ""
     cerebro = bt.Cerebro()
     cerebro.addstrategy(TestStrategy)
+    store = spstore.SharpPointStore()
+    broker = store.getbroker()
     cerebro.setbroker(SharpPointBroker(dataname=oname))
 
     # Create a Data Feed
