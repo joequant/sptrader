@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 import config
 import cffi_to_py
 import spstore
-import spcsv
+import spfeed
 import spbroker
 
 cv = threading.Condition()

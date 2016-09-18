@@ -7,7 +7,7 @@ import sys  # To find out the script name (in argv[0])
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, location)
 sys.path.insert(0, os.path.join(location, "../sptrader"))
-from spcsv import SharpPointCSVData
+from spfeed import SharpPointCSVData
 
 class TestStrategy(bt.Strategy):
     params = (
