@@ -163,6 +163,14 @@ or ``BackTestCls``
     def get_instrument(self, dataname):
         pass
 
+    def _get_request(self, method, **kwargs):
+        return requests.get(self.p.gateway + method,
+                            **kwargs)
+
+    def _post_request(self, method, **kwargs):
+        return requests.post(self.p.gateway + method,
+                             **kwargs)
+
     def streaming_events(self, tmout=None):
         q = queue.Queue()
         kwargs = {'q': q, 'tmout': tmout}
@@ -172,8 +180,7 @@ or ``BackTestCls``
         t.start()
 
     def _t_streaming_listener(self, q, tmout=None):
-        response = requests.get(self.p.gateway + "log/subscribe",
-                                stream=True)
+        response = self._get_request("log/subscribe", stream=True)
         client = sseclient.SSEClient(response)
         for event in client.events():
             if self.p.debug:
@@ -214,7 +221,7 @@ or ``BackTestCls``
         return q
 
     def _t_streaming_prices(self, dataname, q, tmout):
-        r = requests.get(self.p.gateway + "ticker/subscribe/" + dataname)
+        r = self._get_request("ticker/subscribe/" + dataname)
 
     def get_cash(self):
         return self._cash
@@ -244,7 +251,7 @@ or ``BackTestCls``
     }
 
     def isloggedin(self):
-        login_info = requests.get(self.p.gateway + "login-info").json()
+        login_info = self._get_request("login-info").json()
         if self.p.debug:
             print("login-info", login_info)
         return int(login_info['status']) != -1
@@ -267,8 +274,7 @@ or ``BackTestCls``
                 if self.p.login is not None and not self.isloggedin():
                     if self.p.debug:
                         print("login", self.p.login)
-                    r = requests.post(self.p.gateway + "login",
-                                      json=self.p.login)
+                    r = self._post_request("login", json=self.p.login)
             except Exception as e:
                 self.put_notification(e)
                 continue
@@ -311,8 +317,7 @@ or ``BackTestCls``
             if self.p.debug:
                 print(msg)
             try:
-                r = requests.post(self.p.gateway + "order/add",
-                                  json=okwargs)
+                r = self._post_request("order/add", json=okwargs)
             except Exception as e:
                 self.put_notification(e)
                 self.broker._reject(order.ref)
