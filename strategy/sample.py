@@ -136,7 +136,6 @@ def run_strategy(fname, kwargs):
     # Create a Data Feed
     data = store.getdata(
         dataname=fname,
-        product='HSIZ6',
         **kwargs)
     data2 = bt.DataClone(dataname=data)
     data2.addfilter(bt.ReplayerMinutes, compression=5)
@@ -176,6 +175,7 @@ if __name__ == '__main__':
     p = run({
         "name" : "sample",
         "id" : 1,
+        "product" : "HSIZ6",
         "newdata": True,
         "keepalive": True,
         "streaming" : True,
