@@ -350,10 +350,11 @@ def strategy_start():
     s = request.json['strategy']
     id = request.json['id']
 
-    if (s, id) not in stratlist: 
-        stratlist[(s, id)] = \
-                              strategy.run(s, id, request.json)
-        stratlist[(s, id)].start()
+    if (s, id) not in stratlist:
+        sthread = strategy.run(s, id, request.json)
+        stratlist[(s, id)] = sthread
+        sthread.daemon = True
+        sthread.start()
         send_dict("LocalStrategyStatus",
                   {"strategy" : s,
                    "id" : id,
