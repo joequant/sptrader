@@ -148,11 +148,9 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
     params = (
         ('cash', 10000.0),
         ('checksubmit', True),
-        ('dataname', None),
         ('eosbar', False),
         ('filler', None),
     )
-    f = None
 
     def __init__(self, **kwargs):
         super(SharpPointBroker, self).__init__()
@@ -166,12 +164,6 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
         self.notifs = collections.deque()
 
         self.submitted = collections.deque()
-        if self.f is None:
-            if hasattr(self.p.dataname, 'readline'):
-                self.f = self.p.dataname
-            elif self.p.dataname is not None:
-                # Let an exception propagate to let the caller know
-                self.f = io.open(self.p.dataname, 'a')
 
     def start(self):
         super(SharpPointBroker, self).start()
@@ -180,9 +172,6 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
     def stop(self):
         super(SharpPointBroker, self).stop()
         self.o.stop()
-        if self.f is not None:
-            self.f.close()
-            self.f = None
 
     def get_notification(self):
         try:
