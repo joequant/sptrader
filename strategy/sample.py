@@ -15,6 +15,7 @@ sys.path.insert(0, location)
 sys.path.insert(0, os.path.join(location, "../sptrader"))
 from spfeed import SharpPointCSVData
 from spbroker import SharpPointBroker
+import spstore
 
 class TestStrategy(bt.Strategy):
     params = (
@@ -118,7 +119,7 @@ class Unbuffered(object):
     def __getattr__(self, attr):
         return getattr(self.stream, attr)
 
-def run_strategy(fname, oname, kwargs):
+def run_strategy(fname, kwargs):
     modpath = os.path.dirname(os.path.realpath(__file__))
     logpath = os.path.join(modpath, '../data/log-%s-%s.txt' % \
                            (kwargs['name'],
@@ -130,10 +131,10 @@ def run_strategy(fname, oname, kwargs):
     cerebro.addstrategy(TestStrategy)
     store = spstore.SharpPointStore()
     broker = store.getbroker()
-    cerebro.setbroker(SharpPointBroker(dataname=oname))
+    cerebro.setbroker(broker)
 
     # Create a Data Feed
-    data = SharpPointCSVData(
+    data = store.getdata(
         dataname=fname,
         product='HSIZ6',
         **kwargs)
@@ -168,8 +169,7 @@ def run(args):
     # because it could have been called from anywhere
     modpath = os.path.dirname(os.path.realpath(__file__))
     datapath = os.path.join(modpath, '../data/ticker.txt')
-    orderpath = os.path.join(modpath, '../data/orders.txt')
-    p = Process(target=run_strategy, args=(datapath, orderpath, args))
+    p = Process(target=run_strategy, args=(datapath, args))
     return p
 
 if __name__ == '__main__':
@@ -177,8 +177,9 @@ if __name__ == '__main__':
         "name" : "sample",
         "id" : 1,
         "newdata": True,
-             "keepalive": True,
-             "debug" : True})
+        "keepalive": True,
+        "streaming" : True,
+        "debug" : True})
     p.start()
     p.join()
 
