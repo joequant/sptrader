@@ -374,13 +374,15 @@ def strategy_stop():
         abort(400)
     s = request.json['strategy']
     id = request.json['id']
-
-    stratlist[(s, id)].stop()
     send_dict("LocalStrategyStatus",
               {"strategy" : s,
                "id" : id,
                "status" : "stopped"})
+    if (s, id) not in stratlist:
+        return "NOT FOUND"
+    stratlist[(s, id)].terminate()
     stratlist.pop((s, id), None)
+    return "OK"
 
 
 @app.route("/strategy/pause", methods=['POST'])
