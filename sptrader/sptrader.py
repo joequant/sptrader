@@ -502,7 +502,7 @@ class SPTrader(object):
 
     def get_instrument(self):
         count = self.get_instrument_count()
-        buffer = self.ffi.new("SPApiInstrument[%d]" % (count + 1))
+        buffer = self.ffi.new("SPApiInstrument[%d]" % (count))
         if self.api.SPAPI_GetInstrumentByArray(buffer) == 0:
             return self.cdata_to_py(buffer)
         else:
@@ -515,7 +515,7 @@ class SPTrader(object):
         count = self.get_product_count()
         if count == 0:
             return []
-        buffer = self.ffi.new("SPApiProduct[%d]" % (count + 1))
+        buffer = self.ffi.new("SPApiProduct[%d]" % (count))
         if self.api.SPAPI_GetProductByArray(buffer) == 0:
             return []
         return self.cdata_to_py(buffer)
@@ -532,7 +532,7 @@ class SPTrader(object):
         count = self.get_order_count()
         if count == 0:
             return []
-        buffer = self.ffi.new("SPApiOrder[%d]" % (count + 1))
+        buffer = self.ffi.new("SPApiOrder[%d]" % (count))
         if self.api.SPAPI_GetOrdersByArray(self.user,
                                            self.acc_no,
                                            buffer) != 0:
@@ -548,7 +548,7 @@ class SPTrader(object):
         count = self.get_trade_count()
         if count == 0:
             return []
-        buffer = self.ffi.new("SPApiTrade[%d]" % (count + 1))
+        buffer = self.ffi.new("SPApiTrade[%d]" % (count))
         if self.api.SPAPI_GetAllTradesByArray(self.user,
                                               self.acc_no,
                                               buffer) != 0:
