@@ -1,4 +1,5 @@
-{
+{"//" : "fix react and ag-grid versions to avoid collapsing ag-grid",
+ "//" : "bug.  debug which version is a problem later",
     "name" : "Sptrader",
     "version" : "0.0.3",
     "author" : "Joseph C Wang <joequant@gmail.com>",
@@ -8,12 +9,12 @@
 	"url" : "https://github.com/joequant/sptrader.git"
     },
     "dependencies" : {
-	"react" : "latest",
-	"react-dom" : "latest",
-	"react-bootstrap" : "latest",
+	"react" : "15.3.x",
+	"react-dom" : "15.3.x",
+	"react-bootstrap" : "0.30.x",
 	"react-addons-linked-state-mixin" : "latest",
-	"ag-grid": "latest",
-	"ag-grid-react": "latest"
+	"ag-grid": "5.2.x",
+	"ag-grid-react": "5.2.x"
     },
     "devDependencies" : {
 	"browserify" : "latest",
