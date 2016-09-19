@@ -10,8 +10,7 @@ var TradeTable = React.createClass({
 		 field: "ProdCode"},
 		{headerName: "Time",
 		 field: "TradeTime"}
-	    ],
-	    rowData: [{name: "foobar"}]
+	    ]
 	};
     },
     render: function() {
@@ -21,14 +20,7 @@ var TradeTable = React.createClass({
 	    // will update when these lists change
 	    columnDefs={this.state.columnDefs}
 	    rowData={this.props.data}
-
-	    // or provide props the old way with no binding
-	    rowSelection="multiple"
-	    enableSorting="true"
-	    enableFilter="true"
-                   rowHeight="22"
-		/>
-	)
+        />)
     }
 });
     

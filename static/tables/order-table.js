@@ -31,8 +31,7 @@ var OrderTable = React.createClass({
 		{headerName: "T.Stam",
 		 field: "UpdateTime"},
 		{headerName: "Ext.Order#",
-		 field: "ExtOrderNo"}],
-	    rowData: [{name: "foobar"}]
+		 field: "ExtOrderNo"}]
 	};
     },
     render: function() {
@@ -42,13 +41,7 @@ var OrderTable = React.createClass({
 	    // will update when these lists change
 	    columnDefs={this.state.columnDefs}
 	    rowData={this.props.data}
-
-	    // or provide props the old way with no binding
-	    rowSelection="multiple"
-	    enableSorting="true"
-	    enableFilter="true"
-                   rowHeight="22"
-		/>
+	/>
 	)
     }
 });
