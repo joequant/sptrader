@@ -8,9 +8,8 @@
 	"url" : "https://github.com/joequant/sptrader.git"
     },
     "dependencies" : {
-	"react" : "15.x",
-	"react-dom" : "15.x",
-	"react-datagrid" : "latest",
+	"react" : "latest",
+	"react-dom" : "latest",
 	"react-bootstrap" : "latest",
 	"react-addons-linked-state-mixin" : "latest",
 	"ag-grid": "latest",

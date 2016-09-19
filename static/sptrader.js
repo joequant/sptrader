@@ -302,7 +302,7 @@ var SpTraderApp = React.createClass({
 	}
 	return(
 		<Tabs id="tabs">
-		<Tab eventKey={1} title="Account">
+		<Tab eventKey={1} title="Account" >
 		<LoginForm show={this.state.showLoginForm}
 	    label={this.state.loginLabel}
 	    data={this.state.info}
@@ -310,31 +310,32 @@ var SpTraderApp = React.createClass({
 		<Button bsStyle="success" onClick={this.logout}>Logout</Button>
 		<ConnectionTable data={this.state.connection_info}/>
 		<Tabs id="tab1">
-		<Tab eventKey={1} title="Account">
+		<Tab eventKey={1} title="Account" >
 		<AccountTable data={this.state.account_info} />
 		</Tab>
-		<Tab eventKey={2} title="Order">
+		<Tab eventKey={2} title="Order" >
 		<AlertBox show={this.state.showAlertBox}
 	    text={this.state.alertText}
 	    ok={this.hideAlertBox} />
 		<OrderForm show={this.state.showOrderForm}
 	    onSubmit={this.submitOrder}
 	    onCancel={this.hideOrderForm}/>
+
 		<Button bsStyle="success" onClick={this.showOrderForm}>Show Order Form</Button>
 		<OrderTable data={this.state.orders} />
 		</Tab>
-		<Tab eventKey={3} title="Position">
+		<Tab eventKey={3} title="Position" >
 		<PositionTable data={this.state.positions} />
 		</Tab>
-		<Tab eventKey={4} title="Trade">
+		<Tab eventKey={4} title="Trade" >
 		<TradeTable data={this.state.trades}/>
 		</Tab>
-		<Tab eventKey={5} title="Ticker">
+		<Tab eventKey={5} title="Ticker" >
 		<TickerControl tickers={this.state.tickers}/>
 		</Tab>
 		</Tabs>
 		</Tab>
-		<Tab eventKey={2} title="Strategy">
+		<Tab eventKey={2} title="Strategy" >
 		<StrategyTab status={this.state.strategy_status}/>
 		</Tab>
 		<Tab eventKey={3} title="Scratchpad">
@@ -349,18 +350,6 @@ var SpTraderApp = React.createClass({
 	)
     }
 });
-
-
-var helloWorld = React.createClass({
-    render: function() {
-	return (<h2>Greetings from SPTrader</h2>)
-    }
-});
-
-ReactDOM.render(
-    <helloWorld />,
-    document.getElementById('content')
-);
 
 ReactDOM.render(
     <SpTraderApp />,
