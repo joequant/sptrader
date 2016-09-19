@@ -29,7 +29,7 @@ var StrategyControl = React.createClass({
 	var pause_disabled = true;
 	var stop_disabled = true;
 	console.log(this.props.params);
-	if (status == undefined || status == "stopped" || start == "error") {
+	if (status == undefined || status == "stopped" || status == "error") {
 	    start_disabled = false;
 	} else if (status == "paused") {
 	    start_disabled = false;
