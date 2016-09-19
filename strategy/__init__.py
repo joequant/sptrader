@@ -11,6 +11,7 @@ def run(name, id, kwargs):
         kwargs['newdata'] = True
         kwargs['keepalive'] = True
         kwargs['debug'] = True
+        kwargs['streaming'] = True
         return sample.run(kwargs)
 
 if __name__ == '__main__':

@@ -254,7 +254,7 @@ var SpTraderApp = React.createClass({
 	var d = this.state.orders;
 	var found = false;
 	for (var i =0; i < d.length; i++) {
-	    if (d[i].IntOrderNo == data.IntOrderNo) {
+	    if (parseInt(d[i].IntOrderNo) == parseInt(data.IntOrderNo)) {
 		d[i] = data;
 		found = true;
 	    }
