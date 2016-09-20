@@ -58,6 +58,7 @@ var SampleUi = React.createClass({
 		{headerName: "Id",
 		 field: "id"},
 		{headerName: "Status",
+		 volatile: true,
 		 field: "status"},
 		{headerName: "Product",
 		 field: "product",
@@ -74,6 +75,7 @@ var SampleUi = React.createClass({
 		 }},
 		{headerName: "Actions",
 		 field: "start",
+		 volatile: true,
 		 cellRenderer: reactCellRendererFactory(StrategyControl)
 		}],
 	    rowData: []
@@ -93,6 +95,8 @@ var SampleUi = React.createClass({
 	    }
 	}
 	this.setState({rowData: r});
+	this.api.setRowData(r);
+	this.apo.softRefresh();
     },
     onGridReady(params) {
 	this.api = params.api;
