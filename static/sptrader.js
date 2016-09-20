@@ -137,6 +137,13 @@ var SpTraderApp = React.createClass({
 	$.getJSON("/login-info", function(d) {
 	    if (parseInt(d.status) != -1) {
 		l.setState({showLoginForm: false});
+		l.fillTables();
+	    }
+	    if (d.connected != undefined) {
+		l.setState({connection_info: d.connected});
+	    }
+	    if (d.account_info != undefined) {
+		l.setState({account_info: d.account_info});
 	    }
 	    l.setState({info: d.info});
 	});
@@ -167,12 +174,14 @@ var SpTraderApp = React.createClass({
     },
     logout: function() {
 	$.get("/logout");
-	this.setState({loginLabel: ''});
-	this.setState({showLoginForm: true});
+	this.setState({loginLabel: '',
+		       showLoginForm: true});
     },
     onerror: function(event) {
-	this.setState({loginLabel: 'Connection broken'});
-	this.setState({showLoginForm: true});
+	if (!this.state.showLoginForm) {
+	    this.setState({loginLabel: 'Connection broken',
+			   showLoginForm: true});
+	}
     },
     addToLog: function(event) {
 	data = JSON.parse(event.data);
@@ -200,18 +209,21 @@ var SpTraderApp = React.createClass({
 	this.setState({conn_info: conn_info})
 	if (parseInt(host_type) == 80 &&
 	    parseInt(con_status) == 2) {
-	    var l = this;
-	    $.getJSON("/ticker/list", function(d) {
-		l.setState({tickers: d.data});
-	    });
-	    $.getJSON("/account-info");
-	    $.getJSON("/order/list", function(d) {
-		l.setState({orders: d.data});
-		});
-	    $.getJSON("/trade/list", function(d) {
-		l.setState({trades: d.data});
-	    });
+	    this.fillTables();
 	}
+    },
+    fillTables: function() {
+	var l = this;
+	$.getJSON("/account-info");
+	$.getJSON("/ticker/list", function(d) {
+	    l.setState({tickers: d.data});
+	});
+	$.getJSON("/order/list", function(d) {
+	    l.setState({orders: d.data});
+	});
+	$.getJSON("/trade/list", function(d) {
+	    l.setState({trades: d.data});
+	});
     },
     showOrderForm: function(event) {
 	this.setState({showOrderForm: true});

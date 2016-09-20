@@ -47,15 +47,13 @@ def send_cdata(id, data):
 
 @app.route("/login-info")
 def logininfo():
-    for k, v in info_cache['connected'].items():
-        send_dict("ConnectedReply", {
-            "host_type": k,
-            "con_status": v
-        })
+    d = {"info": config.logininfo,
+         "status": "%d" % sp.get_login_status(80)}
+    if info_cache['connected'] is not None:
+        d['connected'] = info_cache['connected']
     if info_cache['accountinfo'] is not None:
-        send_cdata("AccountInfoPush", info_cache['accountinfo'])
-    return jsonify({"info": config.logininfo,
-                    "status": "%d" % sp.get_login_status(80)})
+        d['accountinfo'] = info_cache['accountinfo']
+    return jsonify(d)
 
 
 @sp.ffi.callback("LoginReplyAddr")
@@ -131,7 +129,7 @@ sp.register_account_logout_reply(account_logout_reply)
 
 @sp.ffi.callback("AccountInfoPushAddr")
 def account_info_push(data):
-    info_cache['accountinfo'] = data
+    info_cache['accountinfo'] = sp.cdata_to_py(data[0])
     send_cdata("AccountInfoPush", data)
 sp.register_account_info_push(account_info_push)
 

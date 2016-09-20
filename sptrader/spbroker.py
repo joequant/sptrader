@@ -26,7 +26,6 @@ import collections
 import backtrader as bt
 import io
 import spstore
-from backtrader.comminfo import CommInfoBase
 from backtrader.order import Order, BuyOrder, SellOrder
 from backtrader.position import Position
 from backtrader.metabase import MetaParams
