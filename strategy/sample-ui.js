@@ -96,7 +96,6 @@ var SampleUi = React.createClass({
 	}
 	this.setState({rowData: r});
 	this.api.setRowData(r);
-	this.api.softRefresh();
     },
     onGridReady(params) {
 	this.api = params.api;
