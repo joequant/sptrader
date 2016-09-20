@@ -27,7 +27,8 @@ var AlertBox = React.createClass( {
 		<Modal.Header>
 		</Modal.Header>
 		<Modal.Body>
-		<FormControl type="textarea" value={this.props.text} />
+		<FormControl componentClass="textarea"
+		value={this.props.text} />
 		<Button
 		onClick={this.ok}>
 		OK
