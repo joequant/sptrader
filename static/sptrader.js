@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Tabs, Tab, ButtonToolbar, Button, FormControl,
-	FormGroup, ControlLabel, HelpBlock, Modal } from 'react-bootstrap';
+	FormGroup, ControlLabel, HelpBlock, Modal} from 'react-bootstrap';
 import ReactAddonsLinkedStateMixin from 'react-addons-linked-state-mixin';
 import {AgGridReact} from 'ag-grid-react';
 import LoginForm from './login-form';
@@ -19,15 +19,22 @@ var AlertBox = React.createClass( {
     ok() {
 	this.props.ok();
     },
+    clear() {
+	this.props.clear();
+    },
     render() {
 	return (<Modal show={this.props.show}>
 		<Modal.Header>
 		</Modal.Header>
 		<Modal.Body>
-		{this.props.text}
+		<FormControl type="textarea" value={this.props.text} />
 		<Button
 		onClick={this.ok}>
 		OK
+		</Button>
+		<Button
+		onClick={this.clear}>
+		Clear
 		</Button>
 		</Modal.Body>
 		</Modal>);
@@ -44,6 +51,9 @@ var SubscribeBox = React.createClass( {
 	$.each(this.props.event, function(k, v) {
 	    source.addEventListener(k, v);
 	});
+	source.onerror = function(e) {
+	    obj.props.onerror(e);
+	};
     },
     render: function() {
         return null;
@@ -159,6 +169,10 @@ var SpTraderApp = React.createClass({
 	this.setState({loginLabel: ''});
 	this.setState({showLoginForm: true});
     },
+    onerror: function(event) {
+	this.setState({loginLabel: 'Connection broken'});
+	this.setState({showLoginForm: true});
+    },
     addToLog: function(event) {
 	data = JSON.parse(event.data);
 	console.log(data);
@@ -207,8 +221,12 @@ var SpTraderApp = React.createClass({
     hideAlertBox: function(event) {
 	this.setState({showAlertBox: false});
     },
+    clearAlertBox: function(event) {
+	this.setState({alertText: ""});
+    },
     orderFailed: function(event) {
-	this.setState({alertText: JSON.stringify(event.data),
+	this.setState({alertText: this.state.alertText + "\n" +
+		       JSON.stringify(event.data),
 		       showAlertBox: true});
     },
     submitOrder: function(data) {
@@ -232,10 +250,10 @@ var SpTraderApp = React.createClass({
 	this.setState({tickers: data.data});
     },
     updateTrades: function(event) {
-	var data = JSON.parse(event.data);
-	data = data.data;
+	var data = JSON.parse(event.data).data;
 	var d = this.state.trades;
 	var found = false;
+	console.log(data);
 	for (var i =0; i < d.length; i++) {
 	    if (d[i].IntOrderNo == data.IntOrderNo) {
 		d[i] = data;
@@ -248,8 +266,7 @@ var SpTraderApp = React.createClass({
 	this.setState({trades: d});
     },
     updateOrders: function(event) {
-	var data = JSON.parse(event.data);
-	data = data.data;
+	var data = JSON.parse(event.data).data;
 	console.log(data);
 	var d = this.state.orders;
 	var found = false;
@@ -316,7 +333,8 @@ var SpTraderApp = React.createClass({
 		<Tab eventKey={2} title="Order" >
 		<AlertBox show={this.state.showAlertBox}
 	    text={this.state.alertText}
-	    ok={this.hideAlertBox} />
+	    ok={this.hideAlertBox}
+	    clear={this.clearAlertBox} />
 		<OrderForm show={this.state.showOrderForm}
 	    onSubmit={this.submitOrder}
 	    onCancel={this.hideOrderForm}/>
@@ -342,7 +360,8 @@ var SpTraderApp = React.createClass({
 		<ButtonToolbar>
 		<Button bsStyle="success" onClick={publish}>Ping</Button>
 		</ButtonToolbar>
-		<SubscribeBox url="/log/subscribe" event={events} />
+		<SubscribeBox url="/log/subscribe" event={events}
+	    onerror={this.onerror} />
 		<FormControl componentClass="textarea" value={this.state.log} />
 		<SampleTable/>
 		</Tab>
