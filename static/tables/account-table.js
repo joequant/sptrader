@@ -11,7 +11,8 @@ var AccountTable = React.createClass({
 		{headerName: "Name",
 		 field: "name"},
 		{headerName: "Value",
-		 field: "value"}],
+		 field: "value",
+		 cellClass: ['cell-right']}],
 	    fields: []
 	};
     },
