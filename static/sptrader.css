@@ -5,3 +5,7 @@
 .cell-right {
     text-align: right;
 }
+
+.short-number-field {
+    width: 50px;
+}

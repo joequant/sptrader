@@ -1,26 +1,25 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
+import {isNumber, formatNumber, renderNumber} from '../utils';
+
 var AccountTable = React.createClass({
-    getInitialState: function() {
-	var l = this;
-	$.getJSON("/schema/SPApiAccInfo", function(d) {
-	    l.setState({fields: d.retval});
-	});
+    getInitialState() {
 	return {
 	    columnDefs: [
 		{headerName: "Name",
 		 field: "name"},
 		{headerName: "Value",
 		 field: "value",
-		 cellClass: ['cell-right']}],
+		 cellClass: ['cell-right'],
+		 cellRenderer: renderNumber}],
 	    fields: []
 	};
     },
-    render: function() {
+    render() {
         var rowData = []
 	if (this.props.data != undefined) {
-	    for(var i=0, len=this.state.fields.length; i < len; i++) {
-		var field_name = this.state.fields[i];
+	    for(var i=0, len=this.props.fields.length; i < len; i++) {
+		var field_name = this.props.fields[i];
 		rowData.push({name: field_name,
 			      value: this.props.data[field_name]})
 	    }
@@ -32,12 +31,6 @@ var AccountTable = React.createClass({
 	    // will update when these lists change
 	    columnDefs={this.state.columnDefs}
 	    rowData={rowData}
-
-	    // or provide props the old way with no binding
-	    rowSelection="multiple"
-	    enableSorting="true"
-	    enableFilter="true"
-                   rowHeight="22"
 		/>
 	)
     }

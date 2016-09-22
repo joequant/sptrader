@@ -1,13 +1,18 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
+import {isNumber, formatNumber, renderNumber} from '../utils';
+
 var TradeTable = React.createClass({
     getInitialState: function() {
 	return {
 	    columnDefs: [
 		{headerName: "Id",
-		 field: "RecNo"},
+		 field: "RecNo",
+		 cellClass: "short-number-field"},
 		{headerName: "Price",
-		 field: "Price"},
+		 field: "Price",
+		 cellRenderer: renderNumber,
+		 cellClass: "short-number-field"},
 		{headerName: "TradeNo",
 		 field: "TradeNo"},
 		{headerName: "ExtOrderNo",
@@ -15,7 +20,8 @@ var TradeTable = React.createClass({
 		{headerName: "IntOrderNo",
 		 field: "IntOrderNo"},
 		{headerName: "Qty",
-		 field: "Qty"},
+		 field: "Qty",
+		 cellClass: "short-number-field"},
 		{headerName: "TradeDate",
 		 field: "TradeDate"},
 		{headerName: "TradeTime",
@@ -47,13 +53,18 @@ var TradeTable = React.createClass({
 		{headerName: "TradeRef",
 		 field: "TradeRef"},
 		{headerName: "TotalQty",
-		 field: "TotalQty"},
+		 field: "TotalQty",
+		 cellClass: "short-number-field"},
 		{headerName: "RemainingQty",
-		 field: "RemainingQty"},
+		 field: "RemainingQty",
+		 cellClass: "short-number-field"},
 		{headerName: "TradedQty",
-		 field: "TradedQty"},
+		 field: "TradedQty",
+		 cellClass: "short-number-field"},
 		{headerName: "AvgTradedPrice",
-		 field: "AvgTradedPrice"}
+		 field: "AvgTradedPrice",
+		 cellClass: "short-number-field",
+		 cellRenderer: renderNumber}
 	    ]
 	};
     },
