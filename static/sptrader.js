@@ -132,8 +132,12 @@ function FieldGroup({ id, label, help, ...props }) {
 console.log("New SPTrader");
 
 var SpTraderApp = React.createClass({
-    getInitialState: function() {
+    getInitialState() {
 	var l = this;
+	$.getJSON("/schema/SPApiAccInfo", function(d) {
+	    l.setState({account_fields: d.retval});
+	});
+
 	$.getJSON("/login-info", function(d) {
 	    if (parseInt(d.status) != -1) {
 		l.setState({showLoginForm: false});
@@ -161,10 +165,11 @@ var SpTraderApp = React.createClass({
 	    orders: [],
 	    trades: [],
 	    positions: [],
+	    account_fields: [],
 	    strategy_status: {}
 	};
     },
-    submitModal: function(data) {
+    submitModal(data) {
 	$.ajax({
 	    type: 'post',
 	    url: '/login',
@@ -172,23 +177,23 @@ var SpTraderApp = React.createClass({
 	    contentType: "application/json"
 	});
     },
-    logout: function() {
+    logout() {
 	$.get("/logout");
 	this.setState({loginLabel: '',
 		       showLoginForm: true});
     },
-    onerror: function(event) {
+    onerror(event) {
 	if (!this.state.showLoginForm) {
 	    this.setState({loginLabel: 'Connection broken',
 			   showLoginForm: true});
 	}
     },
-    addToLog: function(event) {
+    addToLog(event) {
 	data = JSON.parse(event.data);
 	console.log(data);
 	this.setState({log: this.state.log + event.data + "\n"});
     },
-    loginReply: function(event) {
+    loginReply(event) {
 	data = JSON.parse(event.data);
 	console.log(data);
 	this.setState({log: this.state.log + event.data + "\n"});
@@ -198,7 +203,7 @@ var SpTraderApp = React.createClass({
 	    this.setState({showLoginForm: false});
 	}
     },
-    connectedReply: function(event) {
+    connectedReply(event) {
 	data = JSON.parse(event.data);
 	console.log(data);
 	this.setState({log: this.state.log + event.data + "\n"});
@@ -212,7 +217,7 @@ var SpTraderApp = React.createClass({
 	    this.fillTables();
 	}
     },
-    fillTables: function() {
+    fillTables() {
 	var l = this;
 	$.getJSON("/account-info");
 	$.getJSON("/ticker/list", function(d) {
@@ -225,24 +230,24 @@ var SpTraderApp = React.createClass({
 	    l.setState({trades: d.data});
 	});
     },
-    showOrderForm: function(event) {
+    showOrderForm(event) {
 	this.setState({showOrderForm: true});
     },
-    hideOrderForm: function(event) {
+    hideOrderForm(event) {
 	this.setState({showOrderForm: false});
     },
-    hideAlertBox: function(event) {
+    hideAlertBox(event) {
 	this.setState({showAlertBox: false});
     },
-    clearAlertBox: function(event) {
+    clearAlertBox(event) {
 	this.setState({alertText: ""});
     },
-    orderFailed: function(event) {
+    orderFailed(event) {
 	this.setState({alertText: this.state.alertText + "\n" +
 		       JSON.stringify(event.data),
 		       showAlertBox: true});
     },
-    submitOrder: function(data) {
+    submitOrder(data) {
 	console.log(data);
 	$.ajax({
 	    type: 'post',
@@ -252,17 +257,17 @@ var SpTraderApp = React.createClass({
 	});
 	this.setState({showOrderForm: false});
     },
-    accountInfoPush: function(event) {
+    accountInfoPush(event) {
 	data = JSON.parse(event.data);
 	console.log(data);
 	this.setState({account_info: data.data});
     },
-    updateTickers: function(event) {
+    updateTickers(event) {
 	data = JSON.parse(event.data);
 	console.log(data);
 	this.setState({tickers: data.data});
     },
-    updateTrades: function(event) {
+    updateTrades(event) {
 	var data = JSON.parse(event.data).data;
 	var d = this.state.trades;
 	var found = false;
@@ -278,7 +283,7 @@ var SpTraderApp = React.createClass({
 	}
 	this.setState({trades: d});
     },
-    updateOrders: function(event) {
+    updateOrders(event) {
 	var data = JSON.parse(event.data).data;
 	console.log(data);
 	var d = this.state.orders;
@@ -294,7 +299,7 @@ var SpTraderApp = React.createClass({
 	}
 	this.setState({orders: d});
     },
-    strategyStatus: function(event) {
+    strategyStatus(event) {
 	var data = JSON.parse(event.data);
 	console.log(data);
 	var d = this.state.strategy_status;
@@ -305,7 +310,7 @@ var SpTraderApp = React.createClass({
 	d[data['strategy']][data['id']] = data['status'];
 	this.setState({strategy_status: d});
     },
-    render: function() {
+    render() {
 	var events = {
 	    "ping" : this.addToLog,
 	    "LoginReply" : this.loginReply,
@@ -341,7 +346,9 @@ var SpTraderApp = React.createClass({
 		<ConnectionTable data={this.state.connection_info}/>
 		<Tabs id="tab1">
 		<Tab eventKey={1} title="Account" >
-		<AccountTable data={this.state.account_info} />
+		<AccountTable
+	    fields={this.state.account_fields} 
+	    data={this.state.account_info} />
 		</Tab>
 		<Tab eventKey={2} title="Order" >
 		<AlertBox show={this.state.showAlertBox}
