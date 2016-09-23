@@ -421,7 +421,7 @@ public:
 };
 
   
-  static ApiProxyWrapperReplyStatic wrapper_reply;  
+static ApiProxyWrapperReplyStatic wrapper_reply;  
 class ApiProxyWrapper {
 public:
 	ApiProxyWrapper(void);
@@ -487,11 +487,6 @@ private:
 };
 
 static ApiProxyWrapper api_proxy_wrapper;
-  ApiProxyWrapper::ApiProxyWrapper() {
-    SPAPI_RegisterApiProxyWrapperReply(&wrapper_reply);
-  }
-  ApiProxyWrapper::~ApiProxyWrapper() {}
-
 
 void SPAPI_RegisterLoginReply(LoginReplyAddr addr){
   wrapper_reply._login_reply = addr;
@@ -570,7 +565,9 @@ void SPAPI_RegisterQuoteRequestReceivedReport(
 }
 
 int  SPAPI_Initialize(){
-  return api_proxy_wrapper.SPAPI_Initialize();
+  int retval = api_proxy_wrapper.SPAPI_Initialize();
+  api_proxy_wrapper.SPAPI_RegisterApiProxyWrapperReply(&wrapper_reply);
+  return retval;
 }
 void SPAPI_SetLoginInfo(char *host,
     int port, char *license, char *app_id, char *user_id, char *password){
