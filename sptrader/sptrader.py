@@ -382,7 +382,8 @@ if os.name == "nt":
     spapi = ffi.dlopen(os.path.join(dll_location, "spapidllm64.dll"))
 else:
     ffi.cdef(spapi_cdef.replace("SPDLLCALL", ""))
-    ffi.dlopen(os.path.join(dll_location, "libapiwrapper.so"))
+    ffi.dlopen(os.path.join(dll_location, "libapiwrapper.so"),
+               ffi.RTLD_GLOBAL | ffi.RTLD_NOW)
     spapi = ffi.dlopen(os.path.join(dll_location, "linux-shim.so"))
 
 # Remember to convert unicode strings to byte strings otherwise
