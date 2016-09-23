@@ -3,7 +3,7 @@ function isNumber(obj) {
 };
 
 function formatNumber(n) {
-    return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
+    return Number(n).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
 };
 
 function renderNumber(params) {
