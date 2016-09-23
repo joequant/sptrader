@@ -1,7 +1,7 @@
 {"//" : "fix react and ag-grid versions to avoid collapsing ag-grid",
  "//" : "bug.  debug which version is a problem later",
     "name" : "Sptrader",
-    "version" : "0.0.3",
+    "version" : "0.1",
     "author" : "Joseph C Wang <joequant@gmail.com>",
     "license" : "BSD-2-Clause",
     "repository" : {
