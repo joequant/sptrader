@@ -78,7 +78,7 @@ sp.register_login_reply(login_actions)
 sp.register_account_info_push(account_info_func)
 sp.register_connecting_reply(connected_reply_func)
 sp.register_instrument_list_reply(instrument_list_reply_func)
-sp.register_api_price_update(api_price_update_func)
+sp.register_price_update(api_price_update_func)
 
 print(sp.login())
 
