@@ -1,6 +1,7 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
-import {isNumber, formatNumber, renderNumber} from '../utils';
+import {isNumber, formatNumber, renderNumber, renderBuySell,
+       shortnumberwidth} from '../utils';
 
 var TradeTable = React.createClass({
     getInitialState: function() {
@@ -8,20 +9,23 @@ var TradeTable = React.createClass({
 	    columnDefs: [
 		{headerName: "Id",
 		 field: "RecNo",
-		 cellClass: "short-number-field"},
+		 width: shortnumberwidth},
 		{headerName: "Price",
 		 field: "Price",
 		 cellRenderer: renderNumber,
-		 cellClass: "short-number-field"},
+		 width: shortnumberwidth},
 		{headerName: "TradeNo",
-		 field: "TradeNo"},
+		 field: "TradeNo",
+		 width: shortnumberwidth},
 		{headerName: "ExtOrderNo",
-		 field: "ExtOrderNo"},
+		 field: "ExtOrderNo",
+		 width: shortnumberwidth},
 		{headerName: "IntOrderNo",
-		 field: "IntOrderNo"},
+		 field: "IntOrderNo",
+		 width: shortnumberwidth},
 		{headerName: "Qty",
 		 field: "Qty",
-		 cellClass: "short-number-field"},
+		 width: shortnumberwidth},
 		{headerName: "TradeDate",
 		 field: "TradeDate"},
 		{headerName: "TradeTime",
@@ -41,7 +45,9 @@ var TradeTable = React.createClass({
 		{headerName: "ClOrderId",
 		 field: "ClOrderId"},
 		{headerName: "BuySell",
-		 field: "BuySell"},
+		 field: "BuySell",
+		 cellRenderer: renderBuySell,
+		},
 		{headerName: "OpenClose",
 		 field: "OpenClose"},
 		{headerName: "Status",
@@ -49,21 +55,22 @@ var TradeTable = React.createClass({
 		{headerName: "DecInPrice",
 		 field: "DecInPrice"},
 		{headerName: "OrderPrice",
-		 field: "OrderPrice"},
+		 field: "OrderPrice",
+		 cellRenderer: renderNumber},
 		{headerName: "TradeRef",
 		 field: "TradeRef"},
 		{headerName: "TotalQty",
 		 field: "TotalQty",
-		 cellClass: "short-number-field"},
+		 width: shortnumberwidth},
 		{headerName: "RemainingQty",
 		 field: "RemainingQty",
-		 cellClass: "short-number-field"},
+		 width: shortnumberwidth},
 		{headerName: "TradedQty",
 		 field: "TradedQty",
-		 cellClass: "short-number-field"},
+		 width: shortnumberwidth},
 		{headerName: "AvgTradedPrice",
 		 field: "AvgTradedPrice",
-		 cellClass: "short-number-field",
+		 width: shortnumberwidth,
 		 cellRenderer: renderNumber}
 	    ]
 	};

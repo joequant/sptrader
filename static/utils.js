@@ -14,7 +14,18 @@ function renderNumber(params) {
 	return x;
     }
 };
+
+function renderBuySell(params) {
+    var x = params.data.value;
+    if (x == 66) {
+	return "Buy";
+    } else if (x == 83) {
+	return "Sell";
+    } else {
+	return x;
+    }
+};
 module.exports.isNumber = isNumber;
 module.exports.formatNumber = formatNumber;
 module.exports.renderNumber = renderNumber;
-
+module.exports.shortnumberwidth = 100;

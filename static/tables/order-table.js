@@ -1,5 +1,7 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
+import {shortnumberwidth, renderNumber} from '../utils';
+
 var OrderTable = React.createClass({
     getInitialState: function() {
 	return {
@@ -8,30 +10,31 @@ var OrderTable = React.createClass({
 		 field: "orders"},
 		{headerName: "Id",
 		 field: "id",
-		 cellClass: "short-number-field"},
+		 width: shortnumberwidth},
 		{headerName: "Name",
 		 field: "name"},
 		{headerName: "OS BQty",
 		 field: "osbqty",
-		 cellClass: "short-number-field"},
+		 width: shortnumberwidth},
 		{headerName: "OS SQty",
 		 field: "ossqty",
-		 cellClass: "short-number-field"},
+		 width: shortnumberwidth},
 		{headerName: "Price",
 		 field: "Price",
-		 cellClass: "short-number-field"},
+		 width: shortnumberwidth,
+		 cellRenderer: renderNumber},
 		{headerName: "Valid",
 		 field: "ValidType",
-		 cellClass: "short-number-field"},
+		 width: shortnumberwidth},
 		{headerName: "Cond.",
 		 field: "CondType",
-		 cellClass: "short-number-field"},
+		 width: shortnumberwidth},
 		{headerName: "Status",
 		 field: "Status",
-		 cellClass: "short-number-field"},
+		 width: shortnumberwidth},
 		{headerName: "Traded",
 		 field: "TradedQty",
-		 cellClass: "short-number-field"},
+		 width: shortnumberwidth},
 		{headerName: "Initiator",
 		 field: "Initiator"},
 		{headerName: "Ref",
@@ -40,7 +43,7 @@ var OrderTable = React.createClass({
 		 field: "UpdateTime"},
 		{headerName: "Ext.Order#",
 		 field: "ExtOrderNo",
-		 cellClass: "short-number-field"}]
+		 width: shortnumberwidth}]
 	};
     },
     render: function() {
