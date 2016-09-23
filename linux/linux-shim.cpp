@@ -1,3 +1,4 @@
+#include <vector>
 extern "C" {
 typedef signed long int __int64_t;
 typedef unsigned long int __uint64_t;
@@ -272,45 +273,154 @@ typedef void ( *ApiMMOrderRequestFailedAddr)(SPApiMMOrder *mm_order,
 typedef void ( *ApiQuoteRequestReceivedAddr)(char *product_code,
     char buy_sell, long qty);
 
+using namespace std;
 
-void  _Z24SPAPI_RegisterLoginReplyPFvlPcE(LoginReplyAddr addr);
+class ApiProxyWrapperReply {
+public:
+	ApiProxyWrapperReply(void){};
+	~ApiProxyWrapperReply(void){};
+	virtual void OnTest() = 0;
+	virtual void OnLoginReply(long ret_code,char *ret_msg) = 0;
+	virtual void OnConnectedReply(long host_type,long con_status) = 0;
+	virtual void OnApiOrderRequestFailed(tinyint action, const SPApiOrder *order, long err_code, char *err_msg) = 0;
+	virtual void OnApiOrderReport(long rec_no, const SPApiOrder *order) = 0;
+	virtual void OnApiOrderBeforeSendReport(const SPApiOrder *order) = 0;
+	virtual void OnAccountLoginReply(char *accNo, long ret_code, char* ret_msg) = 0;
+	virtual void OnAccountLogoutReply(long ret_code, char* ret_msg) = 0;
+	virtual void OnAccountInfoPush(const SPApiAccInfo *acc_info) = 0;
+	virtual void OnAccountPositionPush(const SPApiPos *pos) = 0;
+	virtual void OnUpdatedAccountPositionPush(const SPApiPos *pos) = 0;
+	virtual void OnUpdatedAccountBalancePush(const SPApiAccBal *acc_bal) = 0;
+	virtual void OnApiTradeReport(long rec_no, const SPApiTrade *trade) = 0;
+	virtual void OnApiPriceUpdate(const SPApiPrice *price) = 0;
+	virtual void OnApiTickerUpdate(const SPApiTicker *ticker) = 0;
+	virtual void OnPswChangeReply(long ret_code, char *ret_msg) = 0;
+	virtual void OnProductListByCodeReply(char *inst_code, bool is_ready, char *ret_msg) = 0;
+	virtual void OnInstrumentListReply(bool is_ready, char *ret_msg) = 0;
+	virtual void OnBusinessDateReply(long business_date) = 0;
+	virtual void OnApiMMOrderBeforeSendReport(SPApiMMOrder *mm_order) = 0;
+	virtual void OnApiMMOrderRequestFailed(SPApiMMOrder *mm_order, long err_code, char *err_msg) = 0;
+	virtual void OnApiQuoteRequestReceived(char *product_code, char buy_sell, long qty) = 0;
+};
+
+  class ApiProxyWrapperReplyStatic:ApiProxyWrapperReply {
+public:
+	ApiProxyWrapperReplyStatic(void){};
+	~ApiProxyWrapperReplyStatic(void){};
+	virtual void OnTest() = 0;
+    virtual void OnLoginReply(long ret_code,char *ret_msg) = 0;
+	virtual void OnConnectedReply(long host_type,long con_status) = 0;
+	virtual void OnApiOrderRequestFailed(tinyint action, const SPApiOrder *order, long err_code, char *err_msg) = 0;
+	virtual void OnApiOrderReport(long rec_no, const SPApiOrder *order) = 0;
+	virtual void OnApiOrderBeforeSendReport(const SPApiOrder *order) = 0;
+	virtual void OnAccountLoginReply(char *accNo, long ret_code, char* ret_msg) = 0;
+	virtual void OnAccountLogoutReply(long ret_code, char* ret_msg) = 0;
+	virtual void OnAccountInfoPush(const SPApiAccInfo *acc_info) = 0;
+	virtual void OnAccountPositionPush(const SPApiPos *pos) = 0;
+	virtual void OnUpdatedAccountPositionPush(const SPApiPos *pos) = 0;
+	virtual void OnUpdatedAccountBalancePush(const SPApiAccBal *acc_bal) = 0;
+	virtual void OnApiTradeReport(long rec_no, const SPApiTrade *trade) = 0;
+	virtual void OnApiPriceUpdate(const SPApiPrice *price) = 0;
+	virtual void OnApiTickerUpdate(const SPApiTicker *ticker) = 0;
+	virtual void OnPswChangeReply(long ret_code, char *ret_msg) = 0;
+	virtual void OnProductListByCodeReply(char *inst_code, bool is_ready, char *ret_msg) = 0;
+	virtual void OnInstrumentListReply(bool is_ready, char *ret_msg) = 0;
+	virtual void OnBusinessDateReply(long business_date) = 0;
+	virtual void OnApiMMOrderBeforeSendReport(SPApiMMOrder *mm_order) = 0;
+	virtual void OnApiMMOrderRequestFailed(SPApiMMOrder *mm_order, long err_code, char *err_msg) = 0;
+	virtual void OnApiQuoteRequestReceived(char *product_code, char buy_sell, long qty) = 0;
+};
+
+  
+class ApiProxyWrapper {
+public:
+	ApiProxyWrapper(void);
+	~ApiProxyWrapper(void);
+
+	void SPAPI_RegisterApiProxyWrapperReply(ApiProxyWrapperReply* apiProxyWrapperReply);
+	int SPAPI_Initialize();
+	void SPAPI_SetLoginInfo(char *host, int port, char *license, char *app_id, char *user_id, char *password);
+	int SPAPI_Login();
+	int SPAPI_GetLoginStatus(char *user_id, short host_id);
+	int SPAPI_AddOrder(SPApiOrder *order);
+	int SPAPI_AddInactiveOrder(SPApiOrder* order);
+	int SPAPI_ChangeOrder(char *user_id, SPApiOrder* order, double org_price, long org_qty);
+	int SPAPI_ChangeOrderBy(char *user_id, char *acc_no, long accOrderNo, double org_price, long org_qty, double newPrice, long newQty);
+	int SPAPI_DeleteOrderBy(char *user_id, char *acc_no, long accOrderNo, char* productCode, char* clOrderId);
+	int SPAPI_DeleteAllOrders(char *user_id, char *acc_no);
+	int SPAPI_ActivateAllOrders(char *user_id, char *acc_no);
+	int SPAPI_InactivateAllOrders(char *user_id, char *acc_no);
+	int SPAPI_ActivateOrderBy(char *user_id, char *acc_no, long accOrderNo);
+	int SPAPI_InactivateOrderBy(char *user_id, char *acc_no, long accOrderNo);
+	int SPAPI_GetOrderCount(char *user_id, char* acc_no);
+	int SPAPI_GetOrderByOrderNo(char *user_id, char *acc_no, long int_order_no, SPApiOrder *order);
+	int SPAPI_GetActiveOrders(char *user_id, char *acc_no, vector<SPApiOrder>& apiOrderList);
+	int SPAPI_GetPosCount(char *user_id);
+	int SPAPI_GetPosByProduct(char *user_id, char *prod_code, SPApiPos *pos);
+	void SPAPI_Uninitialize();
+	int SPAPI_Logout(char *user_id);
+	int SPAPI_AccountLogin(char *user_id, char *acc_no);
+	int SPAPI_AccountLogout(char *user_id, char *acc_no);
+	int SPAPI_GetTradeCount(char *user_id, char *acc_no);
+	int SPAPI_GetAllTrades(char *user_id, char *acc_no, vector<SPApiTrade>& apiTradeList);
+	int SPAPI_SubscribePrice(char *user_id, char *prod_code, int mode);
+	int SPAPI_SubscribeTicker(char *user_id, char *prod_code, int mode);
+	int SPAPI_ChangePassword(char *user_id, char *old_password, char *new_password);
+	int SPAPI_GetDllVersion(char *dll_ver_no, char *dll_rel_no, char *dll_suffix);
+	int SPAPI_GetAccBalCount(char* user_id);
+	int SPAPI_GetAccBalByCurrency(char *user_id, char *ccy, SPApiAccBal *acc_bal);
+	int SPAPI_GetAllAccBal(char *user_id, vector<SPApiAccBal>& apiAccBalList);
+	int SPAPI_GetCcyRateByCcy(char *user_id, char *ccy, double &rate);
+	int SPAPI_GetAccInfo(char *user_id, SPApiAccInfo *acc_info);
+	int SPAPI_GetPriceByCode(char *user_id, char *prod_code, SPApiPrice *price);
+	int SPAPI_SetApiLogPath(char *path);
+	int SPAPI_LoadProductInfoListByCode(char *inst_code);
+	int SPAPI_GetProductCount();
+	int SPAPI_GetProduct(vector<SPApiProduct>& apiProdList);
+	int SPAPI_GetProductByCode(char *prod_code, SPApiProduct *prod);
+	int SPAPI_LoadInstrumentList();
+	int SPAPI_GetInstrumentCount();
+	int SPAPI_GetInstrument(vector<SPApiInstrument>& apiInstList);
+	int SPAPI_GetInstrumentByCode(char *inst_code, SPApiInstrument *inst);
+	void SPAPI_SetLanguageId(int langid);
+	int SPAPI_SendMarketMakingOrder(char *user_id, SPApiMMOrder *mm_order);
+	int SPAPI_SubscribeQuoteRequest(char *user_id, char *prod_code, int mode);
+	int SPAPI_SubscribeAllQuoteRequest(char *user_id, int mode);
+    int SPAPI_GetAllAccBalByArray(char *acc_no, SPApiAccBal* apiAccBalList);
+    int SPAPI_GetOrdersByArray(char* userId, char* acc_no, SPApiOrder* apiOrderList);
+    int SPAPI_GetAllTradesByArray(char* userId, char* acc_no, SPApiTrade* apiTradeList);
+    int SPAPI_GetInstrumentByArray(SPApiInstrument* apiInstList);
+    int SPAPI_GetProductByArray(SPApiProduct* apiProdList);
+    
+private:
+
+};
+
+static ApiProxyWrapper api_proxy_wrapper;
+
+
 void SPAPI_RegisterLoginReply(LoginReplyAddr addr){
-  _Z24SPAPI_RegisterLoginReplyPFvlPcE(addr);
 }
 
-void _Z29SPAPI_RegisterConnectingReplyPFvllE(ConnectedReplyAddr addr);
 void SPAPI_RegisterConnectingReply(ConnectedReplyAddr addr){
-  _Z29SPAPI_RegisterConnectingReplyPFvllE(addr);
 }
 
-void _Z25SPAPI_RegisterOrderReportPFvlP10SPApiOrderE(ApiOrderReportAddr addr);
 void SPAPI_RegisterOrderReport(ApiOrderReportAddr addr){
-  _Z25SPAPI_RegisterOrderReportPFvlP10SPApiOrderE(addr);
 }
 
-void _Z32SPAPI_RegisterOrderRequestFailedPFvcP10SPApiOrderlPcE(ApiOrderRequestFailedAddr addr);
 void SPAPI_RegisterOrderRequestFailed(ApiOrderRequestFailedAddr addr){
-  _Z32SPAPI_RegisterOrderRequestFailedPFvcP10SPApiOrderlPcE(addr);
 }
 
-void _Z35SPAPI_RegisterOrderBeforeSendReportPFvP10SPApiOrderE(ApiOrderBeforeSendReportAddr addr);
 void SPAPI_RegisterOrderBeforeSendReport(ApiOrderBeforeSendReportAddr addr){
-  _Z35SPAPI_RegisterOrderBeforeSendReportPFvP10SPApiOrderE(addr);
 }
 
-void _Z31SPAPI_RegisterAccountLoginReplyPFvPclS_E(AccountLoginReplyAddr addr);
 void SPAPI_RegisterAccountLoginReply(AccountLoginReplyAddr addr){
-  _Z31SPAPI_RegisterAccountLoginReplyPFvPclS_E(addr);
 }
 
-void _Z32SPAPI_RegisterAccountLogoutReplyPFvlPcE(AccountLogoutReplyAddr addr);
 void SPAPI_RegisterAccountLogoutReply(AccountLogoutReplyAddr addr){
-  _Z32SPAPI_RegisterAccountLogoutReplyPFvlPcE(addr);
 }
 
-void _Z29SPAPI_RegisterAccountInfoPushPFvP12SPApiAccInfoE(AccountInfoPushAddr addr);
 void SPAPI_RegisterAccountInfoPush(AccountInfoPushAddr addr){
-  _Z29SPAPI_RegisterAccountInfoPushPFvP12SPApiAccInfoE(addr);
 }
 
 void SPAPI_RegisterAccountPositionPush(AccountPositionPushAddr addr){}
@@ -331,7 +441,9 @@ void SPAPI_RegisterMMOrderBeforeSendReport(
 void SPAPI_RegisterQuoteRequestReceivedReport(
     ApiQuoteRequestReceivedAddr addr){}
 
-int  SPAPI_Initialize(){}
+int  SPAPI_Initialize(){
+  return api_proxy_wrapper.SPAPI_Initialize();
+}
 void SPAPI_SetLoginInfo(char *host,
     int port, char *license, char *app_id, char *user_id, char *password){}
 int  SPAPI_Login(){}
@@ -392,4 +504,5 @@ int SPAPI_GetOrdersByArray(char *user_id, char *acc_no,
 int SPAPI_GetAllAccBalByArray(char *user_id, SPApiAccBal* apiAccBalList){}
 int SPAPI_GetInstrumentByArray(SPApiInstrument* apiInstList){}
 int SPAPI_GetProductByArray(SPApiProduct* apiProdList){}
+
 }
