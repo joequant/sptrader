@@ -9,11 +9,7 @@ import multiprocessing
 from spfeed import SharpPointCSVData
 from spbroker import SharpPointBroker
 import spstore
-
-
-import strategy.sample
-dispatch = {}
-dispatch['sample'] = strategy.sample.SampleStrategy
+import strategylist
 
 class Unbuffered(object):
     def __init__(self, stream):
@@ -68,7 +64,7 @@ def run_strategy(module, fname, kwargs):
     return None
 
 def run(name, id, kwargs):
-    module = dispatch[name]
+    module = strategylist.dispatch[name]
     modpath = os.path.dirname(os.path.realpath(__file__))
     datapath = os.path.join(modpath, '../data/ticker.txt')
     kwargs['newdata'] = True
@@ -80,4 +76,5 @@ def run(name, id, kwargs):
     return p
 
 if __name__ == '__main__':
+    print(strategylist.dispatch)
     run("sample", 1, {'exitbars':1})
