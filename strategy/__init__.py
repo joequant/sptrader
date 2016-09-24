@@ -12,6 +12,8 @@ from spfeed import SharpPointCSVData
 from spbroker import SharpPointBroker
 import spstore
 
+dispatch = {}
+
 class Unbuffered(object):
     def __init__(self, stream):
         self.stream = stream
@@ -64,19 +66,17 @@ def run_strategy(module, fname, kwargs):
     f.close()
     return None
 
-
 def run(name, id, kwargs):
-    if name == "sample":
-        module = strategy.sample.TestStrategy
-        modpath = os.path.dirname(os.path.realpath(__file__))
-        datapath = os.path.join(modpath, '../data/ticker.txt')
-        kwargs['newdata'] = True
-        kwargs['keepalive'] = True
-        kwargs['debug'] = True
-        kwargs['streaming'] = True
-        p = multiprocessing.Process(target=run_strategy,
-                                    args=(module, datapath, kwargs))
-        return p
+    module = dispatch[name]
+    modpath = os.path.dirname(os.path.realpath(__file__))
+    datapath = os.path.join(modpath, '../data/ticker.txt')
+    kwargs['newdata'] = True
+    kwargs['keepalive'] = True
+    kwargs['debug'] = True
+    kwargs['streaming'] = True
+    p = multiprocessing.Process(target=run_strategy,
+                                args=(module, datapath, kwargs))
+    return p
 
 if __name__ == '__main__':
     run("sample", 1)

@@ -7,6 +7,7 @@ from backtrader.plot.plot import Plot
 import datetime  # For datetime objects
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
+import strategy
 # Create a Strategy
 
 location = os.path.dirname(os.path.realpath(__file__))
@@ -104,3 +105,5 @@ class TestStrategy(bt.Strategy):
 
                 # Keep track of the created order to avoid a 2nd order
                 self.order = self.sell()
+
+strategy.dispatch['sample'] = TestStrategy

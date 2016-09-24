@@ -122,6 +122,12 @@ function renderTime(params) {
 };
 
 
+function renderLog(params) {
+    return "<a href='/strategy/log/" +
+	params.data.strategy + "/" +
+	params.data.id + "' target='_blank'>Log</a>";
+};
+
 module.exports.isNumber = isNumber;
 module.exports.formatNumber = formatNumber;
 module.exports.renderNumber = renderNumber;
@@ -131,3 +137,4 @@ module.exports.renderDate = renderDate;
 module.exports.renderTime = renderTime;
 module.exports.renderBuySell = renderBuySell;
 module.exports.StrategyControl = StrategyControl;
+module.exports.renderLog = renderLog;
