@@ -1,7 +1,4 @@
-import matplotlib
-matplotlib.use('Agg', warn=False, force=True)
 import backtrader as bt
-import matplotlib.pyplot as plt
 from backtrader.plot.plot import Plot
 
 import datetime  # For datetime objects
@@ -14,7 +11,7 @@ location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, location)
 sys.path.insert(0, os.path.join(location, "../sptrader"))
 
-class TestStrategy(bt.Strategy):
+class SampleStrategy(bt.Strategy):
     params = (
         ('exitbars', 3),
         ('maperiod', 10)
@@ -106,4 +103,4 @@ class TestStrategy(bt.Strategy):
                 # Keep track of the created order to avoid a 2nd order
                 self.order = self.sell()
 
-strategy.dispatch['sample'] = TestStrategy
+

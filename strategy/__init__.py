@@ -3,8 +3,6 @@ matplotlib.use('Agg', warn=False, force=True)
 import backtrader as bt
 import matplotlib.pyplot as plt
 from backtrader.plot.plot import Plot
-
-import strategy.sample
 import sys
 import os
 import multiprocessing
@@ -12,7 +10,10 @@ from spfeed import SharpPointCSVData
 from spbroker import SharpPointBroker
 import spstore
 
+
+import strategy.sample
 dispatch = {}
+dispatch['sample'] = strategy.sample.SampleStrategy
 
 class Unbuffered(object):
     def __init__(self, stream):
@@ -79,4 +80,4 @@ def run(name, id, kwargs):
     return p
 
 if __name__ == '__main__':
-    run("sample", 1)
+    run("sample", 1, {'exitbars':1})
