@@ -1,8 +1,8 @@
-.cell-left {
+.ag-body .ag-row .cell-left {
     text-align: left;
 }
 
-.ag-body .ag-cell {
+.ag-body .ag-row {
     text-align: right;
 }
 

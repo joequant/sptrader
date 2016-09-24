@@ -7,10 +7,11 @@ var AccountTable = React.createClass({
 	return {
 	    columnDefs: [
 		{headerName: "Name",
-		 field: "name"},
+		 field: "name",
+		 cellClass: ['cell-left']
+		},
 		{headerName: "Value",
 		 field: "value",
-		 cellClass: ['cell-right'],
 		 cellRenderer: renderNumber}],
 	    fields: []
 	};
