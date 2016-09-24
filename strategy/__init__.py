@@ -75,5 +75,9 @@ def run(name, id, kwargs):
                                 args=(module, datapath, kwargs))
     return p
 
+def params(name):
+    return strategylist.dispatch[name].params._getitems()
+
 if __name__ == '__main__':
+    print(params('sample'))
     run("sample", 1, {'exitbars':1})
