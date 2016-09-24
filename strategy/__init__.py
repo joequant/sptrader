@@ -22,7 +22,6 @@ class Unbuffered(object):
 
 def run_strategy(name, fname, kwargs, q):
     try:
-        print("FFOOO!!!!")
         module = strategylist.dispatch[name]
         modpath = os.path.dirname(os.path.realpath(__file__))
         logpath = os.path.join(modpath, '../data/log-%s-%s.txt' % \
@@ -64,9 +63,10 @@ def run_strategy(name, fname, kwargs, q):
         # Print out the final result
         print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
         f.close()
+        q.put((kwargs['strategy'], kwargs['id'], "done"))
         return None
     except:
-        q.put("error")
+        q.put((kwargs['strategy'], kwargs['id'], "error"))
         raise
 
 def run(name, id, kwargs):

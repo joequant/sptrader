@@ -6,6 +6,7 @@ import os
 import sys
 import cffi
 import time
+import threading
 
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(location, "..", "sptrader"))
@@ -343,14 +344,17 @@ def clear_ticker():
 
 stratlist = {}
 
-
-def error_handler(s, id):
-    print('error starting strategy')
-    send_dict("LocalStrategyStatus",
-              {"strategy" : s,
-               "id" : id,
-               "status" : "error"})
-
+def strategy_listener(p, q):
+    try:
+        while True:
+            (s, id, status) = q.get()
+            print("received message")
+            send_dict("LocalStrategyStatus",
+                      {"strategy" : s,
+                       "id" : id,
+                       "status" : status})
+    except GeneratorExit:  # Or maybe use flask signals
+        return
 
 @app.route("/strategy/start", methods=['POST'])
 def strategy_start():
@@ -359,12 +363,15 @@ def strategy_start():
     s = request.json['strategy']
     id = request.json['id']
     if (s, id) not in stratlist:
-        (sthread, q) = strategy.run(s, id, request.json)
-        stratlist[(s, id)] = sthread
+        (p, q) = strategy.run(s, id, request.json)
+        stratlist[(s, id)] = (p, q)
         send_dict("LocalStrategyStatus",
                   {"strategy" : s,
                    "id" : id,
                    "status" : "running"})
+        t = threading.Thread(target=strategy_listener, args=(p, q))
+        t.daemon = True
+        t.start()
         return "OK"
     else:
         send_dict("LocalStrategyStatus",
@@ -386,7 +393,9 @@ def strategy_stop():
                "status" : "stopped"})
     if (s, id) not in stratlist:
         return "NOT FOUND"
-    stratlist[(s, id)].terminate()
+    (p, q) = stratlist[(s, id)]
+    p.terminate()
+    q.close()
     stratlist.pop((s, id), None)
     return "OK"
 
