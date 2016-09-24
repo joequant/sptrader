@@ -1,6 +1,6 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
-import {shortnumberwidth, renderNumber} from '../utils';
+import {shortnumberwidth, renderNumber, renderDateTime} from '../utils';
 
 var OrderTable = React.createClass({
     getInitialState: function() {
@@ -40,7 +40,9 @@ var OrderTable = React.createClass({
 		{headerName: "Ref",
 		 field: "Ref"},
 		{headerName: "T.Stam",
-		 field: "UpdateTime"},
+		 field: "UpdateTime",
+		 cellRenderer: renderDateTime
+		},
 		{headerName: "Ext.Order#",
 		 field: "ExtOrderNo",
 		 width: shortnumberwidth}]

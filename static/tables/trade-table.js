@@ -1,7 +1,7 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
 import {isNumber, formatNumber, renderNumber, renderBuySell,
-       shortnumberwidth} from '../utils';
+	shortnumberwidth, renderDate, renderTime} from '../utils';
 
 var TradeTable = React.createClass({
     getInitialState: function() {
@@ -27,9 +27,13 @@ var TradeTable = React.createClass({
 		 field: "Qty",
 		 width: shortnumberwidth},
 		{headerName: "TradeDate",
-		 field: "TradeDate"},
+		 field: "TradeDate",
+		 cellRenderer: renderDate
+		},
 		{headerName: "TradeTime",
-		 field: "TradeTime"},
+		 field: "TradeTime",
+		 cellRenderer: renderTime
+		},
 		{headerName: "AccNo",
 		 field: "AccNo"},
 		{headerName: "ProdCode",
