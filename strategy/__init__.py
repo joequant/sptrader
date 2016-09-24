@@ -76,5 +76,4 @@ def run(name, id, kwargs):
     return p
 
 if __name__ == '__main__':
-    print(strategylist.dispatch)
     run("sample", 1, {'exitbars':1})
