@@ -13,7 +13,7 @@ import PositionTable from './tables/position-table';
 import TradeTable from './tables/trade-table';
 import AccountTable from './tables/account-table';
 import TickerControl from './ticker-control';
-import StrategyTab from '../strategy/strategy-tab';
+import StrategyTab from './strategy-tab';
 
 var AlertBox = React.createClass( {
     ok() {
