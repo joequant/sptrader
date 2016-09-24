@@ -9,7 +9,7 @@ import multiprocessing
 from spfeed import SharpPointCSVData
 from spbroker import SharpPointBroker
 import spstore
-import strategylist
+import strategy.strategylist
 
 class Unbuffered(object):
     def __init__(self, stream):
