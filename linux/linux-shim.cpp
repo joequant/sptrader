@@ -1,3 +1,7 @@
+// Copyright (C) Bitquant Research Laboratories (Asia) Limited
+// released under terms of the Simplified BSD License
+
+
 #include <vector>
 extern "C" {
 typedef signed long int __int64_t;
