@@ -5,13 +5,14 @@ var ConnectionTable = React.createClass({
 	return {
 	    columnDefs: [
 		{headerName: "Link",
-	     field: "link",
-	     enableRowGroup: true, enablePivot: true,
-	     width: 150, pinned: true},
-	    {headerName: "Status",
-	     field: "status",
-	     enableRowGroup: true, enablePivot: true,
-	     width: 150, pinned: true,
+		 field: "link",
+		 cellClass: ['cell-left'],
+		 enableRowGroup: true, enablePivot: true,
+		 width: 150, pinned: true},
+		{headerName: "Status",
+		 field: "status",
+		 enableRowGroup: true, enablePivot: true,
+		 width: 150, pinned: true,
 	     cellRenderer: function(params) {
 		 if (params.data.status == undefined) {
 		     return "";
