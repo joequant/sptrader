@@ -1,3 +1,54 @@
+import React from 'react';
+import {Button} from 'react-bootstrap';
+
+var StrategyControl = React.createClass({
+    post(url, data) {
+	$.ajax({
+	    type: 'post',
+	    url: url,
+	    data: JSON.stringify(data),
+	    contentType: "application/json"
+	});
+    },
+    start() {
+	var data = this.props.params.data;
+	this.post("/strategy/start", data);
+    },
+    pause() {
+	var data = this.props.params.data;
+	this.post("/strategy/pause", data);
+    },
+    stop() {
+	var data = this.props.params.data;
+	this.post("/strategy/stop", data);
+    },
+    render() {
+	var status = this.props.params.data.status;
+	var start_disabled = true;
+	var pause_disabled = true;
+	var stop_disabled = true;
+	console.log(this.props.params);
+	if (status == undefined || status == "stopped" || status == "error") {
+	    start_disabled = false;
+	} else if (status == "paused") {
+	    start_disabled = false;
+	} else if (status == "running") {
+	    pause_disabled = false;
+	    stop_disabled = false;
+	}
+	return (
+		<div>
+		<Button onClick={this.start}
+	    disabled={start_disabled}>Start</Button>
+		<Button onClick={this.pause}
+	    disabled={pause_disabled}>Pause</Button>
+		<Button onClick={this.stop}
+	    disabled={stop_disabled}>Stop</Button>
+		</div>
+	);
+    }
+});
+
 function isNumber(obj) {
     return !isNaN(parseFloat(obj))
 };
@@ -79,3 +130,4 @@ module.exports.renderDateTime = renderDateTime;
 module.exports.renderDate = renderDate;
 module.exports.renderTime = renderTime;
 module.exports.renderBuySell = renderBuySell;
+module.exports.StrategyControl = StrategyControl;

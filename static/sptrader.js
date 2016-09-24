@@ -13,7 +13,7 @@ import PositionTable from './tables/position-table';
 import TradeTable from './tables/trade-table';
 import AccountTable from './tables/account-table';
 import TickerControl from './ticker-control';
-import StrategyTab from './strategy-tab';
+import StrategyTab from '../strategy/strategy-tab';
 
 var AlertBox = React.createClass( {
     ok() {
@@ -58,53 +58,6 @@ var SubscribeBox = React.createClass( {
     },
     render: function() {
         return null;
-    }
-});
-
-var Injector = React.createClass( {
-    mixins: [ReactAddonsLinkedStateMixin],
-    getInitialState: function() {
-	return {message: 'Hello!',
-		textinput : ''};
-    },
-    inject : function() {
-	var self = this;
-	jQuery.ajax({
-	    url: "/inject",
-	    type: "POST",
-	    data: self.state.textinput,
-	    contentType: "application/json; charset=utf-8",
-	    success: function (response) {
-		self.setState({message: response});
-	    }
-	});
-    },
-    injectTest : function() {
-	this.setState({message : "test inject"});
-    },
-    clear: function() {
-	this.setState({textinput : ''});
-    },
-    fileOpen: function(e) {
-	var self = this;
-	var files = e.target.files,
-	    reader = new FileReader();
-	reader.onload = function() {
-	    self.setState({textinput: this.result});
-	}
-	reader.readAsText(files[0]);
-    },
-    render: function() {
-	return (
-<div>
-<Button bsStyle="success" onClick={this.inject}>Inject</Button>
-<Button bsStyle="success" onClick={this.clear}>Clear</Button>
-<Button bsStyle="success" onClick={this.injectTest}>Test</Button>
-<FormControl componentClass="file" onChange={this.fileOpen} />
-<FormControl componentClass="textarea" valueLink={this.linkState('textinput')} />
-<FormControl componentClass="textarea" valueLink={this.linkState('message')} />
-</div>
-	);
     }
 });
 
