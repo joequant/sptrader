@@ -23,7 +23,7 @@ import strategy
 sp = sptrader.SPTrader()
 log_subscriptions = []
 empty_cache = {"connected": {},
-               "accountinfo": None}
+               "account_info": None}
 info_cache = empty_cache
 ticker_products = set()
 app = Flask(__name__,
@@ -52,8 +52,9 @@ def logininfo():
          "status": "%d" % sp.get_login_status(80)}
     if info_cache['connected'] is not None:
         d['connected'] = info_cache['connected']
-    if info_cache['accountinfo'] is not None:
-        d['accountinfo'] = info_cache['accountinfo']
+    if info_cache['account_info'] is not None:
+        d['account_info'] = info_cache['account_info']
+    d['account_fields'] = sp.fields("SPApiAccInfo")
     return jsonify(d)
 
 
@@ -130,7 +131,7 @@ sp.register_account_logout_reply(account_logout_reply)
 
 @sp.ffi.callback("AccountInfoPushAddr")
 def account_info_push(data):
-    info_cache['accountinfo'] = sp.cdata_to_py(data[0])
+    info_cache['account_info'] = sp.cdata_to_py(data[0])
     send_cdata("AccountInfoPush", data)
 sp.register_account_info_push(account_info_push)
 

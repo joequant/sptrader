@@ -135,7 +135,7 @@ var SpTraderApp = React.createClass({
     getInitialState() {
 	var l = this;
 	$.getJSON("/schema/SPApiAccInfo", function(d) {
-	    l.setState({account_fields: d.retval});
+
 	});
 
 	$.getJSON("/login-info", function(d) {
@@ -148,6 +148,9 @@ var SpTraderApp = React.createClass({
 	    }
 	    if (d.account_info != undefined) {
 		l.setState({account_info: d.account_info});
+	    }
+	    if (d.account_fields != undefined) {
+	    	l.setState({account_fields: d.account_fields});
 	    }
 	    l.setState({info: d.info});
 	});
