@@ -11,7 +11,7 @@ var StrategyTab = React.createClass( {
 	return (
 		<div>
 		{StrategyList.strategies.map(function(s) {
-		    return (<div><b>{s}</b><br/>
+		    return (<div key={s}><b>{s}</b><br/>
 			    <StrategyTable
 			    strategy={s}
 			    columns={StrategyList.columns[s]}

@@ -343,18 +343,24 @@ def clear_ticker():
 
 stratlist = {}
 
+
+def error_handler(s, id):
+    print('error starting strategy')
+    send_dict("LocalStrategyStatus",
+              {"strategy" : s,
+               "id" : id,
+               "status" : "error"})
+
+
 @app.route("/strategy/start", methods=['POST'])
 def strategy_start():
     if not request.json:
         abort(400)
     s = request.json['strategy']
     id = request.json['id']
-
     if (s, id) not in stratlist:
-        sthread = strategy.run(s, id, request.json)
+        (sthread, q) = strategy.run(s, id, request.json)
         stratlist[(s, id)] = sthread
-        sthread.daemon = True
-        sthread.start()
         send_dict("LocalStrategyStatus",
                   {"strategy" : s,
                    "id" : id,
