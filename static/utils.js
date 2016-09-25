@@ -12,14 +12,17 @@ var StrategyControl = React.createClass({
     },
     start() {
 	var data = this.props.params.data;
+	console.log(this.props.params);
 	this.post("/strategy/start", data);
     },
     pause() {
 	var data = this.props.params.data;
+	console.log(this.props.params);
 	this.post("/strategy/pause", data);
     },
     stop() {
 	var data = this.props.params.data;
+	console.log(this.props.params);
 	this.post("/strategy/stop", data);
     },
     render() {

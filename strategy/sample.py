@@ -20,8 +20,6 @@ class SampleStrategy(bt.Strategy):
     @classmethod
     def headers(cls):
         return [
-            {'headerName': "Product",
-             'field': "product"},
             {'headerName': "Exitbars",
              'field': "exitbars"},
             {'headerName': "Maperiod",

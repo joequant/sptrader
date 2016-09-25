@@ -279,12 +279,6 @@ or ``BackTestCls``
                 self.put_notification(e)
                 continue
 
-    def _get_product(self, data):
-        if hasattr(data, "product"):
-            return data.product()
-        else:
-            return data._dataname
-
     def order_create(self, order, **kwargs):
         okwargs = {"DecInPrice": 0,
                    "Ref": "test",
@@ -301,7 +295,7 @@ or ``BackTestCls``
             okwargs['BuySell'] = "S"
         okwargs['Price'] = order.created.price
         okwargs['Qty'] = abs(order.created.size)
-        okwargs['ProdCode'] = self._get_product(order.data)
+        okwargs['ProdCode'] = order.data._dataname
         okwargs['Ref2'] = str(order.ref)
         if self.p.debug:
             print(okwargs)

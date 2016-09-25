@@ -20,8 +20,11 @@ class Unbuffered(object):
     def __getattr__(self, attr):
         return getattr(self.stream, attr)
 
-def run_strategy(name, fname, kwargs, q):
+def run_strategy(name, kwargs, q):
     try:
+        if kwargs.get('dataname', None) is None or \
+               kwargs['dataname'] == '':
+            raise ValueError('missing dataname')
         module = strategylist.dispatch[name]
         modpath = os.path.dirname(os.path.realpath(__file__))
         logpath = os.path.join(modpath, '../data/log-%s-%s.txt' % \
@@ -37,7 +40,6 @@ def run_strategy(name, fname, kwargs, q):
         
         # Create a Data Feed
         data = store.getdata(
-            dataname=fname,
             **kwargs)
         data2 = bt.DataClone(dataname=data)
         data2.addfilter(bt.ReplayerMinutes, compression=5)
@@ -74,12 +76,14 @@ def run(name, id, kwargs):
     q = Queue()
     modpath = os.path.dirname(os.path.realpath(__file__))
     datapath = os.path.join(modpath, '../data/ticker.txt')
+    open(datapath, 'a').close()
+    kwargs['tickersource'] = datapath
     kwargs['newdata'] = True
     kwargs['keepalive'] = True
     kwargs['debug'] = True
     kwargs['streaming'] = True
     p = Process(target=run_strategy,
-                args=(name, datapath, kwargs, q))
+                args=(name, kwargs, q))
     p.daemon = True
     p.start()
     return (p, q)

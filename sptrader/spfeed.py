@@ -13,6 +13,7 @@ from __future__ import (absolute_import, division, print_function,
 import datetime
 import time
 import spstore
+import io
 from backtrader.feeds import feed
 from backtrader.utils import date2num
 from backtrader.metabase import MetaParams
@@ -33,10 +34,10 @@ class SharpPointCSVData(with_metaclass(MetaSharpPointData, feed.CSVDataBase)):
     Specific parameters:
 
       - ``dataname``: The filename to parse or a file-like object
-      - ``product`` : Product id
+      - ``datasource`` : Product id
     '''
     params = (('nullvalue', float('NaN')),
-              ('product', None),
+              ('tickersource', None),
               ('newdata', False),
               ('keepalive', False),
               ('debug', True),
@@ -47,6 +48,17 @@ class SharpPointCSVData(with_metaclass(MetaSharpPointData, feed.CSVDataBase)):
         self.o = spstore.SharpPointStore(**kwargs)
 
     def start(self):
+        if self.f is None:
+            if self.p.tickersource is None:
+                dataname = self.p.dataname
+            else:
+                dataname = self.p.tickersource
+            if hasattr(dataname, 'readline'):
+                self.f =dataname
+            else:
+                # Let an exception propagate to let the caller know
+                self.f = io.open(dataname, 'r')
+
         super(SharpPointCSVData, self).start()
         if self.p.newdata:
             self.f.seek(0, 2)
@@ -61,7 +73,7 @@ class SharpPointCSVData(with_metaclass(MetaSharpPointData, feed.CSVDataBase)):
             self.lines.openinterest[0] = self.p.nullvalue
         if self.p.streaming:
             print("start price streaming")
-            self.o.streaming_prices(self.p.product)
+            self.o.streaming_prices(self.p.dataname)
 
     def _load(self):
         if self.f is None:
@@ -81,14 +93,11 @@ class SharpPointCSVData(with_metaclass(MetaSharpPointData, feed.CSVDataBase)):
                 if self.p.debug:
                     print(line)
                 linetokens = line.split(self.separator)
-                if linetokens[4] == self.p.product:
+                if linetokens[4] == self.p.dataname:
                     return self._loadline(linetokens)
 
     def islive(self):
         return self.p.keepalive
-
-    def product(self):
-        return self.p.product
 
     def _loadline(self, linetokens):
         itoken = iter(linetokens)

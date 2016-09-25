@@ -16,7 +16,11 @@ var StrategyTable = React.createClass({
 			   field: "status"},
 			  {headerName: "Comment",
 			   volatile: true,
-			   field: "comment"}
+			   field: "comment"},
+			  {headerName: "Instrument",
+			   field: "dataname",
+			   editable: true,
+			   defaultData: ''}
 		      ];
 		      var end = [
 			  {headerName: "Log",
