@@ -86,6 +86,9 @@ class SampleStrategy(bt.Strategy):
         if self.order:
             return
 
+        if len(self.dataclose) < 3:
+            return
+
         # Check if we are in the market
         if not self.position:
 
