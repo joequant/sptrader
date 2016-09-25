@@ -7,6 +7,7 @@ import sys
 import cffi
 import time
 import threading
+import json
 
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(location, "..", "sptrader"))
@@ -20,6 +21,7 @@ from queue import Queue
 from sse import ServerSentEvent
 import sptrader
 import strategy
+import strategy.strategylist
 
 sp = sptrader.SPTrader()
 log_subscriptions = []
@@ -347,12 +349,17 @@ stratlist = {}
 def strategy_listener(p, q):
     try:
         while True:
-            (s, id, status) = q.get()
+            (s, id, status. comment) = q.get()
             print("received message")
             send_dict("LocalStrategyStatus",
                       {"strategy" : s,
                        "id" : id,
-                       "status" : status})
+                       "status" : status,
+                       "comment" : comment})
+            if status == "error" or status == "done":
+                q.close()
+                stratlist.pop((s, id), None)
+                return
     except GeneratorExit:  # Or maybe use flask signals
         return
 
@@ -368,7 +375,8 @@ def strategy_start():
         send_dict("LocalStrategyStatus",
                   {"strategy" : s,
                    "id" : id,
-                   "status" : "running"})
+                   "status" : "running",
+                   "comment" : ""})
         t = threading.Thread(target=strategy_listener, args=(p, q))
         t.daemon = True
         t.start()
@@ -377,7 +385,8 @@ def strategy_start():
         send_dict("LocalStrategyStatus",
                   {"strategy" : s,
                    "id" : id,
-                   "status" : "running"})
+                   "status" : "running",
+                   "comment" : ""})
         return "STARTED"
 
 
@@ -394,8 +403,8 @@ def strategy_stop():
     if (s, id) not in stratlist:
         return "NOT FOUND"
     (p, q) = stratlist[(s, id)]
-    p.terminate()
     q.close()
+    p.terminate()
     stratlist.pop((s, id), None)
     return "OK"
 
@@ -416,6 +425,16 @@ def strategy_pause():
 def strategy_log(stratname, id):
     return monitor_file(os.path.join(data_dir,
                                      "log-%s-%s.txt" % (stratname, str(id))))
+
+
+@app.route("/strategy/list")
+def strategy_list():
+    return json.dumps(strategy.strategylist._list)
+
+
+@app.route('/strategy/headers/<string:stratname>')
+def strategy_headers(stratname):
+    return json.dumps(strategy.strategylist.dispatch[stratname].headers())
 
 
 # ---------------------------

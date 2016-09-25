@@ -1,21 +1,23 @@
 import React from 'react';
 import {StrategyTable} from './tables/strategy-table';
-import {StrategyList} from '../strategy/strategy-list';
 
 var StrategyTab = React.createClass( {
     getInitialState: function() {
-	return {};
+	var l = this;
+	$.getJSON("/strategy/list", function(d) {
+	    l.setState({'strategylist':d});
+	});
+	return {'strategylist': []};
     },
     render: function() {
-	var status = this.props.status;
+	var info = this.props.info;
 	return (
 		<div>
-		{StrategyList.strategies.map(function(s) {
+		{this.state.strategylist.map(function(s) {
 		    return (<div key={s}><b>{s}</b><br/>
 			    <StrategyTable
 			    strategy={s}
-			    columns={StrategyList.columns[s]}
-			    status={status[s]}/></div>);
+			    info={info[s]}/></div>);
 		})}
 	    </div>);
     }

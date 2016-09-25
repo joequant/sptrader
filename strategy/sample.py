@@ -17,6 +17,19 @@ class SampleStrategy(bt.Strategy):
         ('maperiod', 10)
     )
 
+    @classmethod
+    def headers(cls):
+        return [
+            {'headerName': "Product",
+             'field': "product",
+             'defaultData': ''},
+            {'headerName': "Exitbars",
+             'field': "exitbars",
+             'defaultData': 3},
+            {'headerName': "Maperiod",
+             'field': "maperiod",
+             'defaultData': 10},
+            ]
     def log(self, txt, dt=None):
         ''' Logging function fot this strategy'''
         dt = dt or self.datas[0].datetime.datetime()

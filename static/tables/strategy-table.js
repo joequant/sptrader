@@ -1,26 +1,68 @@
 import React from 'react';
-import {AgGridReact} from 'ag-grid-react';
+import {AgGridReact, reactCellRendererFactory} from 'ag-grid-react';
 import {Button} from 'react-bootstrap';
-
+import {StrategyControl, renderLog} from '../../static/utils';
 
 var StrategyTable = React.createClass({
     getInitialState() {
+	var l = this;
+	$.getJSON("/strategy/headers/" + l.props.strategy,
+		  function(d) {
+		      var start = [
+			  {headerName: "Id",
+			   field: "id"},
+			  {headerName: "Status",
+			   volatile: true,
+			   field: "status"}];
+		      var end = [
+			  {headerName: "Log",
+			   field: "log",
+			   cellRenderer: renderLog},
+			  {headerName: "Actions",
+			   field: "start",
+			   volatile: true,
+			   cellRenderer:
+			   reactCellRendererFactory(StrategyControl)
+			  }];
+		      for (var i=0; i < d.length; i++) {
+			  d[i]['editable'] = true;
+		      }
+		      var items = start.concat(d).concat(end);
+		      var defaultData = {};
+		      for (var i=0; i < items.length; i++) {
+			  if (items[i].defaultData != undefined) {
+			      defaultData[items[i].field] =
+				  items[i].defaultData;
+			  }
+		      }
+		      defaultData['status'] = 'stopped';
+		      defaultData['strategy'] = l.props.strategy;
+		      l.setState({columnDefs: items,
+				  defaultData: defaultData});
+		  });
 	return {
 	    counter:0,
-	    rowData: []
+	    columnDefs: [],
+	    rowData: [],
+	    defaultData: {}
 	};
     },
     // in onGridReady, store the api for later use
     componentWillReceiveProps(newprops) {
-	if (newprops.status == undefined) {
+	console.log('strategy-table', newprops);
+	if (newprops.info == undefined) {
 	    return;
 	}
 	var r = this.state.rowData;
 	for(var i=0; i < r.length; i++) {
-	    if (newprops.status[r[i]['id']] != undefined) {
-		r[i]['status'] = newprops.status[r[i]['id']];
+	    var newr = newprops.info[r[i]['id']];
+	    if (newr != undefined) {
+		for (var attrname in newr){
+		    r[i][attrname] = newr[attrname];
+		}
 	    }
 	}
+	console.log('strategy-table', r);
 	this.setState({rowData: r});
 	this.api.setRowData(r);
     },
@@ -29,15 +71,16 @@ var StrategyTable = React.createClass({
 	this.columnApi = params.columnApi;
     },
     addRow() {
-	var r = this.state.rowData;
+	var r = this.state.defaultData;
 	var c = this.state.counter;
+	var rows = this.state.rowData;
 	c = c+1;
-	r.push({id: c,
-		status: "stopped",
-		strategy: this.props.strategy});
-	this.setState({rowData: r,
+	r['id'] = c;
+	rows.push(r);
+	console.log(rows);
+	this.setState({rowData: rows,
 		       counter: c});
-	this.api.setRowData(r);
+	this.api.setRowData(rows);
     },
     status() {
     },
@@ -48,7 +91,7 @@ var StrategyTable = React.createClass({
 	<AgGridReact
 	    // column definitions and row data are immutable, the grid
 	    // will update when these lists change
-	    columnDefs={this.props.columns}
+	    columnDefs={this.state.columnDefs}
 	    rowData={this.state.rowData}
 	    onGridReady={this.onGridReady}
 		/></div>
