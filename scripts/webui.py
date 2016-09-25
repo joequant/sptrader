@@ -356,7 +356,13 @@ def strategy_listener(p, q):
                        "id" : id,
                        "status" : status,
                        "comment" : comment})
-            if status == "error" or status == "done":
+            if status == "error":
+                q.close()
+                (p, q) = stratlist[(s, id)]
+                p.terminate()
+                stratlist.pop((s, id), None)
+                return
+            elif status == "done":
                 q.close()
                 stratlist.pop((s, id), None)
                 return
