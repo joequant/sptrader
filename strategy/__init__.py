@@ -10,6 +10,8 @@ from spfeed import SharpPointCSVData
 from spbroker import SharpPointBroker
 import spstore
 import strategy.strategylist
+from datetime import datetime
+from pytz import timezone
 
 class Unbuffered(object):
     def __init__(self, stream):
@@ -103,8 +105,24 @@ def headers(name):
             headers[i]['defaultData'] = defaultData[headers[i]['field']]
     return headers
 
+
+def string_to_seconds(s):
+    v = s.split(":")
+    r = int(v[0]) * 3600 + int(v[1]) * 60
+    if len(v) > 2:
+        r = r + int(v[2])
+    return r
+
+def seconds_today(tz='UTC'):
+    timez = timezone(tz)
+    now = datetime.now(timez)
+    return (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
+
 if __name__ == '__main__':
     print(params('sample'))
     print(params('sample').get('exitbars', None))
+    print(string_to_seconds("14:30"))
+    print(seconds_today())
+    print(seconds_today('Asia/Hong_Kong'))
     run("sample", 1, {'exitbars':1})
 
