@@ -1,7 +1,7 @@
 import React from 'react';
 import {AgGridReact, reactCellRendererFactory} from 'ag-grid-react';
 import {Button} from 'react-bootstrap';
-import {StrategyControl, renderLog} from '../../static/utils';
+import {BacktestControl, renderLog} from '../../static/utils';
 
 var BacktestTable = React.createClass({
     getInitialState() {
@@ -15,9 +15,12 @@ var BacktestTable = React.createClass({
 			   defaultData: ''}
 		      ];
 		      var end = [
-			  {headerName: "Log",
-			   field: "log",
-			   cellRenderer: renderLog}];
+			  {headerName: "Backtest",
+			   field: "backtest",
+			   volatile: true,
+			   cellRenderer:
+			   reactCellRendererFactory(BacktestControl)
+			  }];
 		      for (var i=0; i < d.length; i++) {
 			  d[i]['editable'] = true;
 		      }
@@ -39,9 +42,6 @@ var BacktestTable = React.createClass({
 	    defaultData: {}
 	};
     },
-    // in onGridReady, store the api for later use
-    componentWillReceiveProps(newprops) {
-    },
     onGridReady(params) {
 	this.api = params.api;
 	this.columnApi = params.columnApi;
@@ -52,8 +52,6 @@ var BacktestTable = React.createClass({
 	rows.push(r);
 	this.setState({rowData: rows});
 	this.api.setRowData(rows);
-    },
-    status() {
     },
     render() {
 	return (

@@ -53,6 +53,27 @@ var StrategyControl = React.createClass({
     }
 });
 
+var BacktestControl = React.createClass({
+    post(url, data) {
+	$.ajax({
+	    type: 'post',
+	    url: url,
+	    data: JSON.stringify(data),
+	    contentType: "application/json"
+	});
+    },
+    backtest() {
+	var data = this.props.params.data;
+	console.log(this.props.params);
+	this.post("/backtest", data);
+    },
+    render() {
+	return (
+		<Button onClick={this.backtest}>Backtest</Button>
+	);
+    }
+});
+
 function isNumber(obj) {
     return !isNaN(parseFloat(obj))
 };
@@ -141,4 +162,5 @@ module.exports.renderDate = renderDate;
 module.exports.renderTime = renderTime;
 module.exports.renderBuySell = renderBuySell;
 module.exports.StrategyControl = StrategyControl;
+module.exports.BacktestControl = BacktestControl;
 module.exports.renderLog = renderLog;
