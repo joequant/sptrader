@@ -13,7 +13,11 @@ var StrategyTable = React.createClass({
 			   field: "id"},
 			  {headerName: "Status",
 			   volatile: true,
-			   field: "status"}];
+			   field: "status"},
+			  {headerName: "Comment",
+			   volatile: true,
+			   field: "comment"}
+		      ];
 		      var end = [
 			  {headerName: "Log",
 			   field: "log",

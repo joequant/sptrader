@@ -349,7 +349,7 @@ stratlist = {}
 def strategy_listener(p, q):
     try:
         while True:
-            (s, id, status. comment) = q.get()
+            (s, id, status, comment) = q.get()
             send_dict("LocalStrategyStatus",
                       {"strategy" : s,
                        "id" : id,

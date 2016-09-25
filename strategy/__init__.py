@@ -66,7 +66,8 @@ def run_strategy(name, fname, kwargs, q):
         q.put((kwargs['strategy'], kwargs['id'], "done", ""))
         return None
     except:
-        q.put((kwargs['strategy'], kwargs['id'], "error", sys.exc_info()[0]))
+        q.put((kwargs['strategy'], kwargs['id'], "error",
+               repr(sys.exc_info())))
         raise
 
 def run(name, id, kwargs):
