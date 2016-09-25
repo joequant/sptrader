@@ -3,7 +3,7 @@ import {AgGridReact} from 'ag-grid-react';
 import {shortnumberwidth, renderNumber, renderDateTime} from '../utils';
 
 var OrderTable = React.createClass({
-    getInitialState: function() {
+    getInitialState() {
 	return {
 	    columnDefs: [
 		{headerName: "Orders",
@@ -48,13 +48,21 @@ var OrderTable = React.createClass({
 		 width: shortnumberwidth}]
 	};
     },
-    render: function() {
+    onGridReady(params) {
+	this.api = params.api;
+	this.columnApi = params.columnApi;
+    },
+    componentWillReceiveProps(newprops) {
+	this.api.setRowData(newprops.rowData);
+    },
+    render() {
 	return (
 	<AgGridReact
 	    // column definitions and row data are immutable, the grid
 	    // will update when these lists change
 	    columnDefs={this.state.columnDefs}
 	    rowData={this.props.data}
+	    onGridReady={this.onGridReady}
 	/>
 	)
     }

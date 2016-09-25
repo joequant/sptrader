@@ -79,6 +79,13 @@ var TradeTable = React.createClass({
 	    ]
 	};
     },
+    onGridReady(params) {
+	this.api = params.api;
+	this.columnApi = params.columnApi;
+    },
+    componentWillReceiveProps(newprops) {
+	this.api.setRowData(newprops.rowData);
+    },
     render: function() {
 	return (
 	<AgGridReact
@@ -86,6 +93,7 @@ var TradeTable = React.createClass({
 	    // will update when these lists change
 	    columnDefs={this.state.columnDefs}
 	    rowData={this.props.data}
+	    onGridReady={this.onGridReady}
         />)
     }
 });
