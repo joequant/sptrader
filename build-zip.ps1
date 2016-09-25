@@ -9,6 +9,7 @@ New-Item -ItemType directory sptrader
 New-Item -ItemType directory sptrader\sptrader
 New-Item -ItemType directory sptrader\static
 New-Item -ItemType directory sptrader\tests
+New-Item -ItemType directory sptrader\scripts
 New-Item -ItemType directory sptrader\strategy
 Copy-Item ..\sptrader\*.md sptrader
 Copy-Item ..\sptrader\*.ps1 sptrader
@@ -17,6 +18,7 @@ Copy-Item ..\sptrader\*.json sptrader
 Copy-Item ..\sptrader\sptrader\*.py sptrader\sptrader
 Copy-Item ..\sptrader\strategy\*.py sptrader\strategy
 Copy-Item ..\sptrader\strategy\*.js sptrader\strategy
+Copy-Item ..\sptrader\scripts\*.py sptrader\scripts
 Copy-Item ..\sptrader\static\*.html sptrader\static
 Copy-Item ..\sptrader\static\*.css sptrader\static
 Copy-Item ..\sptrader\static\*.js sptrader\static
