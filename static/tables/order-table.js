@@ -52,9 +52,6 @@ var OrderTable = React.createClass({
 	this.api = params.api;
 	this.columnApi = params.columnApi;
     },
-    componentWillReceiveProps(newprops) {
-	this.api.setRowData(newprops.rowData);
-    },
     render() {
 	return (
 	<AgGridReact

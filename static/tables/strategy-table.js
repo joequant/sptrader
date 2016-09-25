@@ -57,7 +57,6 @@ var StrategyTable = React.createClass({
     },
     // in onGridReady, store the api for later use
     componentWillReceiveProps(newprops) {
-	console.log('strategy-table', newprops);
 	if (newprops.info == undefined) {
 	    return;
 	}
@@ -70,7 +69,6 @@ var StrategyTable = React.createClass({
 		}
 	    }
 	}
-	console.log('strategy-table', r);
 	this.setState({rowData: r});
 	this.api.setRowData(r);
     },

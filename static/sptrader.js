@@ -82,7 +82,6 @@ function FieldGroup({ id, label, help, ...props }) {
     </div>
   );
 }
-console.log("New SPTrader");
 
 var SpTraderApp = React.createClass({
     getInitialState() {
@@ -251,8 +250,10 @@ var SpTraderApp = React.createClass({
 	    }
 	}
 	if (!found) {
+	    console.log("order added");
 	    d.push(data);
 	}
+	console.log("orders", d);
 	this.setState({orders: d});
     },
     strategyStatus(event) {
