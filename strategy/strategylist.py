@@ -1,8 +1,9 @@
 # Adding other items
 import strategy
 import strategy.sample
+import collections
 
-_list = ['sample']
-dispatch = {
-    'sample': strategy.sample.SampleStrategy
-}
+dispatch = collections.OrderedDict([
+    ('sample', strategy.sample.SampleStrategy)
+    ])
+

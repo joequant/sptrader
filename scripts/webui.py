@@ -429,7 +429,7 @@ def strategy_log(stratname, id):
 
 @app.route("/strategy/list")
 def strategy_list():
-    return json.dumps(strategy.strategylist._list)
+    return json.dumps(list(strategy.strategylist.dispatch.keys()))
 
 
 @app.route('/strategy/headers/<string:stratname>')
