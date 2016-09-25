@@ -290,7 +290,7 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
         order = BuyOrder(owner=owner, data=data,
                          size=size, price=price, pricelimit=plimit,
                          exectype=exectype, valid=valid, tradeid=tradeid)
-
+        order.addcomminfo(self.getcommissioninfo(data))
         order.addinfo(**kwargs)
         self.orders[order.ref] = order
         return self.o.order_create(order)
@@ -303,7 +303,7 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
         order = SellOrder(owner=owner, data=data,
                           size=size, price=price, pricelimit=plimit,
                           exectype=exectype, valid=valid, tradeid=tradeid)
-
+        order.addcomminfo(self.getcommissioninfo(data))
         order.addinfo(**kwargs)
         self.orders[order.ref] = order
         return self.o.order_create(order)
