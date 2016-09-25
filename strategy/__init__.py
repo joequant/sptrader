@@ -83,9 +83,23 @@ def run(name, id, kwargs):
     p.start()
     return (p, q)
 
+def strategy_list():
+    return list(strategy.strategylist.dispatch.keys())
+
 def params(name):
-    return strategylist.dispatch[name].params._getitems()
+    return strategy.strategylist.dispatch[name].params._getpairs()
+
+def headers(name):
+    headers = strategy.strategylist.dispatch[name].headers()
+    defaultData = params(name)
+    for i in range(len(headers)):
+        if not 'defaultData' in headers[i] and \
+               headers[i]['field'] in defaultData:
+            headers[i]['defaultData'] = defaultData[headers[i]['field']]
+    return headers
 
 if __name__ == '__main__':
     print(params('sample'))
+    print(params('sample').get('exitbars', None))
     run("sample", 1, {'exitbars':1})
+

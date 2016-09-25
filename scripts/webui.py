@@ -350,7 +350,6 @@ def strategy_listener(p, q):
     try:
         while True:
             (s, id, status. comment) = q.get()
-            print("received message")
             send_dict("LocalStrategyStatus",
                       {"strategy" : s,
                        "id" : id,
@@ -429,12 +428,12 @@ def strategy_log(stratname, id):
 
 @app.route("/strategy/list")
 def strategy_list():
-    return json.dumps(list(strategy.strategylist.dispatch.keys()))
+    return json.dumps(strategy.strategy_list())
 
 
 @app.route('/strategy/headers/<string:stratname>')
 def strategy_headers(stratname):
-    return json.dumps(strategy.strategylist.dispatch[stratname].headers())
+    return json.dumps(strategy.headers(stratname))
 
 
 # ---------------------------

@@ -21,14 +21,11 @@ class SampleStrategy(bt.Strategy):
     def headers(cls):
         return [
             {'headerName': "Product",
-             'field': "product",
-             'defaultData': ''},
+             'field': "product"},
             {'headerName': "Exitbars",
-             'field': "exitbars",
-             'defaultData': 3},
+             'field': "exitbars"},
             {'headerName': "Maperiod",
-             'field': "maperiod",
-             'defaultData': 10},
+             'field': "maperiod"}
             ]
     def log(self, txt, dt=None):
         ''' Logging function fot this strategy'''
