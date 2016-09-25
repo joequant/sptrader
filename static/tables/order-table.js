@@ -54,7 +54,6 @@ var OrderTable = React.createClass({
     },
     componentDidUpdate(prevprops, prevstate) {
 	this.api.setRowData(this.props.data);
-	this.api.refreshView();
     },
     render() {
 	return (

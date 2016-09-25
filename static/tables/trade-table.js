@@ -85,7 +85,6 @@ var TradeTable = React.createClass({
     },
     componentDidUpdate(prevprops, prevstate) {
 	this.api.setRowData(this.props.data);
-	this.api.refreshView();
     },
     render: function() {
 	return (

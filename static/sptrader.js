@@ -14,6 +14,7 @@ import TradeTable from './tables/trade-table';
 import AccountTable from './tables/account-table';
 import TickerControl from './ticker-control';
 import StrategyTab from './strategy-tab';
+import BacktestTab from './backtest-tab';
 
 var AlertBox = React.createClass( {
     ok() {
@@ -336,7 +337,10 @@ var SpTraderApp = React.createClass({
 		<StrategyTab info={this.state.strategy_info}
 	    strategylist={this.state.strategy_list} />
 		</Tab>
-		<Tab eventKey={3} title="Scratchpad">
+		<Tab eventKey={3} title="Backtest" >
+		<BacktestTab strategylist={this.state.strategy_list} />
+		</Tab>
+		<Tab eventKey={4} title="Scratchpad">
 		<ButtonToolbar>
 		<Button bsStyle="success" onClick={publish}>Ping</Button>
 		</ButtonToolbar>
