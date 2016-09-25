@@ -86,10 +86,6 @@ function FieldGroup({ id, label, help, ...props }) {
 var SpTraderApp = React.createClass({
     getInitialState() {
 	var l = this;
-	$.getJSON("/schema/SPApiAccInfo", function(d) {
-
-	});
-
 	$.getJSON("/login-info", function(d) {
 	    if (parseInt(d.status) != -1) {
 		l.setState({showLoginForm: false});
@@ -103,6 +99,9 @@ var SpTraderApp = React.createClass({
 	    }
 	    if (d.account_fields != undefined) {
 	    	l.setState({account_fields: d.account_fields});
+	    }
+	    if (d.strategy_list != undefined) {
+	    	l.setState({strategy_list: d.strategy_list});
 	    }
 	    l.setState({info: d.info});
 	});
@@ -121,7 +120,8 @@ var SpTraderApp = React.createClass({
 	    trades: [],
 	    positions: [],
 	    account_fields: [],
-	    strategy_info: {}
+	    strategy_info: {},
+	    strategy_list: []
 	};
     },
     submitModal(data) {
@@ -333,7 +333,8 @@ var SpTraderApp = React.createClass({
 		</Tabs>
 		</Tab>
 		<Tab eventKey={2} title="Strategy" >
-		<StrategyTab info={this.state.strategy_info}/>
+		<StrategyTab info={this.state.strategy_info}
+	    strategylist={this.state.strategy_list} />
 		</Tab>
 		<Tab eventKey={3} title="Scratchpad">
 		<ButtonToolbar>

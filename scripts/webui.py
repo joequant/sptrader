@@ -58,6 +58,7 @@ def logininfo():
     if info_cache['account_info'] is not None:
         d['account_info'] = info_cache['account_info']
     d['account_fields'] = sp.fields("SPApiAccInfo")
+    d['strategy_list'] = strategy.strategy_list()
     return jsonify(d)
 
 
