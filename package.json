@@ -14,7 +14,8 @@
 	"react-bootstrap" : "0.30.x",
 	"react-addons-linked-state-mixin" : "latest",
 	"ag-grid": "5.2.x",
-	"ag-grid-react": "5.2.x"
+	"ag-grid-react": "5.2.x",
+	"eventsource-polyfill" : "latest"
     },
     "devDependencies" : {
 	"browserify" : "latest",
@@ -25,7 +26,7 @@
 	"babel-preset-stage-2" : "latest"
     },
     "scripts": {
-	"build-js": "browserify -t [ babelify --presets [ es2015 react stage-2 ] ]  static/sptrader.js -o static/bundle.js",
-	"watch-js": "watchify -t  [ babelify --presets [ es2015 react stage-2 ] ] static/sptrader.js -o static/bundle.js"
+	"build-js": "browserify -d -t [ babelify --presets [ es2015 react stage-2 ] ]  static/sptrader.js -o static/bundle.js",
+	"watch-js": "watchify -d -t  [ babelify --presets [ es2015 react stage-2 ] ] static/sptrader.js -o static/bundle.js"
     }
 }

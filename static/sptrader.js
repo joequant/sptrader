@@ -15,6 +15,8 @@ import AccountTable from './tables/account-table';
 import TickerControl from './ticker-control';
 import StrategyTab from './strategy-tab';
 import BacktestTab from './backtest-tab';
+// load (Polyfill) EventSource, in case browser does not support it...
+require('eventsource-polyfill');
 
 var AlertBox = React.createClass( {
     ok() {
