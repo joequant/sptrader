@@ -56,7 +56,7 @@ var BacktestTable = React.createClass({
     render() {
 	return (
 	    <div>
-		<Button onClick={this.addRow}>Add Row</Button>
+		<Button onClick={this.addRow}>New Backtest</Button>
 	<AgGridReact
 	    // column definitions and row data are immutable, the grid
 	    // will update when these lists change

@@ -93,7 +93,7 @@ var StrategyTable = React.createClass({
     render() {
 	return (
 	    <div>
-		<Button onClick={this.addRow}>Add Row</Button>
+		<Button onClick={this.addRow}>New Strategy</Button>
 	<AgGridReact
 	    // column definitions and row data are immutable, the grid
 	    // will update when these lists change
