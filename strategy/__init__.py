@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from backtrader.plot.plot import Plot
 import sys
 import os
+import io
+import base64
 from multiprocessing import Process, Queue
 from spfeed import SharpPointCSVData
 from spbroker import SharpPointBroker
@@ -47,23 +49,12 @@ def run_strategy(name, kwargs, q):
         data2.addfilter(bt.ReplayerMinutes, compression=5)
         cerebro.adddata(data)
         cerebro.adddata(data2)
-        
-        # Set our desired cash start
-        cerebro.broker.setcash(100000.0)
-
-        # Set the commission - 0.1% ... divide by 100 to remove the %
-        cerebro.broker.setcommission(commission=0.001)
 
         # Print out the starting conditions
         print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
     
         # Run over everything
         cerebro.run()
-        plotter = Plot(style='candle')
-        cerebro.plot(plotter)
-        imgdata = open('out.svg', 'wb')
-        plt.savefig(imgdata, format='svg')
-        imgdata.close()
         # Print out the final result
         print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
         f.close()
@@ -73,6 +64,55 @@ def run_strategy(name, kwargs, q):
         q.put((kwargs['strategy'], kwargs['id'], "error",
                repr(sys.exc_info())))
         raise
+
+def run_backtest(kwargs):
+    try:
+        if kwargs.get('dataname', None) is None or \
+               kwargs['dataname'] == '':
+            raise ValueError('missing dataname')
+        module = strategylist.dispatch[kwargs['strategy']]
+        modpath = os.path.dirname(os.path.realpath(__file__))
+        f = io.StringIO()
+        old_stdout = sys.stdout
+        sys.stdout = f
+        cerebro = bt.Cerebro()
+        cerebro.addstrategy(module)
+        store = spstore.SharpPointStore()
+        broker = store.getbroker(backtest=kwargs.get('backtest', True))
+        cerebro.setbroker(broker)
+        
+        # Create a Data Feed
+        data = store.getdata(
+            **kwargs)
+        data2 = bt.DataClone(dataname=data)
+        data2.addfilter(bt.ReplayerMinutes, compression=5)
+        cerebro.adddata(data)
+        cerebro.adddata(data2)
+        
+        # Set the commission - 0.1% ... divide by 100 to remove the %
+        cerebro.broker.setcommission(commission=0.0)
+
+        # Print out the starting conditions
+        print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    
+        # Run over everything
+        cerebro.run()
+        plotter = Plot(style='candle')
+        cerebro.plot(plotter)
+        imgdata = io.BytesIO() 
+        plt.savefig(imgdata, format='svg')
+
+        # Print out the final result
+        print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+        retval = '<img src="data:image/svg+xml;base64,%s" /><br>' % \
+                 base64.b64encode(imgdata.getvalue()).decode('ascii') + \
+                 '<pre>%s</pre>' % f.getvalue()
+        imgdata.close()
+        f.close()
+        sys.stdout = old_stdout
+        return retval
+    except:
+        return repr(sys.exc_info())
 
 def run(name, id, kwargs):
     q = Queue()
@@ -89,6 +129,17 @@ def run(name, id, kwargs):
     p.daemon = True
     p.start()
     return (p, q)
+
+def backtest(kwargs):
+    modpath = os.path.dirname(os.path.realpath(__file__))
+    datapath = os.path.join(modpath, '../data/ticker.txt')
+    open(datapath, 'a').close()
+    kwargs['tickersource'] = datapath
+    kwargs['newdata'] = False
+    kwargs['keepalive'] = False
+    kwargs['debug'] = False
+    kwargs['streaming'] = False
+    return run_backtest(kwargs)
 
 def strategy_list():
     return list(strategy.strategylist.dispatch.keys())

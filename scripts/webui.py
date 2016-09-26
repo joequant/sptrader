@@ -8,11 +8,19 @@ import cffi
 import time
 import threading
 import json
+import errno
 
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 sys.path.insert(0, os.path.join(location, ".."))
 data_dir = os.path.join(location, "..", "data")
+
+try:
+    os.makedirs(data_dir)
+except OSError as exception:
+    if exception.errno != errno.EEXIST:
+        raise
+
 ticker_file = os.path.join(data_dir, "ticker.txt")
 order_file = os.path.join(data_dir, "orders.txt")
 
@@ -442,6 +450,11 @@ def strategy_list():
 def strategy_headers(stratname):
     return json.dumps(strategy.headers(stratname))
 
+#-----------------------------
+@app.route("/backtest", methods=['POST'])
+def backtest():
+    s = request.json['strategy']
+    return strategy.backtest(s, request.json)
 
 # ---------------------------
 @app.route("/orders/read")
