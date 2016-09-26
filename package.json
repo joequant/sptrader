@@ -15,7 +15,7 @@
 	"react-addons-linked-state-mixin" : "latest",
 	"ag-grid": "5.2.x",
 	"ag-grid-react": "5.2.x",
-	"eventsource-polyfill" : "latest"
+	"eventsource-polyfill" : "0.9.x"
     },
     "devDependencies" : {
 	"browserify" : "latest",
