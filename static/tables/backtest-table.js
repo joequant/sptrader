@@ -48,7 +48,7 @@ var BacktestTable = React.createClass({
 	this.columnApi = params.columnApi;
     },
     addRow() {
-	var r = this.state.defaultData;
+	var r = Object.assign({}, this.state.defaultData);
 	var rows = this.state.rowData;
 	rows.push(r);
 	this.setState({rowData: rows});

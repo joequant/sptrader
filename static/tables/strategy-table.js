@@ -77,7 +77,7 @@ var StrategyTable = React.createClass({
 	this.columnApi = params.columnApi;
     },
     addRow() {
-	var r = this.state.defaultData;
+	var r = Object.assign({}, this.state.defaultData);
 	var c = this.state.counter;
 	var rows = this.state.rowData;
 	c = c+1;

@@ -1,3 +1,10 @@
+0.1.3
+
+Fixed:
+
+* strategy rows not independent
+
+
 0.1.2 - 28 September 2016
 
 Fixed:
