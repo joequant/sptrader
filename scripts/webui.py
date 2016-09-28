@@ -454,7 +454,7 @@ def strategy_headers(stratname):
 @app.route("/backtest", methods=['POST'])
 def backtest():
     s = request.json['strategy']
-    return strategy.backtest(s, request.json)
+    return strategy.backtest(request.json)
 
 # ---------------------------
 @app.route("/orders/read")

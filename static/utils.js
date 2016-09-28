@@ -54,12 +54,17 @@ var StrategyControl = React.createClass({
 });
 
 var BacktestControl = React.createClass({
+  
     post(url, data) {
+	var myWindow = window.open("", "MsgWindow");
 	$.ajax({
 	    type: 'post',
 	    url: url,
 	    data: JSON.stringify(data),
-	    contentType: "application/json"
+	    contentType: "application/json",
+	    success: function(data) {
+		myWindow.document.write(data);
+	    }
 	});
     },
     backtest() {

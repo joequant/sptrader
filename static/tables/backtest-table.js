@@ -11,6 +11,7 @@ var BacktestTable = React.createClass({
 		      var start = [
 			  {headerName: "Instrument",
 			   field: "dataname",
+			   volatile: true,
 			   editable: true,
 			   defaultData: ''}
 		      ];
