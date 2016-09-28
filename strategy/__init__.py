@@ -164,16 +164,19 @@ def string_to_seconds(s):
         r = r + int(v[2])
     return r
 
-def seconds_today(tz='UTC'):
+def seconds_tz(tz='UTC'):
     timez = timezone(tz)
     now = datetime.now(timez)
+    return (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
+
+def seconds_from_midnight(s):
     return (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
 
 if __name__ == '__main__':
     print(params('sample'))
     print(params('sample').get('exitbars', None))
     print(string_to_seconds("14:30"))
-    print(seconds_today())
-    print(seconds_today('Asia/Hong_Kong'))
+    print(seconds_tz())
+    print(seconds_tz('Asia/Hong_Kong'))
     run("sample", 1, {'exitbars':1})
 
