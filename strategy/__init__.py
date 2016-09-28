@@ -66,53 +66,50 @@ def run_strategy(name, kwargs, q):
         raise
 
 def run_backtest(kwargs):
-    try:
-        if kwargs.get('dataname', None) is None or \
-               kwargs['dataname'] == '':
-            raise ValueError('missing dataname')
-        module = strategylist.dispatch[kwargs['strategy']]
-        modpath = os.path.dirname(os.path.realpath(__file__))
-        f = io.StringIO()
-        old_stdout = sys.stdout
-        sys.stdout = f
-        cerebro = bt.Cerebro()
-        cerebro.addstrategy(module)
-        store = spstore.SharpPointStore()
-        broker = store.getbroker(backtest=kwargs.get('backtest', True))
-        cerebro.setbroker(broker)
-        
-        # Create a Data Feed
-        data = store.getdata(
-            **kwargs)
-        data2 = bt.DataClone(dataname=data)
-        data2.addfilter(bt.ReplayerMinutes, compression=5)
-        cerebro.adddata(data)
-        cerebro.adddata(data2)
-        
-        # Set the commission - 0.1% ... divide by 100 to remove the %
-        cerebro.broker.setcommission(commission=0.0)
-
-        # Print out the starting conditions
-        print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    if kwargs.get('dataname', None) is None or \
+           kwargs['dataname'] == '':
+        raise ValueError('missing dataname')
+    module = strategylist.dispatch[kwargs['strategy']]
+    modpath = os.path.dirname(os.path.realpath(__file__))
+    f = io.StringIO()
+    old_stdout = sys.stdout
+    sys.stdout = f
+    cerebro = bt.Cerebro()
+    cerebro.addstrategy(module)
+    store = spstore.SharpPointStore()
+    broker = store.getbroker(backtest=kwargs.get('backtest', True))
+    cerebro.setbroker(broker)
     
-        # Run over everything
-        cerebro.run()
-        plotter = Plot(style='candle')
-        cerebro.plot(plotter)
-        imgdata = io.BytesIO() 
-        plt.savefig(imgdata, format='svg')
-
-        # Print out the final result
-        print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
-        retval = '<img src="data:image/svg+xml;base64,%s" /><br>' % \
-                 base64.b64encode(imgdata.getvalue()).decode('ascii') + \
-                 '<pre>%s</pre>' % f.getvalue()
-        imgdata.close()
-        f.close()
-        sys.stdout = old_stdout
-        return retval
-    except:
-        return repr(sys.exc_info())
+    # Create a Data Feed
+    data = store.getdata(
+        **kwargs)
+    data2 = bt.DataClone(dataname=data)
+    data2.addfilter(bt.ReplayerMinutes, compression=5)
+    cerebro.adddata(data)
+    cerebro.adddata(data2)
+    
+    # Set the commission - 0.1% ... divide by 100 to remove the %
+    cerebro.broker.setcommission(commission=0.0)
+    
+    # Print out the starting conditions
+    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    
+    # Run over everything
+    cerebro.run()
+    plotter = Plot(style='candle')
+    cerebro.plot(plotter)
+    imgdata = io.BytesIO() 
+    plt.savefig(imgdata, format='svg')
+    
+    # Print out the final result
+    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    retval = '<img src="data:image/svg+xml;base64,%s" /><br>' % \
+             base64.b64encode(imgdata.getvalue()).decode('ascii') + \
+             '<pre>%s</pre>' % f.getvalue()
+    imgdata.close()
+    f.close()
+    sys.stdout = old_stdout
+    return retval
 
 def run(name, id, kwargs):
     q = Queue()
