@@ -39,7 +39,7 @@ class SharpPointCSVData(with_metaclass(MetaSharpPointData, feed.CSVDataBase)):
               ('tickersource', None),
               ('newdata', False),
               ('keepalive', False),
-              ('debug', True),
+              ('debug', False),
               ('streaming', False))
 
     def __init__(self, **kwargs):
