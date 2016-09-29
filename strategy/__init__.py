@@ -14,6 +14,7 @@ import spstore
 import strategy.strategylist
 from datetime import datetime
 from pytz import timezone
+import traceback
 
 
 class Unbuffered(object):
@@ -143,7 +144,10 @@ def backtest(kwargs):
     kwargs['keepalive'] = False
     kwargs['debug'] = False
     kwargs['streaming'] = False
-    return run_backtest(kwargs)
+    try:
+        return run_backtest(kwargs)
+    except:
+        return "<pre>" + traceback.format_exc() +"</pre>"
 
 
 def strategy_list():
