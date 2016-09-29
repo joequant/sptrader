@@ -4,7 +4,6 @@ from flask import Flask, Response, jsonify, request, abort
 
 import os
 import sys
-import cffi
 import time
 import threading
 import json
@@ -186,7 +185,7 @@ sp.register_ticker_update(api_ticker_update)
 
 @sp.ffi.callback("PswChangeReplyAddr")
 def psw_change_reply(ret_code, ret_msg):
-    send_cdata("PswChangeReply", data)
+    send_cdata("PswChangeReply", ret_code,  ret_msg)
 sp.register_psw_change_reply(psw_change_reply)
 
 
@@ -453,7 +452,6 @@ def strategy_headers(stratname):
 #-----------------------------
 @app.route("/backtest", methods=['POST'])
 def backtest():
-    s = request.json['strategy']
     return strategy.backtest(request.json)
 
 # ---------------------------
