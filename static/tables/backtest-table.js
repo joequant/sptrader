@@ -13,7 +13,12 @@ var BacktestTable = React.createClass({
 			   field: "dataname",
 			   volatile: true,
 			   editable: true,
-			   defaultData: ''}
+			   defaultData: ''},
+			  {headerName: "Initial cash",
+			   field: "initial_cash",
+			   volatile: true,
+			   editable: true,
+			   defaultData: 100000.0}
 		      ];
 		      var end = [
 			  {headerName: "Backtest",
