@@ -8,6 +8,8 @@ import backtrader as bt
 import matplotlib.pyplot as plt
 from backtrader.plot.plot import Plot
 from multiprocessing import Process, Queue
+
+#must import first to initialize metaclass
 from spfeed import SharpPointCSVData
 from spbroker import SharpPointBroker
 import spstore
@@ -75,8 +77,7 @@ def run_backtest(kwargs):
     if kwargs.get('dataname', None) is None or \
            kwargs['dataname'] == '':
         raise ValueError('missing dataname')
-    module = strategylist.dispatch[kwargs['strategy']]
-    modpath = os.path.dirname(os.path.realpath(__file__))
+    module = strategy.strategylist.dispatch[kwargs['strategy']]
     f = io.StringIO()
     old_stdout = sys.stdout
     sys.stdout = f

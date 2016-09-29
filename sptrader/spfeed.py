@@ -16,7 +16,6 @@ import spstore
 import io
 from backtrader.feeds import feed
 from backtrader.utils import date2num
-from backtrader.metabase import MetaParams
 from backtrader.utils.py3 import with_metaclass
 
 class MetaSharpPointData(feed.MetaCSVDataBase):
