@@ -96,6 +96,9 @@ def run_backtest(kwargs):
     cerebro.adddata(data2)
 
     # Set the commission - 0.1% ... divide by 100 to remove the %
+    initial_cash = kwargs.get("initial_cash", None)
+    if initial_cash is not None:
+        cerebro.broker.setcash(initial_cash)
     cerebro.broker.setcommission(commission=0.0)
 
     # Print out the starting conditions
