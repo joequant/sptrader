@@ -582,165 +582,170 @@ void SPAPI_SetLoginInfo(char *host,
 					      user_id,
 					      password);
 }
-int  SPAPI_Login(){
+
+auto  SPAPI_Login(){
   return api_proxy_wrapper.SPAPI_Login();
 }
-int  SPAPI_GetLoginStatus(char *user_id, short host_id){
+auto  SPAPI_GetLoginStatus(char *user_id, short host_id){
   return api_proxy_wrapper.SPAPI_GetLoginStatus(user_id, host_id);
 }
-int  SPAPI_AddOrder(SPApiOrder *order){
+auto  SPAPI_AddOrder(SPApiOrder *order){
   return api_proxy_wrapper.SPAPI_AddOrder(order);
 }
-int SPAPI_AddInactiveOrder(SPApiOrder* order){
+auto SPAPI_AddInactiveOrder(SPApiOrder* order){
   return api_proxy_wrapper.SPAPI_AddInactiveOrder(order);
 }
-int SPAPI_ChangeOrder(char *user_id,
+auto SPAPI_ChangeOrder(char *user_id,
     SPApiOrder* order, double org_price, long org_qty){
   return api_proxy_wrapper.SPAPI_ChangeOrder(user_id,
 					     order, org_price, org_qty);
 }
-int SPAPI_ChangeOrderBy(char *user_id,
+auto SPAPI_ChangeOrderBy(char *user_id,
     char *acc_no, long accOrderNo, double org_price,
     long org_qty, double newPrice, long newQty){
   return api_proxy_wrapper.SPAPI_ChangeOrderBy(user_id,
 					       acc_no, accOrderNo, org_price,
 					       org_qty, newPrice, newQty);
 }
-int SPAPI_DeleteOrderBy(char *user_id,
+auto SPAPI_DeleteOrderBy(char *user_id,
     char *acc_no, long accOrderNo, char* productCode, char* clOrderId){
   return api_proxy_wrapper.SPAPI_DeleteOrderBy(user_id,
 					       acc_no, accOrderNo,
 					       productCode, clOrderId);
 }
-int SPAPI_DeleteAllOrders(char *user_id, char *acc_no){
+auto SPAPI_DeleteAllOrders(char *user_id, char *acc_no){
   return api_proxy_wrapper.SPAPI_DeleteAllOrders(user_id, acc_no);
 }
-int SPAPI_ActivateAllOrders(char *user_id, char *acc_no){
+auto SPAPI_ActivateAllOrders(char *user_id, char *acc_no){
   return api_proxy_wrapper.SPAPI_ActivateAllOrders(user_id, acc_no);
 }
-int SPAPI_InactivateAllOrders(char *user_id, char *acc_no){
+auto SPAPI_InactivateAllOrders(char *user_id, char *acc_no){
   return api_proxy_wrapper.SPAPI_InactivateAllOrders(user_id, acc_no);
 }
-int SPAPI_ActivateOrderBy(char *user_id, char *acc_no, long accOrderNo){
+auto SPAPI_ActivateOrderBy(char *user_id, char *acc_no, long accOrderNo){
   return api_proxy_wrapper.SPAPI_ActivateOrderBy(user_id, acc_no, accOrderNo);
 }
-int SPAPI_InactivateOrderBy(char *user_id, char *acc_no, long accOrderNo){
+auto SPAPI_InactivateOrderBy(char *user_id, char *acc_no, long accOrderNo){
   return api_proxy_wrapper.SPAPI_InactivateOrderBy(user_id, acc_no, accOrderNo);
 }
-int  SPAPI_GetOrderCount(char *user_id, char* acc_no){
+auto  SPAPI_GetOrderCount(char *user_id, char* acc_no){
   return api_proxy_wrapper.SPAPI_GetOrderCount(user_id, acc_no);
 }
-int  SPAPI_GetOrderByOrderNo(char *user_id, char *acc_no,
+auto  SPAPI_GetOrderByOrderNo(char *user_id, char *acc_no,
     long int_order_no, SPApiOrder *order){
   return api_proxy_wrapper.SPAPI_GetOrderByOrderNo(user_id, acc_no,
 						   int_order_no, order);
 }
-int  SPAPI_GetPosCount(char *user_id){
+auto  SPAPI_GetPosCount(char *user_id){
   return api_proxy_wrapper.SPAPI_GetPosCount(user_id);
 }
-int  SPAPI_GetPosByProduct(char *user_id, char *prod_code, SPApiPos *pos){
+auto  SPAPI_GetPosByProduct(char *user_id, char *prod_code, SPApiPos *pos){
   return api_proxy_wrapper.SPAPI_GetPosByProduct(user_id, prod_code, pos);
 }
-void SPAPI_Uninitialize(){
+auto SPAPI_Uninitialize(){
   return api_proxy_wrapper.SPAPI_Uninitialize();
 }
-int SPAPI_Logout(char *user_id){
+auto SPAPI_Logout(char *user_id){
   return api_proxy_wrapper.SPAPI_Logout(user_id);
 }
-int SPAPI_AccountLogin(char *user_id, char *acc_no){
+auto SPAPI_AccountLogin(char *user_id, char *acc_no){
   return api_proxy_wrapper.SPAPI_AccountLogin(user_id, acc_no);
 }
-int SPAPI_AccountLogout(char *user_id, char *acc_no){
+auto SPAPI_AccountLogout(char *user_id, char *acc_no){
   return api_proxy_wrapper.SPAPI_AccountLogout(user_id, acc_no);
 }
-int  SPAPI_GetTradeCount(char *user_id, char *acc_no){
+auto  SPAPI_GetTradeCount(char *user_id, char *acc_no){
   return api_proxy_wrapper.SPAPI_GetTradeCount(user_id, acc_no);
 }
-int SPAPI_SubscribePrice(char *user_id, char *prod_code, int mode){
+auto SPAPI_SubscribePrice(char *user_id, char *prod_code, int mode){
   return api_proxy_wrapper.SPAPI_SubscribePrice(user_id, prod_code, mode);
 }
-int SPAPI_SubscribeTicker(char *user_id, char *prod_code, int mode){
+auto SPAPI_SubscribeTicker(char *user_id, char *prod_code, int mode){
   return api_proxy_wrapper.SPAPI_SubscribeTicker(user_id, prod_code, mode);
 }
-int SPAPI_ChangePassword(char *user_id, char *old_password,
+auto SPAPI_ChangePassword(char *user_id, char *old_password,
     char *new_password){
   return api_proxy_wrapper.SPAPI_ChangePassword(user_id, old_password,
 						new_password);
 }
-int SPAPI_GetDllVersion(char *dll_ver_no, char *dll_rel_no, char *dll_suffix){
+auto SPAPI_GetDllVersion(char *dll_ver_no, char *dll_rel_no, char *dll_suffix){
   return api_proxy_wrapper.SPAPI_GetDllVersion(dll_ver_no, dll_rel_no, dll_suffix);
 }
-int SPAPI_GetAccBalCount(char* user_id){
+auto SPAPI_GetAccBalCount(char* user_id){
   return api_proxy_wrapper.SPAPI_GetAccBalCount(user_id);
 }
-int SPAPI_GetAccBalByCurrency(char *user_id, char *ccy, SPApiAccBal *acc_bal){
+auto SPAPI_GetAccBalByCurrency(char *user_id, char *ccy, SPApiAccBal *acc_bal){
   return api_proxy_wrapper.SPAPI_GetAccBalByCurrency(user_id, ccy, acc_bal);
 }
-int SPAPI_GetCcyRateByCcy(char *user_id, char *ccy, double *rate){
+auto SPAPI_GetCcyRateByCcy(char *user_id, char *ccy, double *rate){
   return api_proxy_wrapper.SPAPI_GetCcyRateByCcy(user_id, ccy, *rate);
 }
-int SPAPI_GetAccInfo(char *user_id, SPApiAccInfo *acc_info){
+auto SPAPI_GetAccInfo(char *user_id, SPApiAccInfo *acc_info){
   return api_proxy_wrapper.SPAPI_GetAccInfo(user_id, acc_info);
 }
-int SPAPI_GetPriceByCode(char *user_id, char *prod_code, SPApiPrice *price){
+auto SPAPI_GetPriceByCode(char *user_id, char *prod_code, SPApiPrice *price){
   return api_proxy_wrapper.SPAPI_GetPriceByCode(user_id, prod_code, price);
 }
-int SPAPI_SetApiLogPath(char *path){
+auto SPAPI_SetApiLogPath(char *path){
   return api_proxy_wrapper.SPAPI_SetApiLogPath(path);
 }
 
-int SPAPI_LoadProductInfoListByCode(char *inst_code){
+auto SPAPI_LoadProductInfoListByCode(char *inst_code){
   return api_proxy_wrapper.SPAPI_LoadProductInfoListByCode(inst_code);
 }
-int SPAPI_GetProductCount(){
+auto SPAPI_GetProductCount(){
   return api_proxy_wrapper.SPAPI_GetProductCount();
 }
-int SPAPI_GetProductByCode(char *prod_code, SPApiProduct *prod){
+auto SPAPI_GetProductByCode(char *prod_code, SPApiProduct *prod){
   return api_proxy_wrapper.SPAPI_GetProductByCode(prod_code, prod);
 }
 
-int SPAPI_LoadInstrumentList(){
+auto SPAPI_LoadInstrumentList(){
   return api_proxy_wrapper.SPAPI_LoadInstrumentList();
 }
-int SPAPI_GetInstrumentCount(){
+auto SPAPI_GetInstrumentCount(){
   return api_proxy_wrapper.SPAPI_GetInstrumentCount();
 }
-int SPAPI_GetInstrumentByCode(char *inst_code, SPApiInstrument *inst){
+auto SPAPI_GetInstrumentByCode(char *inst_code, SPApiInstrument *inst){
   return api_proxy_wrapper.SPAPI_GetInstrumentByCode(inst_code, inst);
 }
-int SPAPI_SetLanguageId(int langid){
+auto SPAPI_SetLanguageId(int langid){
   api_proxy_wrapper.SPAPI_SetLanguageId(langid);
 }
 
-int SPAPI_SendMarketMakingOrder(char *user_id, SPApiMMOrder *mm_order){
+auto SPAPI_SendMarketMakingOrder(char *user_id, SPApiMMOrder *mm_order){
   return api_proxy_wrapper.SPAPI_SendMarketMakingOrder(user_id, mm_order);
 }
-int SPAPI_SubscribeQuoteRequest(char *user_id, char *prod_code, int mode){
+auto SPAPI_SubscribeQuoteRequest(char *user_id, char *prod_code, int mode){
   return api_proxy_wrapper.SPAPI_SubscribeQuoteRequest(user_id, prod_code,
 						       mode);
 }
-int SPAPI_SubscribeAllQuoteRequest(char *user_id, int mode){
+
+auto SPAPI_SubscribeAllQuoteRequest(char *user_id, int mode){
   return api_proxy_wrapper.SPAPI_SubscribeAllQuoteRequest(user_id, mode);
 }
 
-int SPAPI_GetAllTradesByArray(char *user_id, char *acc_no,
+auto SPAPI_GetAllTradesByArray(char *user_id, char *acc_no,
     SPApiTrade* apiTradeList){
   return api_proxy_wrapper.SPAPI_GetAllTradesByArray(user_id, acc_no,
 						     apiTradeList);
 }
-int SPAPI_GetOrdersByArray(char *user_id, char *acc_no,
+auto SPAPI_GetOrdersByArray(char *user_id, char *acc_no,
     SPApiOrder* apiOrderList){
   return api_proxy_wrapper.SPAPI_GetOrdersByArray(user_id, acc_no,
 						  apiOrderList);
 }
-int SPAPI_GetAllAccBalByArray(char *user_id, SPApiAccBal* apiAccBalList){
+
+auto SPAPI_GetAllAccBalByArray(char *user_id, SPApiAccBal* apiAccBalList){
   return api_proxy_wrapper.SPAPI_GetAllAccBalByArray(user_id,
 						     apiAccBalList);
 }
-int SPAPI_GetInstrumentByArray(SPApiInstrument* apiInstList){
+
+auto SPAPI_GetInstrumentByArray(SPApiInstrument* apiInstList){
   return api_proxy_wrapper.SPAPI_GetInstrumentByArray(apiInstList);
 }
-int SPAPI_GetProductByArray(SPApiProduct* apiProdList){
+
+auto SPAPI_GetProductByArray(SPApiProduct* apiProdList){
   return api_proxy_wrapper.SPAPI_GetProductByArray(apiProdList);
 }
 
