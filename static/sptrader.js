@@ -128,12 +128,7 @@ var SpTraderApp = React.createClass({
 	};
     },
     submitModal(data) {
-	$.ajax({
-	    type: 'post',
-	    url: '/login',
-	    data: JSON.stringify(data),
-	    contentType: "application/json"
-	});
+	$.post('/login', data);
     },
     logout() {
 	$.get("/logout");
@@ -207,12 +202,7 @@ var SpTraderApp = React.createClass({
     },
     submitOrder(data) {
 	console.log(data);
-	$.ajax({
-	    type: 'post',
-	    url: '/order/add',
-	    data: JSON.stringify(data),
-	    contentType: "application/json"
-	});
+	$.post('/order/add', data);
 	this.setState({showOrderForm: false});
     },
     accountInfoPush(event) {

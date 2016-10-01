@@ -76,10 +76,17 @@ class FfiConverter(object):
                         v = bytes(v, 'utf-8')
                     elif isinstance(v, int):
                         v = bytes([v])
+                elif type[k]['cname'][0:5] == 'float' or \
+                     type[k]['cname'][0:6] == 'double':
+                    v = float(v)
+                elif type[k]['cname'][0:3] == 'int' or \
+                     type[k]['cname'][0:4] == 'uint':
+                    v = int(v)
                 setattr(buffer[0], k, v)
             except TypeError as e:
-                print("failed %s %s %s" % (format(e), k, v))
-                return None
+                print("failed %s %s %s for %s" % (format(e), k, v,
+                                                  type[k]['cname']))
+                raise
         return buffer
 
     def to_py(self, s):

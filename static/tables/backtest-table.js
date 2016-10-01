@@ -37,12 +37,12 @@ var BacktestTable = React.createClass({
 			   volatile: true,
 			   editable: true,
 			   defaultData: 100000.0},
-			  {headerName: "Start time",
-			   field: "start_time",
+			  {headerName: "Backtest Start",
+			   field: "backtest_start_time",
 			   volatile: true,
 			   editable: true},
-			  {headerName: "End time",
-			   field: "end_time",
+			  {headerName: "Backtest End",
+			   field: "backtest_end_time",
 			   volatile: true,
 			   editable: true},
 			  {headerName: "Backtest",
@@ -69,7 +69,7 @@ var BacktestTable = React.createClass({
 		      // Get previous monday
 		      d.setDate(d.getDate() - (d.getDay() + 6) % 7);
 		      d.setHours(9);
-		      defaultData['start_time'] = d.Format("yyyy-MM-dd hh:mm:ss");
+		      defaultData['backtest_start_time'] = d.Format("yyyy-MM-dd hh:mm:ss");
 		      l.setState({columnDefs: items,
 				  defaultData: defaultData});
 		  });

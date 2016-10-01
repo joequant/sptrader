@@ -3,12 +3,7 @@ import {Button} from 'react-bootstrap';
 
 var StrategyControl = React.createClass({
     post(url, data) {
-	$.ajax({
-	    type: 'post',
-	    url: url,
-	    data: JSON.stringify(data),
-	    contentType: "application/json"
-	});
+	$.post(url, data);
     },
     start() {
 	var data = this.props.params.data;
@@ -59,16 +54,10 @@ var BacktestControl = React.createClass({
 	myWindow.document.open();
 	myWindow.document.write("<img src='/static/loading_anim.gif' width='20' height='20' />Generating backtest");
 	myWindow.document.close();
-	$.ajax({
-	    type: 'post',
-	    url: url,
-	    data: JSON.stringify(data),
-	    contentType: "application/json",
-	    success: function(data) {
+	$.post(url, data, function(data) {
 		myWindow.document.open();
 		myWindow.document.write(data);
 		myWindow.document.close();
-	    }
 	});
     },
     backtest() {

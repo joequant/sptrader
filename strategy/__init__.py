@@ -9,12 +9,12 @@ import matplotlib.pyplot as plt
 from backtrader.plot.plot import Plot
 from multiprocessing import Process, Queue
 
-#must import first to initialize metaclass
+# must import first to initialize metaclass
 from spfeed import SharpPointCSVData
 from spbroker import SharpPointBroker
 import spstore
 import strategy.strategylist
-from datetime import datetime
+import datetime
 from pytz import timezone
 import traceback
 
@@ -77,6 +77,12 @@ def run_strategy(name, kwargs, q):
         raise
 
 
+def parse_date(s):
+    [d, t] = s.split()
+    l = [int(x) for x in d.split('-')] + [int(x) for x in t.split(':')]
+    return datetime.datetime(*l)
+
+
 def run_backtest(kwargs):
     if kwargs.get('dataname', None) is None or \
            kwargs['dataname'] == '':
@@ -91,6 +97,12 @@ def run_backtest(kwargs):
     broker = store.getbroker(backtest=kwargs.get('backtest', True))
     cerebro.setbroker(broker)
 
+    if kwargs.get('backtest_start_time', '').strip() != '':
+        kwargs['fromdate'] = parse_date(kwargs['backtest_start_time'])
+
+    if kwargs.get('backtest_end_time', '').strip() != '':
+        kwargs['todate'] = parse_date(kwargs['backtest_end_time'])
+
     # Create a Data Feed
     data = store.getdata(
         **kwargs)
@@ -100,7 +112,7 @@ def run_backtest(kwargs):
     cerebro.adddata(data2)
 
     # Set the commission - 0.1% ... divide by 100 to remove the %
-    initial_cash = kwargs.get("initial_cash", None)
+    initial_cash = float(kwargs.get("initial_cash", None))
     if initial_cash is not None:
         cerebro.broker.setcash(initial_cash)
     cerebro.broker.setcommission(commission=0.0)
@@ -155,7 +167,7 @@ def backtest(kwargs):
     try:
         return run_backtest(kwargs)
     except:
-        return "<pre>" + traceback.format_exc() +"</pre>"
+        return "<pre>" + traceback.format_exc() + "</pre>"
 
 
 def strategy_list():

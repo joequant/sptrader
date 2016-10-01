@@ -265,14 +265,14 @@ def monitor_file(filename, newdata=False):
 # -------
 @app.route("/login", methods=['POST'])
 def login():
-    if not request.json:
+    if not request.form:
         abort(400)
-    sp.set_login_info(request.json["host"],
-                      request.json["port"],
-                      request.json["license"],
-                      request.json["app_id"],
-                      request.json["user_id"],
-                      request.json["password"])
+    sp.set_login_info(request.form["host"],
+                      int(request.form["port"]),
+                      request.form["license"],
+                      request.form["app_id"],
+                      request.form["user_id"],
+                      request.form["password"])
     return jsonify({"retval": sp.login()})
 
 
@@ -381,12 +381,12 @@ def strategy_listener(p, q):
 
 @app.route("/strategy/start", methods=['POST'])
 def strategy_start():
-    if not request.json:
+    if not request.form:
         abort(400)
-    s = request.json['strategy']
-    id = request.json['id']
+    s = request.form['strategy']
+    id = request.form['id']
     if (s, id) not in stratlist:
-        (p, q) = strategy.run(s, id, request.json)
+        (p, q) = strategy.run(s, id, request.form.to_dict())
         stratlist[(s, id)] = (p, q)
         send_dict("LocalStrategyStatus",
                   {"strategy" : s,
@@ -408,10 +408,10 @@ def strategy_start():
 
 @app.route("/strategy/stop", methods=['POST'])
 def strategy_stop():
-    if not request.json:
+    if not request.form:
         abort(400)
-    s = request.json['strategy']
-    id = request.json['id']
+    s = request.form['strategy']
+    id = request.form['id']
     send_dict("LocalStrategyStatus",
               {"strategy" : s,
                "id" : id,
@@ -427,10 +427,10 @@ def strategy_stop():
 
 @app.route("/strategy/pause", methods=['POST'])
 def strategy_pause():
-    if not request.json:
+    if not request.form:
         abort(400)
-    s = request.json['strategy']
-    id = request.json['id']
+    s = request.form['strategy']
+    id = request.form['id']
     send_dict("LocalStrategyStatus",
               {"strategy" : s,
                "id" : id,
@@ -455,7 +455,7 @@ def strategy_headers(stratname):
 #-----------------------------
 @app.route("/backtest", methods=['POST'])
 def backtest():
-    return strategy.backtest(request.json)
+    return strategy.backtest(request.form.to_dict())
 
 # ---------------------------
 @app.route("/orders/read")
@@ -488,10 +488,9 @@ def order_list():
 
 @app.route("/order/add", methods=['POST'])
 def order_add():
-    if not request.json:
+    if not request.form:
         abort(400)
-    print(request.json)
-    return str(sp.order_add(request.json))
+    return str(sp.order_add(request.form.to_dict()))
 
 
 @app.route("/price/subscribe/<string:products>")
