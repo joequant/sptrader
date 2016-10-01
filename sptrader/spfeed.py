@@ -40,7 +40,10 @@ class SharpPointCSVData(with_metaclass(MetaSharpPointData, feed.CSVDataBase)):
               ('newdata', False),
               ('keepalive', False),
               ('debug', False),
-              ('streaming', False))
+              ('streaming', False),
+              ('headers', False),
+              ('separator', ';'),
+              ('separatordate', '/'),)
 
     def __init__(self, **kwargs):
         super(SharpPointCSVData, self).__init__()
@@ -51,11 +54,12 @@ class SharpPointCSVData(with_metaclass(MetaSharpPointData, feed.CSVDataBase)):
             if self.p.tickersource is None:
                 dataname = self.p.dataname
             else:
-                dataname = self.p.tickersource
+                dataname = self.p.tickersource % self.p.dataname
             if hasattr(dataname, 'readline'):
                 self.f =dataname
             else:
                 # Let an exception propagate to let the caller know
+                open(dataname,'a').close()
                 self.f = io.open(dataname, 'r')
 
         super(SharpPointCSVData, self).start()
@@ -92,25 +96,27 @@ class SharpPointCSVData(with_metaclass(MetaSharpPointData, feed.CSVDataBase)):
                 if self.p.debug:
                     print(line)
                 linetokens = line.split(self.separator)
-                if linetokens[4] == self.p.dataname:
-                    return self._loadline(linetokens)
+                return self._loadline(linetokens)
 
     def islive(self):
         return self.p.keepalive
 
     def _loadline(self, linetokens):
         itoken = iter(linetokens)
+        sdate = next(itoken)
+        sopen = float(next(itoken))
+        shigh = float(next(itoken))
+        slow = float(next(itoken))
+        sclose = float(next(itoken))
+        svolume = int(next(itoken))
 
-        price = float(next(itoken))
-        volume = float(next(itoken))
-        dtnum = float(next(itoken))
-        dt = datetime.datetime.fromtimestamp(dtnum)
-        self.lines.datetime[0] = date2num(dt)
-        self.lines.open[0] = price
-        self.lines.high[0] = price
-        self.lines.low[0] = price
-        self.lines.close[0] = price
-        self.lines.volume[0] = volume
+        ldata = [int(x) for x in sdate.split(self.p.separatordate)]
+        self.lines.datetime[0] = date2num(datetime.datetime(*ldata))
+        self.lines.open[0] = sopen
+        self.lines.high[0] = shigh
+        self.lines.low[0] = slow
+        self.lines.close[0] = sclose
+        self.lines.volume[0] = svolume
         self.lines.openinterest[0] = 0.0
         return True
 

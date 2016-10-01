@@ -8,6 +8,7 @@ import time
 import threading
 import json
 import errno
+import datetime
 
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(location, "..", "sptrader"))
@@ -20,8 +21,7 @@ except OSError as exception:
     if exception.errno != errno.EEXIST:
         raise
 
-ticker_file = os.path.join(data_dir, "ticker.txt")
-order_file = os.path.join(data_dir, "orders.txt")
+ticker_file = os.path.join(data_dir, "ticker-%s.txt")
 
 import config
 from queue import Queue
@@ -299,13 +299,16 @@ def logout():
 def ticker_update(data):
     send_cdata("ApiTickerUpdate", data)
     t = sp.cdata_to_py(data[0])
-    tickerfile = open(ticker_file, "a")
-    tickerfile.write("%f,%d,%d,%d,%s,%s\n" % (t['Price'],
-                                              t['Qty'],
-                                              t['TickerTime'],
-                                              t['DealSrc'],
-                                              t['ProdCode'],
-                                              t['DecInPrice']))
+    tickerfile = open(ticker_file % t['ProdCode'], "a")
+    dt = datetime.datetime.fromtimestamp(float(t['TickerTime']))
+    price = "%.2f" % float(t['Price'])
+    tickerfile.write("%s; %s; %s; %s; %s; %d\n" % \
+                     (dt.strftime("%Y/%m/%d/%H/%M/%S"),
+                      price,
+                      price,
+                      price,
+                      price,
+                      int(t['Qty'])))
     tickerfile.close()
 sp.register_ticker_update(ticker_update)
 

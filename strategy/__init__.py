@@ -32,17 +32,18 @@ class Unbuffered(object):
 
 
 def run_strategy(name, kwargs, q):
+    if kwargs.get('dataname', None) is None or \
+           kwargs['dataname'] == '':
+        raise ValueError('missing dataname')
+    modpath = os.path.dirname(os.path.realpath(__file__))
+    logpath = os.path.join(modpath, '../data/log-%s-%s.txt' %
+                           (kwargs['strategy'],
+                            str(kwargs['id'])))
+    f = open(logpath, "a")
+    old_sysout = sys.stdout
+    sys.stdout = Unbuffered(f)
     try:
-        if kwargs.get('dataname', None) is None or \
-               kwargs['dataname'] == '':
-            raise ValueError('missing dataname')
         module = strategylist.dispatch[name]
-        modpath = os.path.dirname(os.path.realpath(__file__))
-        logpath = os.path.join(modpath, '../data/log-%s-%s.txt' %
-                               (kwargs['strategy'],
-                                str(kwargs['id'])))
-        f = open(logpath, "w")
-        sys.stdout = Unbuffered(f)
         cerebro = bt.Cerebro()
         cerebro.addstrategy(module)
         store = spstore.SharpPointStore()
@@ -50,8 +51,7 @@ def run_strategy(name, kwargs, q):
         cerebro.setbroker(broker)
 
         # Create a Data Feed
-        data = store.getdata(
-            **kwargs)
+        data = store.getdata(**kwargs)
         data2 = bt.DataClone(dataname=data)
         data2.addfilter(bt.ReplayerMinutes, compression=5)
         cerebro.adddata(data)
@@ -64,10 +64,14 @@ def run_strategy(name, kwargs, q):
         cerebro.run()
         # Print out the final result
         print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+        sys.stdout = old_sysout
         f.close()
         q.put((kwargs['strategy'], kwargs['id'], "done", ""))
         return None
     except:
+        sys.stdout = old_sysout
+        f.close()
+        print(traceback.format_exc())
         q.put((kwargs['strategy'], kwargs['id'], "error",
                repr(sys.exc_info())))
         raise
@@ -125,7 +129,7 @@ def run_backtest(kwargs):
 def run(name, id, kwargs):
     q = Queue()
     modpath = os.path.dirname(os.path.realpath(__file__))
-    datapath = os.path.join(modpath, '../data/ticker.txt')
+    datapath = os.path.join(modpath, '../data/ticker-%s.txt')
     open(datapath, 'a').close()
     kwargs['tickersource'] = datapath
     kwargs['newdata'] = True
@@ -141,7 +145,7 @@ def run(name, id, kwargs):
 
 def backtest(kwargs):
     modpath = os.path.dirname(os.path.realpath(__file__))
-    datapath = os.path.join(modpath, '../data/ticker.txt')
+    datapath = os.path.join(modpath, '../data/ticker-%s.txt')
     open(datapath, 'a').close()
     kwargs['tickersource'] = datapath
     kwargs['newdata'] = False
