@@ -6,6 +6,8 @@ The modules in the directory "strategy" are copyright by their owners
 and may contain proprietary and confidential code, which are not
 intended for public release.
 
+NOTE that this system is NOT supported by SharpPoint.
+
 SYSTEM REQUIREMENTS
 -------------------
 
