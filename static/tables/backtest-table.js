@@ -3,6 +3,22 @@ import {AgGridReact, reactCellRendererFactory} from 'ag-grid-react';
 import {Button} from 'react-bootstrap';
 import {BacktestControl, renderLog} from '../../static/utils';
 
+Date.prototype.Format = function (fmt) { //author: meizz
+    var o = {
+	"M+": this.getMonth() + 1, //月份
+	"d+": this.getDate(), //日
+	"h+": this.getHours(), //小时
+	"m+": this.getMinutes(), //分
+	"s+": this.getSeconds(), //秒
+	"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+	"S": this.getMilliseconds() //毫秒
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+	if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
+
 var BacktestTable = React.createClass({
     getInitialState() {
 	var l = this;
@@ -13,20 +29,30 @@ var BacktestTable = React.createClass({
 			   field: "dataname",
 			   volatile: true,
 			   editable: true,
-			   defaultData: ''},
+			   defaultData: ''}
+		      ];
+		      var end = [
 			  {headerName: "Initial cash",
 			   field: "initial_cash",
 			   volatile: true,
 			   editable: true,
-			   defaultData: 100000.0}
-		      ];
-		      var end = [
+			   defaultData: 100000.0},
+			  {headerName: "Start time",
+			   field: "start_time",
+			   volatile: true,
+			   editable: true},
+			  {headerName: "End time",
+			   field: "end_time",
+			   volatile: true,
+			   editable: true},
 			  {headerName: "Backtest",
 			   field: "backtest",
 			   volatile: true,
 			   cellRenderer:
 			   reactCellRendererFactory(BacktestControl)
 			  }];
+
+		      
 		      for (var i=0; i < d.length; i++) {
 			  d[i]['editable'] = true;
 		      }
@@ -39,6 +65,11 @@ var BacktestTable = React.createClass({
 			  }
 		      }
 		      defaultData['strategy'] = l.props.strategy;
+		      var d = new Date();
+		      // Get previous monday
+		      d.setDate(d.getDate() - (d.getDay() + 6) % 7);
+		      d.setHours(9);
+		      defaultData['start_time'] = d.Format("yyyy-MM-dd hh:mm:ss");
 		      l.setState({columnDefs: items,
 				  defaultData: defaultData});
 		  });
