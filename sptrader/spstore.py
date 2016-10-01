@@ -183,8 +183,6 @@ or ``BackTestCls``
         response = self._get_request("log/subscribe", stream=True)
         client = sseclient.SSEClient(response)
         for event in client.events():
-            if self.p.debug:
-                print(str(event))
             data = json.loads(event.data)
             info = data.get('data', None)
             if event.event == "OrderBeforeSendReport":
