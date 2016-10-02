@@ -287,7 +287,10 @@ var SpTraderApp = React.createClass({
 	    "QuoteRequestReceived" : this.addToLog,
 	    "LocalStrategyStatus" : this.strategyStatus
 	}
-	return(
+	return(<div>
+	    	<SubscribeBox url="/log/subscribe" event={events}
+	    onerror={this.onerror} />
+
 		<Tabs id="tabs">
 		<Tab eventKey={1} title="Account" >
 		<LoginForm show={this.state.showLoginForm}
@@ -336,12 +339,11 @@ var SpTraderApp = React.createClass({
 		<ButtonToolbar>
 		<Button bsStyle="success" onClick={publish}>Ping</Button>
 		</ButtonToolbar>
-		<SubscribeBox url="/log/subscribe" event={events}
-	    onerror={this.onerror} />
 		<FormControl componentClass="textarea" value={this.state.log} />
 		<SampleTable/>
 		</Tab>
-		</Tabs>
+	       </Tabs>
+	       </div>
 	)
     }
 });
