@@ -14,16 +14,24 @@ var TickerControl = React.createClass({
     add_ticker: function() {
 	$.get("/ticker/subscribe/" + this.state.tickers_add);
     },
-    clear_ticker: function() {
-	$.get("/ticker/clear");
+    clear_ticker: function(e) {
+	$.get("/ticker/clear/" + e.target.name);
     },
-    delete_ticker: function(e) {
+    view_ticker: function(e) {
+	var myWindow = window.open("/ticker/view/" + e.target.name);
+    },
+    unsubscribe_ticker: function(e) {
 	$.get("/ticker/unsubscribe/" + e.target.name);
     },
     render: function() {
 	var l = this;
 	var items = this.props.tickers.map(function(i) {
-	    return (<div key={i}>{i} - <Button name={i} onClick={l.delete_ticker}>Delete ticker</Button><br/></div>);});
+	    return (<div key={i}>{i} -
+		    <Button name={i} onClick={l.view_ticker}>View ticker</Button>
+		    <Button name={i} onClick={l.unsubscribe_ticker}>Unsubscribe ticker</Button>
+		    <Button name={i} onClick={l.clear_ticker}>Clear ticker</Button>
+
+		    <br/></div>);});
 	return (<div>
 		<h2>Ticker Control</h2>
 		<a href="/ticker/get" target="_blank">Show ticker</a>
@@ -33,7 +41,6 @@ var TickerControl = React.createClass({
 		onChange={this.onChange}
 		value={this.state.tickers_add}
 		/><Button bsStyle="success" onClick={this.add_ticker}>Add Ticker</Button><br/>
-		<Button bsStyle="success" onClick={this.clear_ticker}>Clear Ticker</Button><br/>
 		{items}<br/></div>);
     }
 });

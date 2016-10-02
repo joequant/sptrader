@@ -3,6 +3,12 @@ import {AgGridReact, reactCellRendererFactory} from 'ag-grid-react';
 import {Button} from 'react-bootstrap';
 import {StrategyControl, renderLog} from '../../static/utils';
 
+function pad(num, size) {
+    var s = num+"";
+    while (s.length < size) s = "0" + s;
+    return s;
+}
+
 var StrategyTable = React.createClass({
     getInitialState() {
 	var l = this;
@@ -81,7 +87,7 @@ var StrategyTable = React.createClass({
 	var c = this.state.counter;
 	var rows = this.state.rowData;
 	c = c+1;
-	r['id'] = c;
+	r['id'] = r.strategy + "-" + pad(c, 5);
 	rows.push(r);
 	console.log(rows);
 	this.setState({rowData: rows,

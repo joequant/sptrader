@@ -23,6 +23,11 @@ except OSError as exception:
 
 ticker_file = os.path.join(data_dir, "ticker-%s.txt")
 
+def get_ticker(s):
+    if "/" in s:
+        raise ValueError
+    return ticker_file % s
+
 import config
 from queue import Queue
 from sse import ServerSentEvent
@@ -299,7 +304,7 @@ def logout():
 def ticker_update(data):
     send_cdata("ApiTickerUpdate", data)
     t = sp.cdata_to_py(data[0])
-    tickerfile = open(ticker_file % t['ProdCode'], "a")
+    tickerfile = open(get_ticker(t['ProdCode']), "a")
     dt = datetime.datetime.fromtimestamp(float(t['TickerTime']))
     price = "%.2f" % float(t['Price'])
     tickerfile.write("%s; %s; %s; %s; %s; %d\n" % \
@@ -346,9 +351,14 @@ def list_ticker():
     return jsonify({"data": list(ticker_products)})
 
 
-@app.route("/ticker/clear")
-def clear_ticker():
-    fo = open(ticker_file, "w")
+@app.route("/ticker/view/<string:product>")
+def view_ticker(product):
+    return monitor_file(get_ticker(product))
+
+
+@app.route("/ticker/clear/<string:product>")
+def clear_ticker(product):
+    fo = open(get_ticker(product), "w")
     fo.truncate()
     fo.close()
     return "OK"
@@ -467,16 +477,6 @@ def orders_read():
 @app.route("/trade/list")
 def list_trade():
     return jsonify({"data": sp.get_all_trades()})
-
-
-@app.route("/ticker/get")
-def ticker():
-    return monitor_file(ticker_file)
-
-
-@app.route("/ticker/get-new")
-def ticker_get_new():
-    return monitor_file(ticker_file, True)
 
 
 # -----------------

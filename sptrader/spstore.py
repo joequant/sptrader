@@ -188,16 +188,16 @@ or ``BackTestCls``
             if event.event == "OrderBeforeSendReport":
                 if self.p.debug:
                     print(data)
-                self.broker._submit(int(info['Ref2']))
+                self.broker._submit(info['Ref'])
             elif event.event == "OrderRequestFailed":
                 if self.p.debug:
                     print(data)
-                self.broker._reject(int(info['Ref2']))
+                self.broker._reject(info['Ref'])
             elif event.event == "OrderReport":
                 if self.p.debug:
                     print(data)
                 status = int(info['Status'])
-                oref = int(info['Ref2'])
+                oref = info['Ref']
                 if status == 4:
                     self.broker._accept(oref)
                 elif status == 6:
@@ -205,7 +205,7 @@ or ``BackTestCls``
             elif event.event == "TradeReport":
                 if self.p.debug:
                     print(data)
-                oref = int(info['Ref2'])
+                oref = info['Ref']
                 qty = int(info['Qty'])
                 price = float(info['Price'])
                 self.broker._fill(oref, qty, price)
@@ -279,7 +279,6 @@ or ``BackTestCls``
 
     def order_create(self, order, **kwargs):
         okwargs = {"DecInPrice": 0,
-                   "Ref": "test",
                    "ClOrderId": "test2",
                    "OpenClose": 0,
                    "CondType": 0,
@@ -294,7 +293,7 @@ or ``BackTestCls``
         okwargs['Price'] = order.created.price
         okwargs['Qty'] = abs(order.created.size)
         okwargs['ProdCode'] = order.data._dataname
-        okwargs['Ref2'] = str(order.ref)
+        okwargs['Ref'] = str(order.ref)
         if self.p.debug:
             print(okwargs)
         self.q_ordercreate.put((order.ref, okwargs,))
