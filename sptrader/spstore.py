@@ -33,8 +33,6 @@ import backtrader as bt
 from backtrader.metabase import MetaParams
 from backtrader.utils.py3 import queue, with_metaclass
 from backtrader.utils import AutoDict
-from backtrader.brokers.bbroker import BackBroker
-
 
 class MetaSingleton(MetaParams):
     '''Metaclass to make a metaclassed class a singleton'''
@@ -67,7 +65,7 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
 
     BrokerCls = None  # broker class will autoregister
     DataCls = None  # data class will auto register
-    BackTestCls = BackBroker
+    BackTestCls = None
 
     params = (
         ('gateway', 'http://localhost:5000/'),

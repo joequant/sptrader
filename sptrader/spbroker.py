@@ -32,9 +32,6 @@ from backtrader.metabase import MetaParams
 from backtrader.utils.py3 import with_metaclass
 
 
-__all__ = ['BackBroker', 'BrokerBack']
-
-
 class MetaSharpPointBroker(MetaParams):
     def __init__(cls, name, bases, dct):
         '''Class has already been created ... register'''

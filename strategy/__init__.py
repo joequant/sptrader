@@ -12,6 +12,7 @@ from multiprocessing import Process, Queue
 # must import first to initialize metaclass
 from spfeed import SharpPointCSVData
 from spbroker import SharpPointBroker
+from spbacktester import SharpPointBackTester
 import spstore
 import strategy.strategylist
 import datetime
