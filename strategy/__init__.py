@@ -32,17 +32,19 @@ class Unbuffered(object):
 
 
 def run_strategy(name, kwargs, q):
-    if kwargs.get('dataname', None) is None or \
-           kwargs['dataname'] == '':
-        raise ValueError('missing dataname')
-    modpath = os.path.dirname(os.path.realpath(__file__))
-    logpath = os.path.join(modpath, '../data/log-%s-%s.txt' %
-                           (kwargs['strategy'],
-                            str(kwargs['id'])))
-    f = open(logpath, "a")
-    old_sysout = sys.stdout
-    sys.stdout = Unbuffered(f)
+    f = None
     try:
+        if kwargs.get('dataname', None) is None or \
+               kwargs['dataname'] == '':
+            raise ValueError('missing dataname')
+        modpath = os.path.dirname(os.path.realpath(__file__))
+        logpath = os.path.join(modpath, '../data/log-%s-%s.txt' %
+                               (kwargs['strategy'],
+                                str(kwargs['id'])))
+        f = open(logpath, "a")
+        old_sysout = sys.stdout
+        sys.stdout = Unbuffered(f)
+
         module = strategylist.dispatch[name]
         cerebro = bt.Cerebro()
         cerebro.addstrategy(module)
@@ -69,8 +71,10 @@ def run_strategy(name, kwargs, q):
         q.put((kwargs['strategy'], kwargs['id'], "done", ""))
         return None
     except:
-        sys.stdout = old_sysout
-        f.close()
+        if f is not None:
+            print(traceback.format_exc())
+            sys.stdout = old_sysout
+            f.close()
         print(traceback.format_exc())
         q.put((kwargs['strategy'], kwargs['id'], "error",
                repr(sys.exc_info())))
