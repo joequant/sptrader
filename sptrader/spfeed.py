@@ -93,8 +93,6 @@ class SharpPointCSVData(with_metaclass(MetaSharpPointData, feed.CSVDataBase)):
                     continue
             else:
                 line = line.rstrip('\n')
-                if self.p.debug:
-                    print(line)
                 linetokens = line.split(self.separator)
                 return self._loadline(linetokens)
 
