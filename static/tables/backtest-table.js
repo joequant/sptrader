@@ -55,6 +55,7 @@ var BacktestTable = React.createClass({
 		      
 		      for (var i=0; i < d.length; i++) {
 			  d[i]['editable'] = true;
+			  d[i]['volatile'] = true;
 		      }
 		      var items = start.concat(d).concat(end);
 		      var defaultData = {};
