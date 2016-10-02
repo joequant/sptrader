@@ -30,6 +30,14 @@ TESTS
 -----
 There are a number of other scripts in directory tests
 
+DEMO ACCOUNTS
+-------------
+
+This software requires an SPTrader account.  Demo accounts are
+available via
+
+http://www.sharppoint.com.hk/algo.php?lang=1&mod=api
+
 
 
 
