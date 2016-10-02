@@ -9,11 +9,17 @@ class MetaSharpPointBackTester(MetaParams):
         # Initialize the class
         spstore.SharpPointStore.BackTestCls = cls
 
-
 class SharpPointBackTester(with_metaclass(MetaSharpPointBackTester,
                                           BackBroker)):
     params = ()
     def init(self):
         super(SharpPointBackTester, self).init()
-
-
+    def getcommissioninfo(self, data):
+        if data._name in self.comminfo:
+            return self.comminfo[data._name]
+        if data._name[0:3] == 'HSI':
+            self.setcommission(stocklike=False, mult=50.0, name=data._name)
+        elif data._name[0:3] == 'MHI':
+            self.setcommission(stocklike=False, mult=10.0, name=data._name)
+        print(self.comminfo)
+        return super(SharpPointBackTester, self).getcommissioninfo(data)

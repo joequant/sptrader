@@ -8,4 +8,5 @@ sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 
 import strategy
 print(strategy.backtest({"dataname": "HSIZ6",
+                         "initial_cash": 100000.00,
                          "strategy" : "sample"}))
