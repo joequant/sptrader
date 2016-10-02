@@ -1,3 +1,10 @@
+0.2
+
+New Features:
+* redid ticker to make format identical with sppro
+* backtester now has more parameters
+
+
 0.1.3
 
 Fixed:
