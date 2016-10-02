@@ -188,16 +188,16 @@ or ``BackTestCls``
             if event.event == "OrderBeforeSendReport":
                 if self.p.debug:
                     print(data)
-                self.broker._submit(info['Ref'])
+                self.broker._submit(int(info['Ref2']))
             elif event.event == "OrderRequestFailed":
                 if self.p.debug:
                     print(data)
-                self.broker._reject(info['Ref'])
+                self.broker._reject(int(info['Ref2']))
             elif event.event == "OrderReport":
                 if self.p.debug:
                     print(data)
                 status = int(info['Status'])
-                oref = info['Ref']
+                oref = int(info['Ref2'])
                 if status == 4:
                     self.broker._accept(oref)
                 elif status == 6:
@@ -205,7 +205,7 @@ or ``BackTestCls``
             elif event.event == "TradeReport":
                 if self.p.debug:
                     print(data)
-                oref = info['Ref']
+                oref = int(info['Ref2'])
                 qty = int(info['Qty'])
                 price = float(info['Price'])
                 self.broker._fill(oref, qty, price)
@@ -293,7 +293,8 @@ or ``BackTestCls``
         okwargs['Price'] = order.created.price
         okwargs['Qty'] = abs(order.created.size)
         okwargs['ProdCode'] = order.data._dataname
-        okwargs['Ref'] = str(order.ref)
+        okwargs['Ref'] = kwargs.get('Ref', '')
+        okwargs['Ref2'] = str(order.ref)
         if self.p.debug:
             print(okwargs)
         self.q_ordercreate.put((order.ref, okwargs,))
