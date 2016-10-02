@@ -1,8 +1,25 @@
 // Copyright (C) Bitquant Research Laboratories (Asia) Limited
 // released under terms of the Simplified BSD License
 
-
+#include <cstddef>
 #include <vector>
+  template <typename T>
+  class FStore {
+    T _func;
+  public:
+    FStore() {
+      _func = nullptr;
+    }
+    template <typename ...Types>
+    void operator()(Types... args) {
+      if (_func)
+	_func(args...);
+    }
+    void set(T& f) {
+      _func = f;
+    }
+  };
+
 extern "C" {
 typedef signed long int __int64_t;
 typedef unsigned long int __uint64_t;
@@ -18,9 +35,9 @@ typedef unsigned long   u_long;
 typedef long long       bigint;
 typedef unsigned long long u_bigint;
 
-typedef char STR4[4];
-typedef char STR16[16];
-typedef char STR40[40];
+using STR4 = char[4];
+using STR16 = char[16];
+using STR40 = char[40];
 
 typedef struct
 {
@@ -248,10 +265,11 @@ typedef struct
     double Rate;
 } SPApiCcyRate;
 
-typedef void ( *LoginReplyAddr)(long ret_code, char *ret_msg);
-typedef void ( *ConnectedReplyAddr)(long host_type, long con_status);
-typedef void ( *ApiOrderRequestFailedAddr)(tinyint action,
-    const SPApiOrder *order, long err_code, char *err_msg);
+using LoginReplyAddr = void(*)(long ret_code, char *ret_msg);
+using ConnectedReplyAddr = void (*)(long host_type, long con_status);
+using ApiOrderRequestFailedAddr = void (*)(tinyint action,
+					   const SPApiOrder *order,
+					   long err_code, char *err_msg);
 typedef void ( *ApiOrderReportAddr)(long rec_no, const SPApiOrder *order);
 typedef void ( *ApiOrderBeforeSendReportAddr)(const SPApiOrder *order);
 typedef void ( *AccountLoginReplyAddr)(char *accNo,
@@ -307,118 +325,116 @@ public:
 	virtual void OnApiQuoteRequestReceived(char *product_code, char buy_sell, long qty) = 0;
 };
 
+#define DECLARE_PROXY(X,Y) \
+  static FStore<Y##Addr> _s_##Y ; void X(Y##Addr addr) { _s_##Y.set(addr); }
+  
+  DECLARE_PROXY(SPAPI_RegisterLoginReply,LoginReply);
+  DECLARE_PROXY(SPAPI_RegisterConnectingReply,ConnectedReply);
+  DECLARE_PROXY(SPAPI_RegisterOrderReport,ApiOrderReport);
+  DECLARE_PROXY(SPAPI_RegisterOrderRequestFailed,ApiOrderRequestFailed);
+  DECLARE_PROXY(SPAPI_RegisterOrderBeforeSendReport,ApiOrderBeforeSendReport);
+  DECLARE_PROXY(SPAPI_RegisterAccountLoginReply,AccountLoginReply);
+  
   class ApiProxyWrapperReplyStatic: public ApiProxyWrapperReply {
 public:
-	ApiProxyWrapperReplyStatic(void){};
-	~ApiProxyWrapperReplyStatic(void){};
-    static LoginReplyAddr _login_reply;
-    virtual void OnTest() {};
-    virtual void OnLoginReply(long ret_code,char *ret_msg) {
-      if (_login_reply)
-	_login_reply(ret_code, ret_msg);
-    }
-    static ConnectedReplyAddr _connected_reply;
-    virtual void OnConnectedReply(long host_type,long con_status) {
-      if (_connected_reply)
-	_connected_reply(host_type, con_status);
-    };
-    static ApiOrderRequestFailedAddr _api_order_request_failed;
-    virtual void OnApiOrderRequestFailed(tinyint action,
-					 const SPApiOrder *order,
-					 long err_code,
-					 char *err_msg) {
-      if (_api_order_request_failed)
-	_api_order_request_failed(action, order, err_code, err_msg);
-    };
-    static ApiOrderReportAddr _api_order_report;
-    virtual void OnApiOrderReport(long rec_no, const SPApiOrder *order) {
-      if (_api_order_report)
-	_api_order_report(rec_no, order);
-    };
-    static ApiOrderBeforeSendReportAddr _api_order_before_send_report;
-    virtual void OnApiOrderBeforeSendReport(const SPApiOrder *order) {
-      if (_api_order_before_send_report)
-	_api_order_before_send_report(order);
-    };
-    static AccountLoginReplyAddr _account_login_reply;
+  ApiProxyWrapperReplyStatic(void){};
+  ~ApiProxyWrapperReplyStatic(void){};
+  virtual void OnTest() {};
+  virtual void OnLoginReply(long ret_code,char *ret_msg) final {
+  _s_LoginReply(ret_code, ret_msg);
+};
+  virtual void OnConnectedReply(long host_type,long con_status) final {
+  _s_ConnectedReply(host_type, con_status);
+};
+  virtual void OnApiOrderRequestFailed(tinyint action,
+    const SPApiOrder *order,
+    long err_code,
+    char *err_msg) final {
+  _s_ApiOrderRequestFailed(action, order, err_code, err_msg);
+};
+  virtual void OnApiOrderReport(long rec_no, const SPApiOrder *order) final {
+  _s_ApiOrderReport(rec_no, order);
+};
+  virtual void OnApiOrderBeforeSendReport(const SPApiOrder *order) final {
+  _s_ApiOrderBeforeSendReport(order);
+};
     virtual void OnAccountLoginReply(char *accNo, long ret_code,
-				     char* ret_msg) {
-      if (_account_login_reply)
-	_account_login_reply(accNo, ret_code, ret_msg);
-    };
+				     char* ret_msg) final {
+  _s_AccountLoginReply(accNo, ret_code, ret_msg);
+};
     static AccountLogoutReplyAddr _account_logout_reply;
-    virtual void OnAccountLogoutReply(long ret_code, char* ret_msg) {
+    virtual void OnAccountLogoutReply(long ret_code, char* ret_msg) final {
       if (_account_logout_reply)
 	_account_logout_reply(ret_code, ret_msg);
     };
     static AccountInfoPushAddr _account_info_push;
-    virtual void OnAccountInfoPush(const SPApiAccInfo *acc_info) {
+    virtual void OnAccountInfoPush(const SPApiAccInfo *acc_info) final {
       if (_account_info_push)
 	_account_info_push(acc_info);
     };
     static AccountPositionPushAddr _account_position_push;
-    virtual void OnAccountPositionPush(const SPApiPos *pos) {
+    virtual void OnAccountPositionPush(const SPApiPos *pos) final {
       if (_account_position_push)
 	_account_position_push(pos);
     };
     static UpdatedAccountPositionPushAddr _updated_account_position_push;
-    virtual void OnUpdatedAccountPositionPush(const SPApiPos *pos) {
+    virtual void OnUpdatedAccountPositionPush(const SPApiPos *pos) final {
       if (_updated_account_position_push)
 	_updated_account_position_push(pos);
     };
     static UpdatedAccountBalancePushAddr _updated_account_balance_push;
-    virtual void OnUpdatedAccountBalancePush(const SPApiAccBal *acc_bal) {
+    virtual void OnUpdatedAccountBalancePush(const SPApiAccBal *acc_bal) final {
       if (_updated_account_balance_push)
       _updated_account_balance_push(acc_bal);
     };
     static ApiTradeReportAddr _api_trade_report;
-    virtual void OnApiTradeReport(long rec_no, const SPApiTrade *trade) {
+    virtual void OnApiTradeReport(long rec_no, const SPApiTrade *trade) final {
       if (_api_trade_report)
 	_api_trade_report(rec_no, trade);
     };
     static ApiPriceUpdateAddr _api_price_update;
-    virtual void OnApiPriceUpdate(const SPApiPrice *price) {
+    virtual void OnApiPriceUpdate(const SPApiPrice *price) final {
       if (_api_price_update)
 	_api_price_update(price);
     };
     static ApiTickerUpdateAddr _api_ticker_update;
-    virtual void OnApiTickerUpdate(const SPApiTicker *ticker) {
+    virtual void OnApiTickerUpdate(const SPApiTicker *ticker) final {
       if (_api_ticker_update)
 	_api_ticker_update(ticker);
     };
     static PswChangeReplyAddr _psw_change_reply;
-    virtual void OnPswChangeReply(long ret_code, char *ret_msg) {
+    virtual void OnPswChangeReply(long ret_code, char *ret_msg) final {
       if (_psw_change_reply)
 	_psw_change_reply(ret_code, ret_msg);
     };
     static ProductListByCodeReplyAddr _product_list_by_code_reply;
     virtual void OnProductListByCodeReply(char *inst_code,
-					  bool is_ready, char *ret_msg) {
+					  bool is_ready, char *ret_msg) final {
       if (_product_list_by_code_reply)
 	_product_list_by_code_reply(inst_code, is_ready, ret_msg);
     };
     static InstrumentListReplyAddr _instrument_list_reply;
-    virtual void OnInstrumentListReply(bool is_ready, char *ret_msg) {
+    virtual void OnInstrumentListReply(bool is_ready, char *ret_msg) final {
       if (_instrument_list_reply)
 	_instrument_list_reply(is_ready, ret_msg);
     };
     static BusinessDateReplyAddr _business_date_reply;
-    virtual void OnBusinessDateReply(long business_date) {
+    virtual void OnBusinessDateReply(long business_date) final {
       if (_business_date_reply)
 	_business_date_reply(business_date);
     };
     static ApiMMOrderBeforeSendReportAddr _api_mm_order_before_send_report;
-    virtual void OnApiMMOrderBeforeSendReport(SPApiMMOrder *mm_order) {
+    virtual void OnApiMMOrderBeforeSendReport(SPApiMMOrder *mm_order) final {
       if (_api_mm_order_before_send_report)
 	_api_mm_order_before_send_report(mm_order);
     };
     static ApiMMOrderRequestFailedAddr _api_mm_order_request_failed;
-    virtual void OnApiMMOrderRequestFailed(SPApiMMOrder *mm_order, long err_code, char *err_msg) {
+    virtual void OnApiMMOrderRequestFailed(SPApiMMOrder *mm_order, long err_code, char *err_msg) final {
       if (_api_mm_order_request_failed)
 	_api_mm_order_request_failed(mm_order, err_code, err_msg);
     };
     static ApiQuoteRequestReceivedAddr _api_quote_request_received;
-    virtual void OnApiQuoteRequestReceived(char *product_code, char buy_sell, long qty) {
+    virtual void OnApiQuoteRequestReceived(char *product_code, char buy_sell, long qty) final {
       if (_api_quote_request_received)
 	_api_quote_request_received(product_code, buy_sell, qty);
     };
@@ -492,30 +508,6 @@ private:
 
 static ApiProxyWrapper api_proxy_wrapper;
 
-void SPAPI_RegisterLoginReply(LoginReplyAddr addr){
-  wrapper_reply._login_reply = addr;
-}
-
-void SPAPI_RegisterConnectingReply(ConnectedReplyAddr addr){
-  wrapper_reply._connected_reply = addr;
-}
-
-void SPAPI_RegisterOrderReport(ApiOrderReportAddr addr){
-  wrapper_reply._api_order_report = addr;
-}
-
-void SPAPI_RegisterOrderRequestFailed(ApiOrderRequestFailedAddr addr){
-  wrapper_reply._api_order_request_failed = addr;
-}
-
-void SPAPI_RegisterOrderBeforeSendReport(ApiOrderBeforeSendReportAddr addr){
-  wrapper_reply._api_order_before_send_report = addr;
-}
-
-void SPAPI_RegisterAccountLoginReply(AccountLoginReplyAddr addr){
-  wrapper_reply._account_login_reply = addr;
-}
-
 void SPAPI_RegisterAccountLogoutReply(AccountLogoutReplyAddr addr){
   wrapper_reply._account_logout_reply = addr;
 }
@@ -582,6 +574,8 @@ void SPAPI_SetLoginInfo(char *host,
 					      user_id,
 					      password);
 }
+
+  // declare function
 
 auto  SPAPI_Login(){
   return api_proxy_wrapper.SPAPI_Login();
@@ -750,12 +744,7 @@ auto SPAPI_GetProductByArray(SPApiProduct* apiProdList){
 }
 
 }
-  LoginReplyAddr ApiProxyWrapperReplyStatic::_login_reply ;
-  ConnectedReplyAddr ApiProxyWrapperReplyStatic::_connected_reply ;
-  ApiOrderRequestFailedAddr ApiProxyWrapperReplyStatic::_api_order_request_failed ;
-  ApiOrderReportAddr ApiProxyWrapperReplyStatic::_api_order_report ;
-  ApiOrderBeforeSendReportAddr ApiProxyWrapperReplyStatic::_api_order_before_send_report ;
-  AccountLoginReplyAddr ApiProxyWrapperReplyStatic::_account_login_reply ;
+
   AccountLogoutReplyAddr ApiProxyWrapperReplyStatic::_account_logout_reply ;
   AccountInfoPushAddr ApiProxyWrapperReplyStatic::_account_info_push ;
   AccountPositionPushAddr ApiProxyWrapperReplyStatic::_account_position_push ;
