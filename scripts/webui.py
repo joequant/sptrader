@@ -23,6 +23,7 @@ except OSError as exception:
 
 ticker_file = os.path.join(data_dir, "ticker-%s.txt")
 
+
 def get_ticker(s):
     if "/" in s:
         raise ValueError
@@ -245,6 +246,7 @@ def quote_request_received(product_code, buy_sell, qty):
                "qty": qty})
 sp.register_quote_request_received_report(quote_request_received)
 
+
 def monitor_file(filename, newdata=False):
     try:
         tickerfile = open(filename)
@@ -307,7 +309,7 @@ def ticker_update(data):
     tickerfile = open(get_ticker(t['ProdCode']), "a")
     dt = datetime.datetime.fromtimestamp(float(t['TickerTime']))
     price = "%.2f" % float(t['Price'])
-    tickerfile.write("%s; %s; %s; %s; %s; %d\n" % \
+    tickerfile.write("%s; %s; %s; %s; %s; %d\n" %
                      (dt.strftime("%Y/%m/%d/%H/%M/%S"),
                       price,
                       price,
@@ -365,29 +367,64 @@ def clear_ticker(product):
 
 # ----------- Strategy ------
 
-stratlist = {}
+
+class StrategyList(object):
+    def __init__(self):
+        self.stratlist = {}
+
+    def start(self, id, kwargs):
+        if id not in self.stratlist or \
+               self.stratlist[id][0] is None:
+            (p, q) = strategy.run(kwargs['strategy'], id, kwargs)
+            kwargs['status'] = 'running'
+            kwargs['comment'] = ''
+            self.stratlist[id] = (p, q, kwargs)
+            t = threading.Thread(target=strategy_listener, args=(p, q))
+            t.daemon = True
+            t.start()
+            return "OK"
+
+    def stop(self, id, status, comment, terminate=False):
+        if id not in self.stratlist:
+            return "NOT FOUND"
+        (p, q, info) = self.stratlist[id]
+        if q is not None:
+            q.close()
+        if p is not None and terminate:
+            p.terminate()
+        info['status'] = status
+        info['comment'] = comment
+        self.stratlist = (None, None, info)
+
+    def data(self, stratname):
+        retval = []
+        for k, v in self.stratlist.items():
+            if v[2]['strategy'] == stratname:
+                retval.append(v[2])
+        return retval
+
+
+stratlist = StrategyList()
+
 
 def strategy_listener(p, q):
     try:
         while True:
             (s, id, status, comment) = q.get()
             send_dict("LocalStrategyStatus",
-                      {"strategy" : s,
-                       "id" : id,
-                       "status" : status,
-                       "comment" : comment})
+                      {"strategy": s,
+                       "id": id,
+                       "status": status,
+                       "comment": comment})
             if status == "error":
-                q.close()
-                (p, q) = stratlist[(s, id)]
-                p.terminate()
-                stratlist.pop((s, id), None)
+                stratlist.stop(id, status, comment, terminate=True)
                 return
             elif status == "done":
-                q.close()
-                stratlist.pop((s, id), None)
+                stratlist.stop(id, status, comment, terminate=False)
                 return
     except GeneratorExit:  # Or maybe use flask signals
         return
+
 
 @app.route("/strategy/start", methods=['POST'])
 def strategy_start():
@@ -395,25 +432,14 @@ def strategy_start():
         abort(400)
     s = request.form['strategy']
     id = request.form['id']
-    if (s, id) not in stratlist:
-        (p, q) = strategy.run(s, id, request.form.to_dict())
-        stratlist[(s, id)] = (p, q)
-        send_dict("LocalStrategyStatus",
-                  {"strategy" : s,
-                   "id" : id,
-                   "status" : "running",
-                   "comment" : ""})
-        t = threading.Thread(target=strategy_listener, args=(p, q))
-        t.daemon = True
-        t.start()
-        return "OK"
-    else:
-        send_dict("LocalStrategyStatus",
-                  {"strategy" : s,
-                   "id" : id,
-                   "status" : "running",
-                   "comment" : ""})
-        return "STARTED"
+    f = request.form.to_dict()
+    stratlist.start(id, f)
+    send_dict("LocalStrategyStatus",
+              {"strategy": s,
+               "id": id,
+               "status": "running",
+               "comment": ""})
+    return "OK"
 
 
 @app.route("/strategy/stop", methods=['POST'])
@@ -423,16 +449,10 @@ def strategy_stop():
     s = request.form['strategy']
     id = request.form['id']
     send_dict("LocalStrategyStatus",
-              {"strategy" : s,
-               "id" : id,
-               "status" : "stopped"})
-    if (s, id) not in stratlist:
-        return "NOT FOUND"
-    (p, q) = stratlist[(s, id)]
-    q.close()
-    p.terminate()
-    stratlist.pop((s, id), None)
-    return "OK"
+              {"strategy": s,
+               "id": id,
+               "status": "stopped"})
+    return stratlist.stop(id, "stopped", "")
 
 
 @app.route("/strategy/pause", methods=['POST'])
@@ -442,9 +462,9 @@ def strategy_pause():
     s = request.form['strategy']
     id = request.form['id']
     send_dict("LocalStrategyStatus",
-              {"strategy" : s,
-               "id" : id,
-               "status" : "paused"})
+              {"strategy": s,
+               "id": id,
+               "status": "paused"})
 
 
 @app.route("/strategy/log/<string:stratname>/<string:id>")
@@ -462,10 +482,17 @@ def strategy_list():
 def strategy_headers(stratname):
     return json.dumps(strategy.headers(stratname))
 
-#-----------------------------
+
+@app.route('/strategy/data/<string:stratname>')
+def strategy_data(stratname):
+    return json.dumps({"data": stratlist.data(stratname)})
+
+
+# -----------------------------
 @app.route("/backtest", methods=['POST'])
 def backtest():
     return strategy.backtest(request.form.to_dict())
+
 
 # ---------------------------
 @app.route("/orders/read")

@@ -54,6 +54,13 @@ var StrategyTable = React.createClass({
 		      defaultData['strategy'] = l.props.strategy;
 		      l.setState({columnDefs: items,
 				  defaultData: defaultData});
+		      $.getJSON("/strategy/data/" + l.props.strategy,
+				function(d) {
+				    var counter = d.data.length + 1;
+				    l.setState({rowData: d.data,
+						   counter: counter});
+				    l.api.setRowData(d.data);
+		      });
 		  });
 	return {
 	    counter:0,
