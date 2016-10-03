@@ -1,28 +1,33 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
-import {shortnumberwidth, renderNumber, renderDateTime} from '../utils';
+import {shortnumberwidth, renderNumber, renderDateTime,
+       renderBuySell} from '../utils';
 
 var OrderTable = React.createClass({
     getInitialState() {
 	return {
 	    columnDefs: [
-		{headerName: "Orders",
-		 field: "orders"},
-		{headerName: "Id",
-		 field: "id",
-		 width: shortnumberwidth},
-		{headerName: "Name",
-		 field: "name"},
-		{headerName: "OS BQty",
-		 field: "osbqty",
-		 width: shortnumberwidth},
-		{headerName: "OS SQty",
-		 field: "ossqty",
-		 width: shortnumberwidth},
+		{headerName: "Ref",
+		 field: "Ref"},
+		{headerName: "Ref2",
+		 field: "Ref2"},
 		{headerName: "Price",
 		 field: "Price",
 		 width: shortnumberwidth,
 		 cellRenderer: renderNumber},
+		{headerName: "AccNo",
+		 field: "AccNo",
+		 width: shortnumberwidth},
+		{headerName: "BuySell",
+		 field: "BuySell",
+		 width: shortnumberwidth,
+		 cellRenderer: renderBuySell},
+		{headerName: "StopType",
+		 field: "StopType",
+		 width: shortnumberwidth},
+		{headerName: "OpenClose",
+		 field: "OpenClose",
+		 width: shortnumberwidth},
 		{headerName: "Valid",
 		 field: "ValidType",
 		 width: shortnumberwidth},
@@ -35,16 +40,20 @@ var OrderTable = React.createClass({
 		{headerName: "Traded",
 		 field: "TradedQty",
 		 width: shortnumberwidth},
+		{headerName: "TotalQty",
+		 field: "TotalQty",
+		 width: shortnumberwidth},
 		{headerName: "Initiator",
 		 field: "Initiator"},
-		{headerName: "Ref",
-		 field: "Ref"},
 		{headerName: "T.Stam",
-		 field: "UpdateTime",
+		 field: "TimeStamp",
 		 cellRenderer: renderDateTime
 		},
 		{headerName: "Ext.Order#",
 		 field: "ExtOrderNo",
+		 width: shortnumberwidth},
+		{headerName: "Int.Order#",
+		 field: "IntOrderNo",
 		 width: shortnumberwidth}]
 	};
     },
