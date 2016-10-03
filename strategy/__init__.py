@@ -211,6 +211,10 @@ class TimeFilter(object):
         return (d - d.replace(hour=0, minute=0,
                               second=0, microsecond=0)).total_seconds()
 
+    def intervals(self, a):
+        ticktime_seconds = self.seconds_from_midnight(a)
+        return (ticktime_seconds, self.start_time, self.end_time)
+
     def filter(self, a):
         ticktime_seconds = self.seconds_from_midnight(a)
         return (ticktime_seconds >= self.start_time and

@@ -183,19 +183,25 @@ or ``BackTestCls``
         for event in client.events():
             data = json.loads(event.data)
             info = data.get('data', None)
+            oref = 0
+            try:
+                oref = int(info['Ref2'])
+            except:
+                if self.p.debug:
+                    print("Unhandled event")
+                return                
             if event.event == "OrderBeforeSendReport":
                 if self.p.debug:
                     print(data)
-                self.broker._submit(int(info['Ref2']))
+                self.broker._submit(oref)
             elif event.event == "OrderRequestFailed":
                 if self.p.debug:
                     print(data)
-                self.broker._reject(int(info['Ref2']))
+                self.broker._reject(oref)
             elif event.event == "OrderReport":
                 if self.p.debug:
                     print(data)
                 status = int(info['Status'])
-                oref = int(info['Ref2'])
                 if status == 4:
                     self.broker._accept(oref)
                 elif status == 6:
@@ -203,7 +209,6 @@ or ``BackTestCls``
             elif event.event == "TradeReport":
                 if self.p.debug:
                     print(data)
-                oref = int(info['Ref2'])
                 qty = int(info['Qty'])
                 price = float(info['Price'])
                 self.broker._fill(oref, qty, price)
