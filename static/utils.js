@@ -67,14 +67,7 @@ var BacktestControl = React.createClass({
     },
     render() {
 	return (
-	    <Form inline>
 		<Button onClick={this.backtest}>Backtest</Button>
-		<Checkbox inline>Upload</Checkbox>
-		<FormControl
-	    type='file' label='Upload' accept='.txt' 
-	    ref={(ref) => this.fileUpload = ref}
-		/>
-		</Form>
 	);
     }
 });

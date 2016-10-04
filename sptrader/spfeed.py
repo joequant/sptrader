@@ -54,7 +54,9 @@ class SharpPointCSVData(with_metaclass(MetaSharpPointData, feed.CSVDataBase)):
             if self.p.tickersource is None:
                 dataname = self.p.dataname
             else:
-                dataname = self.p.tickersource % self.p.dataname
+                dataname = self.p.tickersource
+                dataname = dataname.replace("%{instrument}",
+                                            self.p.dataname)
             if hasattr(dataname, 'readline'):
                 self.f =dataname
             else:

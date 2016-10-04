@@ -342,7 +342,7 @@ var SpTraderApp = React.createClass({
 		</ButtonToolbar>
 		<FormControl componentClass="textarea" value={this.state.log} />
 	       <SampleTable/>
-           <Form inline>
+           <Form inline horizontal class="backtest-control">
 	       <Button onClick={this.backtest}>Backtest</Button>
 	                      <Checkbox inline>Upload</Checkbox>
 	                      <FormControl

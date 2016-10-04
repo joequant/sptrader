@@ -29,7 +29,12 @@ var BacktestTable = React.createClass({
 			   field: "dataname",
 			   volatile: true,
 			   editable: true,
-			   defaultData: ''}
+			   defaultData: ''},
+			  {headerName: "Backtest file",
+			   field: "tickersource",
+			   volatile: true,
+			   editable: true,
+			   defaultData: 'ticker-%{instrument}.txt'}
 		      ];
 		      var end = [
 			  {headerName: "Initial cash",
