@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Tabs, Tab, ButtonToolbar, Button, FormControl,
-	FormGroup, ControlLabel, HelpBlock, Modal} from 'react-bootstrap';
+	FormGroup, ControlLabel, HelpBlock, Modal,
+	Form,Checkbox} from 'react-bootstrap';
 import ReactAddonsLinkedStateMixin from 'react-addons-linked-state-mixin';
 import {AgGridReact} from 'ag-grid-react';
 import LoginForm from './login-form';
@@ -340,7 +341,13 @@ var SpTraderApp = React.createClass({
 		<Button bsStyle="success" onClick={publish}>Ping</Button>
 		</ButtonToolbar>
 		<FormControl componentClass="textarea" value={this.state.log} />
-		<SampleTable/>
+	       <SampleTable/>
+           <Form inline>
+	       <Button onClick={this.backtest}>Backtest</Button>
+	                      <Checkbox inline>Upload</Checkbox>
+	                      <FormControl
+	                  type='file' label='Upload' accept='.txt'/>
+	                      </Form>
 		</Tab>
 	       </Tabs>
 	       </div>

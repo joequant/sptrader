@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button} from 'react-bootstrap';
+import {Button,Checkbox,FormControl,FormGroup,Form} from 'react-bootstrap';
 
 var StrategyControl = React.createClass({
     post(url, data) {
@@ -67,10 +67,19 @@ var BacktestControl = React.createClass({
     },
     render() {
 	return (
+	    <Form inline>
 		<Button onClick={this.backtest}>Backtest</Button>
+		<Checkbox inline>Upload</Checkbox>
+		<FormControl
+	    type='file' label='Upload' accept='.txt' 
+	    ref={(ref) => this.fileUpload = ref}
+		/>
+		</Form>
 	);
     }
 });
+
+
 
 function isNumber(obj) {
     return !isNaN(parseFloat(obj))
