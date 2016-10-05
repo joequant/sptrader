@@ -53,7 +53,6 @@ var SubscribeBox = React.createClass( {
 	}
     },
     componentDidMount() {
-	this.connect();
     },
     connect() {
 	var source = new EventSource(this.props.url); 
@@ -68,22 +67,15 @@ var SubscribeBox = React.createClass( {
 	return source;
     },
     reconnect(callback) {
-	switch (this.state.source.readyState) {
-	case EventSource.OPEN:
-	    callback();
-	    break;
-	case EventSource.CLOSED:
+	console.log("reconnect", this.state.source.readyState);
+	if (this.state.source.readyState == EventSource.CLOSED) {
 	    console.log("closed");
 	    var source = this.connect();
 	    source.onopen = callback;
 	    this.setState({source: source});
-	    break;
-	case EventSource.CONNECTING:
-	    // Possible race condition
-	    this.state.source.onopen = callback;
-	    break;
-	default:
-	    break;
+	} else {
+	    console.log("callback");
+	    callback();
 	}
     },
     render() {
