@@ -71,12 +71,10 @@ var SubscribeBox = React.createClass( {
 	if (this.state.source.readyState == EventSource.CLOSED) {
 	    console.log("closed");
 	    var source = this.connect();
-	    source.onopen = callback;
 	    this.setState({source: source});
-	} else {
-	    console.log("callback");
-	    callback();
-	}
+	} 
+	console.log("callback");
+	callback();
     },
     render() {
         return null;
