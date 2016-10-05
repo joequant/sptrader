@@ -14,6 +14,7 @@ import datetime
 import time
 import spstore
 import io
+import os
 from backtrader.feeds import feed
 from backtrader.utils import date2num
 from backtrader.utils.py3 import with_metaclass
@@ -54,9 +55,11 @@ class SharpPointCSVData(with_metaclass(MetaSharpPointData, feed.CSVDataBase)):
             if self.p.tickersource is None:
                 dataname = self.p.dataname
             else:
+                modpath = os.path.dirname(os.path.realpath(__file__))
                 dataname = self.p.tickersource
                 dataname = dataname.replace("%{instrument}",
                                             self.p.dataname)
+                dataname = os.path.join(modpath, '..', 'data', dataname)
             if hasattr(dataname, 'readline'):
                 self.f =dataname
             else:

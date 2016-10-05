@@ -145,10 +145,6 @@ def run_backtest(kwargs):
 
 def run(name, id, kwargs):
     q = Queue()
-    modpath = os.path.dirname(os.path.realpath(__file__))
-    datapath = os.path.join(modpath, '../data/ticker-%s.txt')
-    open(datapath, 'a').close()
-    kwargs['tickersource'] = datapath
     kwargs['newdata'] = True
     kwargs['keepalive'] = True
     kwargs['debug'] = True
@@ -162,9 +158,6 @@ def run(name, id, kwargs):
 
 def backtest(kwargs):
     modpath = os.path.dirname(os.path.realpath(__file__))
-    datapath = os.path.join(modpath, '../data/ticker-%s.txt')
-    open(datapath, 'a').close()
-    kwargs['tickersource'] = datapath
     kwargs['newdata'] = False
     kwargs['keepalive'] = False
     kwargs['debug'] = False
