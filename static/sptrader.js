@@ -268,6 +268,24 @@ var SpTraderApp = React.createClass({
 	console.log("orders", d);
 	this.setState({orders: d});
     },
+    updatePositions(event) {
+	var data = JSON.parse(event.data).data;
+	console.log(data);
+	var d = this.state.positions;
+	var found = false;
+	for (var i =0; i < d.length; i++) {
+	    if (d[i].ProdCode == data.ProdCode) {
+		d[i] = data;
+		found = true;
+	    }
+	}
+	if (!found) {
+	    console.log("position added");
+	    d.push(data);
+	}
+	console.log("position", d);
+	this.setState({positions: d});
+    },
     strategyStatus(event) {
 	var data = JSON.parse(event.data);
 	console.log(data);
@@ -291,7 +309,7 @@ var SpTraderApp = React.createClass({
 	    "OrderBeforeSendReport" : this.addToLog,
 	    "AccountLoginReply" : this.addToLog,
 	    "AccountInfoPush" : this.accountInfoPush,
-	    "AccountPositionPush" : this.addToLog,
+	    "AccountPositionPush" : this.updatePositions,
 	    "UpdatedAccountPositionPush" : this.addToLog,
 	    "UpdatedAccountBalancePush" : this.addToLog,
 	    "TradeReport" : this.updateTrades,
