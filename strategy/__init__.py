@@ -39,9 +39,8 @@ def run_strategy(name, kwargs, q):
                kwargs['dataname'] == '':
             raise ValueError('missing dataname')
         modpath = os.path.dirname(os.path.realpath(__file__))
-        logpath = os.path.join(modpath, '../data/log-%s-%s.txt' %
-                               (kwargs['strategy'],
-                                str(kwargs['id'])))
+        logpath = os.path.join(modpath, '../data/log-%s.txt' %
+                               (str(kwargs['id'])))
         f = open(logpath, "a")
         old_sysout = sys.stdout
         sys.stdout = Unbuffered(f)
