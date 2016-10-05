@@ -75,12 +75,12 @@ var SubscribeBox = React.createClass( {
 	case EventSource.CLOSED:
 	    console.log("closed");
 	    var source = this.connect();
-	    source.onopen(callback());
+	    source.onopen = callback;
 	    this.setState({source: source});
 	    break;
 	case EventSource.CONNECTING:
 	    // Possible race condition
-	    this.state.source.onopen(callback());
+	    this.state.source.onopen = callback;
 	    break;
 	default:
 	    break;
