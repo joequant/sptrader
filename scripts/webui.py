@@ -394,7 +394,7 @@ class StrategyList(object):
             p.terminate()
         info['status'] = status
         info['comment'] = comment
-        self.stratlist = (None, None, info)
+        self.stratlist[id] = (None, None, info)
 
     def data(self, stratname):
         retval = []
@@ -470,7 +470,7 @@ def strategy_pause():
 @app.route("/strategy/log/<string:stratname>/<string:id>")
 def strategy_log(stratname, id):
     return monitor_file(os.path.join(data_dir,
-                                     "log-%s.txt" % (stratname, str(id))))
+                                     "log-%s.txt" % (str(id))))
 
 
 @app.route("/strategy/list")
