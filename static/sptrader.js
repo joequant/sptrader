@@ -47,11 +47,17 @@ var AlertBox = React.createClass( {
 });
 
 var SubscribeBox = React.createClass( {
-    getInitialState: function() {
-	return {};
+    getInitialState() {
+	return {
+	    source: this.connect()
+	}
     },
-    componentDidMount: function() {
-	var source = new EventSource(this.props.url);
+    componentDidMount() {
+	this.connect();
+    },
+    connect() {
+	var source = new EventSource(this.props.url); 
+
 	var obj = this;
 	$.each(this.props.event, function(k, v) {
 	    source.addEventListener(k, v);
@@ -59,8 +65,18 @@ var SubscribeBox = React.createClass( {
 	source.onerror = function(e) {
 	    obj.props.onerror(e);
 	};
+	return source;
     },
-    render: function() {
+    reconnect(callback) {
+	if ( this.state.source.readState == EventSource.CLOSED) {
+	    var source = this.connect();
+	    source.onopen(callback());
+	    this.setState({source: source});
+	} else {
+	    callback();
+	}
+    },
+    render() {
         return null;
     }
 });
@@ -129,7 +145,9 @@ var SpTraderApp = React.createClass({
 	};
     },
     submitModal(data) {
-	$.post('/login', data);
+	this._subscribe_box.reconnect(function() {
+	    $.post('/login', data);
+	});
     },
     logout() {
 	$.get("/logout");
@@ -290,7 +308,9 @@ var SpTraderApp = React.createClass({
 	}
 	return(<div>
 	    	<SubscribeBox url="/log/subscribe" event={events}
-	    onerror={this.onerror} />
+	       onerror={this.onerror}
+	       ref={(c) => this._subscribe_box = c}
+	       />
 
 		<Tabs id="tabs">
 		<Tab eventKey={1} title="Account" >
@@ -342,7 +362,7 @@ var SpTraderApp = React.createClass({
 		</ButtonToolbar>
 		<FormControl componentClass="textarea" value={this.state.log} />
 	       <SampleTable/>
-           <Form inline horizontal class="backtest-control">
+           <Form inline horizontal className="backtest-control">
 	       <Button onClick={this.backtest}>Backtest</Button>
 	                      <Checkbox inline>Upload</Checkbox>
 	                      <FormControl
