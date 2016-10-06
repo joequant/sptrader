@@ -148,6 +148,8 @@ def run(name, id, kwargs):
     kwargs['keepalive'] = True
     kwargs['debug'] = True
     kwargs['streaming'] = True
+    if 'tickersource' not in kwargs:
+        kwargs['tickersource'] = "ticker-%{instrument}.txt"
     p = Process(target=run_strategy,
                 args=(name, kwargs, q))
     p.daemon = True
