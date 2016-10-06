@@ -571,11 +571,12 @@ def schema(structure):
     return jsonify({"retval": sp.fields(structure)})
 
 
+@app.route("/exit")
+def exit_done():
+    exit()
+    return "OK"
+
 if __name__ == "__main__":
-    try:
-        app.debug = True
-        app.run(threaded=True)
-    except KeyboardInterrupt:
-        print("Keyboard interupt")
-        stratlist.terminate_all()
+    app.debug = True
+    app.run(threaded=True)
 
