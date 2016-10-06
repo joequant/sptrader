@@ -406,7 +406,8 @@ class StrategyList(object):
 
     def terminate_all(self):
         for k, v in self.stratlist.items():
-            if p[0] is not None:
+            if v[0] is not None:
+                p = v[0]
                 p.terminate()
                 p.join()
 
@@ -581,6 +582,6 @@ if __name__ == "__main__":
     try:
         app.debug = True
         app.run(threaded=True)
-    except KeyboardInterupt:
+    except KeyboardInterrupt:
         stratlist.terminate_all()
 
