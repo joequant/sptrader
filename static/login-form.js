@@ -1,14 +1,16 @@
 import React from 'react';
 import {Modal, Button, FormControl, FormGroup,
-	ControlLabel, HelpBlock} from 'react-bootstrap';
+	ControlLabel, HelpBlock, Form, Col} from 'react-bootstrap';
 
 function FieldGroup({ id, label, help, ...props }) {
   return (
-    <div>
-      <label>{label}</label>
+	  <FormGroup controlId={id}>
+	  <Col componentClass={ControlLabel} sm={2}>{label}</Col>
+	  <Col sm={10}>
       <FormControl {...props} />
-      {help && <HelpBlock>{help}</HelpBlock>}
-    </div>
+	  {help && <HelpBlock>{help}</HelpBlock>}
+      </Col>
+    </FormGroup>
   );
 }
 
@@ -48,6 +50,7 @@ var LoginForm = React.createClass({
 		<Modal.Title>Login</Modal.Title>
 		</Modal.Header>
 		<Modal.Body>
+		<Form horizontal>
 		<label>{this.props.label}</label>
 		<FieldGroup
 	    name="host"
@@ -96,6 +99,7 @@ var LoginForm = React.createClass({
 	    onChange={this.onChange}
 	    value={this.state.data.password}
 		/>
+		</Form>
 		</Modal.Body>
 		<Modal.Footer>
 		<Button
