@@ -113,7 +113,6 @@ or ``BackTestCls``
 
         self._cash = 0.0
         self._value = 0.0
-        self._evt_acct = threading.Event()
         self.q_account = queue.Queue()
         self.q_ordercreate = queue.Queue()
         self.q_orderclose = queue.Queue()
