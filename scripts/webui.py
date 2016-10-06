@@ -392,6 +392,7 @@ class StrategyList(object):
             q.close()
         if p is not None and terminate:
             p.terminate()
+            p.join()
         info['status'] = status
         info['comment'] = comment
         self.stratlist[id] = (None, None, info)
@@ -407,7 +408,7 @@ class StrategyList(object):
         for k, v in self.stratlist.items():
             if p[0] is not None:
                 p.terminate()
-
+                p.join()
 
 stratlist = StrategyList()
 
@@ -577,6 +578,9 @@ def exit_done():
     return "OK"
 
 if __name__ == "__main__":
-    app.debug = True
-    app.run(threaded=True)
+    try:
+        app.debug = True
+        app.run(threaded=True)
+    except KeyboardInterupt:
+        stratlist.terminate_all()
 
