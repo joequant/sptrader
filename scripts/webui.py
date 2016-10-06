@@ -403,6 +403,11 @@ class StrategyList(object):
                 retval.append(v[2])
         return retval
 
+    def terminate_all(self):
+        for k, v in self.stratlist.items():
+            if p[0] is not None:
+                p.terminate()
+
 
 stratlist = StrategyList()
 
@@ -567,5 +572,10 @@ def schema(structure):
 
 
 if __name__ == "__main__":
-    app.debug = True
-    app.run(threaded=True)
+    try:
+        app.debug = True
+        app.run(threaded=True)
+    except KeyboardInterrupt:
+        print("Keyboard interupt")
+        stratlist.terminate_all()
+
