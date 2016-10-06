@@ -2,6 +2,7 @@ import spstore
 from backtrader.metabase import MetaParams
 from backtrader.utils.py3 import with_metaclass
 from backtrader.brokers.bbroker import BackBroker
+from backtrader.comminfo import CommInfoBase
 
 class MetaSharpPointBackTester(MetaParams):
     def __init__(cls, name, bases, dct):
@@ -18,8 +19,12 @@ class SharpPointBackTester(with_metaclass(MetaSharpPointBackTester,
         if data._name in self.comminfo:
             return self.comminfo[data._name]
         if data._name[0:3] == 'HSI':
-            self.setcommission(stocklike=False, mult=50.0, name=data._name)
+            self.setcommission(stocklike=False, mult=50.0,
+                               name=data._name,
+                               commtype=CommInfoBase.COMM_FIXED)
         elif data._name[0:3] == 'MHI':
-            self.setcommission(stocklike=False, mult=10.0, name=data._name)
+            self.setcommission(stocklike=False, mult=10.0,
+                               name=data._name,
+                               commtype=CommInfoBase.COMM_FIXED)
         print(self.comminfo)
         return super(SharpPointBackTester, self).getcommissioninfo(data)
