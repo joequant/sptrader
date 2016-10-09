@@ -149,7 +149,6 @@ function renderTime(params) {
 
 function renderLog(params) {
     return "<a href='/strategy/log/" +
-	params.data.strategy + "/" +
 	params.data.id + "' target='_blank'>Log</a>";
 };
 

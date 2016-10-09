@@ -1,7 +1,4 @@
 #!/usr/bin/python3
-
-from flask import Flask, Response, jsonify, request, abort
-
 import os
 import sys
 import time
@@ -9,7 +6,9 @@ import threading
 import json
 import errno
 import datetime
+from queue import Queue
 
+from flask import Flask, Response, jsonify, request, abort
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 sys.path.insert(0, os.path.join(location, ".."))
@@ -30,7 +29,7 @@ def get_ticker(s):
     return ticker_file % s
 
 import config
-from queue import Queue
+
 from sse import ServerSentEvent
 import sptrader
 import strategy
@@ -45,7 +44,7 @@ ticker_products = set()
 app = Flask(__name__,
             static_url_path="/static",
             static_folder=os.path.join(location, "..",
-                                                 "static"))
+                                       "static"))
 
 
 @app.route("/")
@@ -53,13 +52,13 @@ def hello():
     return app.send_static_file("sptrader.html")
 
 
-def send_dict(id, msg):
+def send_dict(event_id, msg):
     for sub in log_subscriptions[:]:
-        sub.put((id, msg))
+        sub.put((event_id, msg))
 
 
-def send_cdata(id, data):
-    send_dict(id, {"data": sp.cdata_to_py(data[0])})
+def send_cdata(event_id, data):
+    send_dict(event_id, {"data": sp.cdata_to_py(data[0])})
 
 
 @app.route("/login-info")
@@ -191,7 +190,7 @@ sp.register_ticker_update(api_ticker_update)
 
 @sp.ffi.callback("PswChangeReplyAddr")
 def psw_change_reply(ret_code, ret_msg):
-    send_cdata("PswChangeReply", ret_code,  ret_msg)
+    send_cdata("PswChangeReply", ret_code, ret_msg)
 sp.register_psw_change_reply(psw_change_reply)
 
 
@@ -372,22 +371,28 @@ class StrategyList(object):
     def __init__(self):
         self.stratlist = {}
 
-    def start(self, id, kwargs):
+    def start(self, kwargs):
         if id not in self.stratlist or \
                self.stratlist[id][0] is None:
-            (p, q) = strategy.run(kwargs['strategy'], id, kwargs)
+            (p, q) = strategy.run(kwargs)
             kwargs['status'] = 'running'
             kwargs['comment'] = ''
-            self.stratlist[id] = (p, q, kwargs)
+            strategy_id = kwargs['id']
+            self.stratlist[strategy_id] = (p, q, kwargs)
             t = threading.Thread(target=strategy_listener, args=(p, q))
             t.daemon = True
             t.start()
+            send_dict("LocalStrategyStatus",
+                      {"strategy": kwargs['strategy'],
+                       "id": kwargs['id'],
+                       "status": "running",
+                       "comment": ""})
             return "OK"
 
-    def stop(self, id, status, comment, terminate=False):
+    def stop(self, sid, status, comment, terminate=False):
         if id not in self.stratlist:
             return "NOT FOUND"
-        (p, q, info) = self.stratlist[id]
+        (p, q, info) = self.stratlist[sid]
         if q is not None:
             q.close()
         if p is not None and terminate:
@@ -396,6 +401,12 @@ class StrategyList(object):
         info['status'] = status
         info['comment'] = comment
         self.stratlist[id] = (None, None, info)
+        send_dict("LocalStrategyStatus",
+                  {"strategy": s,
+                   "id": id,
+                   "status": status,
+                   "comment" : comment})
+        return "OK"
 
     def data(self, stratname):
         retval = []
@@ -417,17 +428,17 @@ stratlist = StrategyList()
 def strategy_listener(p, q):
     try:
         while True:
-            (s, id, status, comment) = q.get()
+            (s, sid, status, comment) = q.get()
             send_dict("LocalStrategyStatus",
                       {"strategy": s,
-                       "id": id,
+                       "id": sid,
                        "status": status,
                        "comment": comment})
             if status == "error":
-                stratlist.stop(id, status, comment, terminate=True)
+                stratlist.stop(sid, status, comment, terminate=True)
                 return
             elif status == "done":
-                stratlist.stop(id, status, comment, terminate=False)
+                stratlist.stop(sid, status, comment, terminate=False)
                 return
     except GeneratorExit:  # Or maybe use flask signals
         return
@@ -437,47 +448,28 @@ def strategy_listener(p, q):
 def strategy_start():
     if not request.form:
         abort(400)
-    s = request.form['strategy']
-    id = request.form['id']
-    f = request.form.to_dict()
-    stratlist.start(id, f)
-    send_dict("LocalStrategyStatus",
-              {"strategy": s,
-               "id": id,
-               "status": "running",
-               "comment": ""})
-    return "OK"
+    return stratlist.start(request.form.to_dict())
 
 
 @app.route("/strategy/stop", methods=['POST'])
 def strategy_stop():
     if not request.form:
         abort(400)
-    s = request.form['strategy']
-    id = request.form['id']
-    send_dict("LocalStrategyStatus",
-              {"strategy": s,
-               "id": id,
-               "status": "stopped"})
-    return stratlist.stop(id, "stopped", "")
+    f = request.form.to_dict()
+    return stratlist.stop(f['id'], "stopped", "")
 
 
 @app.route("/strategy/pause", methods=['POST'])
 def strategy_pause():
     if not request.form:
         abort(400)
-    s = request.form['strategy']
-    id = request.form['id']
-    send_dict("LocalStrategyStatus",
-              {"strategy": s,
-               "id": id,
-               "status": "paused"})
+    return stratlist.pause(request.form.to_dict())
 
 
-@app.route("/strategy/log/<string:stratname>/<string:id>")
-def strategy_log(stratname, id):
+@app.route("/strategy/log/<string:strategy_id>")
+def strategy_log(strategy_id):
     return monitor_file(os.path.join(data_dir,
-                                     "log-%s.txt" % (str(id))))
+                                     "log-%s.txt" % id))
 
 
 @app.route("/strategy/list")
@@ -560,8 +552,8 @@ def subscribe():
         log_subscriptions.append(q)
         try:
             while True:
-                (id, result) = q.get()
-                ev = ServerSentEvent(result, id)
+                (event_id, result) = q.get()
+                ev = ServerSentEvent(result, event_id)
                 yield ev.encode()
         except GeneratorExit:  # Or maybe use flask signals
             log_subscriptions.remove(q)
@@ -584,4 +576,3 @@ if __name__ == "__main__":
         app.run(threaded=True)
     except KeyboardInterrupt:
         stratlist.terminate_all()
-

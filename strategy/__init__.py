@@ -32,12 +32,17 @@ class Unbuffered(object):
         return getattr(self.stream, attr)
 
 
-def run_strategy(name, kwargs, q):
+def check_params(kwargs, slist):
+    for s in slist:
+        if kwargs.get(s, None) is None or \
+               kwargs[s] == '':
+            raise ValueError('missing %s' % str(s))
+    
+
+def run_strategy(kwargs, q):
     f = None
     try:
-        if kwargs.get('dataname', None) is None or \
-               kwargs['dataname'] == '':
-            raise ValueError('missing dataname')
+        check_params(kwargs, ['strategy', 'dataname', 'id'])
         modpath = os.path.dirname(os.path.realpath(__file__))
         logpath = os.path.join(modpath, '../data/log-%s.txt' %
                                (str(kwargs['id'])))
@@ -45,11 +50,11 @@ def run_strategy(name, kwargs, q):
         old_sysout = sys.stdout
         sys.stdout = Unbuffered(f)
 
-        module = strategylist.dispatch[name]
+        module = strategylist.dispatch[kwargs['strategy']]
         cerebro = bt.Cerebro()
         cerebro.addstrategy(module)
         store = spstore.SharpPointStore()
-        broker = store.getbroker(backtest=kwargs.get('backtest', False))
+        broker = store.getbroker()
         cerebro.setbroker(broker)
 
         # Create a Data Feed
@@ -88,9 +93,7 @@ def parse_date(s):
 
 
 def run_backtest(kwargs):
-    if kwargs.get('dataname', None) is None or \
-           kwargs['dataname'] == '':
-        raise ValueError('missing dataname')
+    check_params(kwargs, ['strategy', 'dataname'])
     module = strategy.strategylist.dispatch[kwargs['strategy']]
     f = io.StringIO()
     old_stdout = sys.stdout
@@ -142,7 +145,7 @@ def run_backtest(kwargs):
     return retval
 
 
-def run(name, id, kwargs):
+def run(kwargs):
     q = Queue()
     kwargs['newdata'] = True
     kwargs['keepalive'] = True
@@ -151,7 +154,7 @@ def run(name, id, kwargs):
     if 'tickersource' not in kwargs:
         kwargs['tickersource'] = "ticker-%{instrument}.txt"
     p = Process(target=run_strategy,
-                args=(name, kwargs, q))
+                args=(kwargs, q))
     p.daemon = True
     p.start()
     return (p, q)
