@@ -190,7 +190,8 @@ sp.register_ticker_update(api_ticker_update)
 
 @sp.ffi.callback("PswChangeReplyAddr")
 def psw_change_reply(ret_code, ret_msg):
-    send_cdata("PswChangeReply", ret_code, ret_msg)
+    send_cdata("PswChangeReply", {"ret_code" : ret_code,
+                                  "ret_msg" : ret_msg})
 sp.register_psw_change_reply(psw_change_reply)
 
 
@@ -294,6 +295,7 @@ def ping():
 
 @app.route("/logout")
 def logout():
+    global info_cache
     info_cache = empty_cache
     sp.logout()
     return "OK"
@@ -390,7 +392,7 @@ class StrategyList(object):
             return "OK"
 
     def stop(self, sid, status, comment, terminate=False):
-        if id not in self.stratlist:
+        if sid not in self.stratlist:
             return "NOT FOUND"
         (p, q, info) = self.stratlist[sid]
         if q is not None:
@@ -400,10 +402,10 @@ class StrategyList(object):
             p.join()
         info['status'] = status
         info['comment'] = comment
-        self.stratlist[id] = (None, None, info)
+        self.stratlist[sid] = (None, None, info)
         send_dict("LocalStrategyStatus",
-                  {"strategy": s,
-                   "id": id,
+                  {"strategy": info['strategy'],
+                   "id": sid,
                    "status": status,
                    "comment" : comment})
         return "OK"
@@ -421,6 +423,9 @@ class StrategyList(object):
                 p = v[0]
                 p.terminate()
                 p.join()
+
+    def pause(self, f):
+        raise NotImplementedError
 
 stratlist = StrategyList()
 
@@ -456,7 +461,7 @@ def strategy_stop():
     if not request.form:
         abort(400)
     f = request.form.to_dict()
-    return stratlist.stop(f['id'], "stopped", "")
+    return stratlist.stop(f['id'], "done", "")
 
 
 @app.route("/strategy/pause", methods=['POST'])
@@ -533,7 +538,7 @@ def unsubscribe_price(products):
     if sp.ready() != 0:
         return "NOT READY"
     for p in products.split(","):
-        sp.unsubscribe_price(p, 0)
+        sp.subscribe_price(p, 0)
     return "OK"
 
 
