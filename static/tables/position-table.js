@@ -23,9 +23,15 @@ var PositionTable = React.createClass({
 		{headerName: "ExchangeRate",
 		 field: "ExchangeRate"},
 		{headerName: "P/L (Base Ccy)",
-		 field: "PLBaseCcy"}],
-	    rowData: [{name: "foobar"}]
+		 field: "PLBaseCcy"}]
 	};
+    },
+    onGridReady(params) {
+	this.api = params.api;
+	this.columnApi = params.columnApi;
+    },
+    componentDidUpdate(prevprops, prevstate) {
+	this.api.setRowData(this.props.data);
     },
     render: function() {
 	return (
@@ -33,15 +39,9 @@ var PositionTable = React.createClass({
 	    // column definitions and row data are immutable, the grid
 	    // will update when these lists change
 	    columnDefs={this.state.columnDefs}
-	    rowData={this.state.rowData}
-
-	    // or provide props the old way with no binding
-	    rowSelection="multiple"
-	    enableSorting="true"
-	    enableFilter="true"
-                   rowHeight="22"
-		/>
-	)
+	    rowData={this.props.data}
+	    onGridReady={this.onGridReady}
+	/>)
     }
 });
     
