@@ -391,23 +391,24 @@ class StrategyList(object):
                        "comment": ""})
             return "OK"
 
-    def stop(self, sid, status, comment, terminate=False):
-        if sid not in self.stratlist:
-            return "NOT FOUND"
-        (p, q, info) = self.stratlist[sid]
-        if q is not None:
-            q.close()
-        if p is not None and terminate:
-            p.terminate()
-            p.join()
-        info['status'] = status
-        info['comment'] = comment
+    def stop(self, info, terminate=False):
+        sid = info.get('id', None)
+        if sid in self.stratlist:
+            (p, q, cache) = self.stratlist[sid]
+            cache['status'] = info['status']
+            cache['comment'] = info['comment']
+            info = cache
+            if q is not None:
+                q.close()
+            if p is not None and terminate:
+                p.terminate()
+                p.join()
         self.stratlist[sid] = (None, None, info)
         send_dict("LocalStrategyStatus",
                   {"strategy": info['strategy'],
-                   "id": sid,
-                   "status": status,
-                   "comment" : comment})
+                   "id": info['id'],
+                   "status": info['status'],
+                   "comment" : info['comment']})
         return "OK"
 
     def data(self, stratname):
@@ -434,16 +435,15 @@ def strategy_listener(p, q):
     try:
         while True:
             (s, sid, status, comment) = q.get()
-            send_dict("LocalStrategyStatus",
-                      {"strategy": s,
-                       "id": sid,
-                       "status": status,
-                       "comment": comment})
+            info = {"strategy": s,
+                    "id": sid,
+                    "status": status,
+                    "comment": comment}
             if status == "error":
-                stratlist.stop(sid, status, comment, terminate=True)
+                stratlist.stop(info, terminate=True)
                 return
             elif status == "done":
-                stratlist.stop(sid, status, comment, terminate=False)
+                stratlist.stop(info, terminate=False)
                 return
     except GeneratorExit:  # Or maybe use flask signals
         return
@@ -461,7 +461,9 @@ def strategy_stop():
     if not request.form:
         abort(400)
     f = request.form.to_dict()
-    return stratlist.stop(f['id'], "done", "")
+    f['status'] = "done"
+    f['comment'] = ""
+    return stratlist.stop(f, terminate=True)
 
 
 @app.route("/strategy/pause", methods=['POST'])
@@ -519,9 +521,13 @@ def order_list():
 
 @app.route("/order/add", methods=['POST'])
 def order_add():
-    if not request.form:
+    if request.form:
+        f = request.form.to_dict()
+    elif request.json:
+        f = request.json
+    else:
         abort(400)
-    return str(sp.order_add(request.form.to_dict()))
+    return str(sp.order_add(f))
 
 
 @app.route("/price/subscribe/<string:products>")

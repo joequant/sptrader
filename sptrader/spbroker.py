@@ -24,7 +24,6 @@ from __future__ import (absolute_import, division, print_function,
 import collections
 
 import backtrader as bt
-import io
 import spstore
 from backtrader.order import Order, BuyOrder, SellOrder
 from backtrader.position import Position
@@ -143,7 +142,6 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
     '''
     params = (
         ('cash', 10000.0),
-        ('checksubmit', True),
         ('eosbar', False),
         ('filler', None),
     )
@@ -181,10 +179,6 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
         '''Sets a volume filler for volume filling execution'''
         self.p.filler = filler
 
-    def set_checksubmit(self, checksubmit):
-        '''Sets the checksubmit parameter'''
-        self.p.checksubmit = checksubmit
-
     def set_eosbar(self, eosbar):
         '''Sets the eosbar parameter (alias: ``seteosbar``'''
         self.p.eosbar = eosbar
@@ -219,13 +213,7 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
         return o.status
 
     def submit(self, order):
-        if self.p.checksubmit:
-            order.submit()
-            self.submitted.append(order)
-            self.orders.append(order)
-            self.notify(order)
-        else:
-            self.submit_accept(order)
+        self.submit_accept(order)
         return order
 
     def _submit(self, oref):
@@ -309,7 +297,6 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
         o = self.orders[order.ref]
         if order.status == Order.Cancelled:  # already cancelled
             return
-
         return self.o.order_cancel(order)
 
     def notify(self, order):
