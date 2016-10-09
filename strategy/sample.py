@@ -10,7 +10,9 @@ sys.path.insert(0, os.path.join(location, "../sptrader"))
 class SampleStrategy(bt.Strategy):
     params = (
         ('exitbars', 3),
-        ('maperiod', 10)
+        ('maperiod', 10),
+        ('log', sys.stdout),
+        ('debug', False)
     )
 
     @classmethod
@@ -21,10 +23,10 @@ class SampleStrategy(bt.Strategy):
             {'headerName': "Maperiod",
              'field': "maperiod"}
             ]
-    def log(self, txt, dt=None):
+    def log(self, *args, dt=None):
         ''' Logging function fot this strategy'''
         dt = dt or self.datas[0].datetime.datetime()
-        print('%s, %s' % (dt.isoformat(' '), txt))
+        print('%s, ' % dt.isoformat(' '), *args, file=self.p.log)
 
     def __init__(self):
         # Keep a reference to the "close" line in the data[0] dataseries

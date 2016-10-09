@@ -20,18 +20,6 @@ from pytz import timezone
 import traceback
 
 
-class Unbuffered(object):
-    def __init__(self, stream):
-        self.stream = stream
-
-    def write(self, data):
-        self.stream.write(data)
-        self.stream.flush()
-
-    def __getattr__(self, attr):
-        return getattr(self.stream, attr)
-
-
 def check_params(kwargs, slist):
     for s in slist:
         if kwargs.get(s, None) is None or \
@@ -46,13 +34,23 @@ def run_strategy(kwargs, q):
         modpath = os.path.dirname(os.path.realpath(__file__))
         logpath = os.path.join(modpath, '../data/log-%s.txt' %
                                (str(kwargs['id'])))
-        f = open(logpath, "a")
-        old_sysout = sys.stdout
-        sys.stdout = Unbuffered(f)
-
-        module = strategylist.dispatch[kwargs['strategy']]
+        f = open(logpath, "a", 1)
+        stratargs = {}
+        module = strategy.strategylist.dispatch[kwargs['strategy']]
+        stratparams = module.params._getpairs()
+        for k, v in kwargs.items():
+            if k in stratparams:
+                s = stratparams[k]
+                if isinstance(s, int):
+                    stratargs[k] = int(v)
+                elif isinstance(s, float):
+                    stratargs[k] = float(v)
+                else:
+                    stratargs[k] = v
+        stratargs['log'] = f
+        stratargs['strategy'] = strategylist.dispatch[kwargs['strategy']]
         cerebro = bt.Cerebro()
-        cerebro.addstrategy(module)
+        cerebro.addstrategy(**stratargs)
         store = spstore.SharpPointStore()
         broker = store.getbroker()
         cerebro.setbroker(broker)
@@ -65,20 +63,19 @@ def run_strategy(kwargs, q):
         cerebro.adddata(data2)
 
         # Print out the starting conditions
-        print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+        print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue(),
+              file=f)
 
         # Run over everything
         cerebro.run()
         # Print out the final result
         print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
-        sys.stdout = old_sysout
         f.close()
         q.put((kwargs['strategy'], kwargs['id'], "done", ""))
         return None
     except:
         if f is not None:
-            print(traceback.format_exc())
-            sys.stdout = old_sysout
+            print(traceback.format_exc(), file=f)
             f.close()
         print(traceback.format_exc())
         q.put((kwargs['strategy'], kwargs['id'], "error",
@@ -94,12 +91,23 @@ def parse_date(s):
 
 def run_backtest(kwargs):
     check_params(kwargs, ['strategy', 'dataname'])
-    module = strategy.strategylist.dispatch[kwargs['strategy']]
+    stratargs = {}
     f = io.StringIO()
-    old_stdout = sys.stdout
-    sys.stdout = f
+    module = strategy.strategylist.dispatch[kwargs['strategy']]
+    stratparams = module.params._getpairs()
+    for k, v in kwargs.items():
+        if k in stratparams:
+            s = stratparams[k]
+            if isinstance(s, int):
+                stratargs[k] = int(v)
+            elif isinstance(s, float):
+                stratargs[k] = float(v)
+            else:
+                stratargs[k] = v
+    stratargs['log'] = f
+    stratargs['strategy'] = module
     cerebro = bt.Cerebro()
-    cerebro.addstrategy(module)
+    cerebro.addstrategy(**stratargs)
     store = spstore.SharpPointStore()
     broker = store.getbroker(backtest=kwargs.get('backtest', True))
     cerebro.setbroker(broker)
@@ -111,8 +119,7 @@ def run_backtest(kwargs):
         kwargs['todate'] = parse_date(kwargs['backtest_end_time'])
 
     # Create a Data Feed
-    data = store.getdata(
-        **kwargs)
+    data = store.getdata(**kwargs)
     data2 = bt.DataClone(dataname=data)
     data2.addfilter(bt.ReplayerMinutes, compression=5)
     cerebro.adddata(data)
@@ -125,7 +132,8 @@ def run_backtest(kwargs):
 #    cerebro.broker.setcommission(commission=0.0)
 
     # Print out the starting conditions
-    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue(),
+          file=f)
 
     # Run over everything
     cerebro.run()
@@ -135,13 +143,13 @@ def run_backtest(kwargs):
     plt.savefig(imgdata, format='svg')
 
     # Print out the final result
-    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue(),
+          file=f)
     retval = '<img src="data:image/svg+xml;base64,%s" /><br>' % \
              base64.b64encode(imgdata.getvalue()).decode('ascii') + \
              '<pre>%s</pre>' % f.getvalue()
     imgdata.close()
     f.close()
-    sys.stdout = old_stdout
     return retval
 
 
