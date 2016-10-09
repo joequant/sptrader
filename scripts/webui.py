@@ -469,7 +469,7 @@ def strategy_pause():
 @app.route("/strategy/log/<string:strategy_id>")
 def strategy_log(strategy_id):
     return monitor_file(os.path.join(data_dir,
-                                     "log-%s.txt" % id))
+                                     "log-%s.txt" % strategy_id))
 
 
 @app.route("/strategy/list")
