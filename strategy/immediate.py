@@ -71,7 +71,7 @@ class ImmediateStrategy(bt.Strategy):
     def next(self):
         # Simply log the closing price of the series from the reference
         self.log('%.2f %.2f' % (self.datas[0].open[0],
-                                     self.datas[1].open[0]))
+                                self.datas[1].open[0]))
 
         # Check if an order is pending ... if yes, we cannot send a 2nd one
         if len(self.datas[0].close) > self.p.delay:
@@ -79,6 +79,9 @@ class ImmediateStrategy(bt.Strategy):
             self.order = None
 
         if len(self.datas[0].close) < 1:
+            return
+
+        if self.order:
             return
 
         # Check if we are in the market
