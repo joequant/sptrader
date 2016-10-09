@@ -25,7 +25,7 @@ def check_params(kwargs, slist):
         if kwargs.get(s, None) is None or \
                kwargs[s] == '':
             raise ValueError('missing %s' % str(s))
-    
+
 
 def run_strategy(kwargs, q):
     f = None
@@ -169,7 +169,6 @@ def run(kwargs):
 
 
 def backtest(kwargs):
-    modpath = os.path.dirname(os.path.realpath(__file__))
     kwargs['newdata'] = False
     kwargs['keepalive'] = False
     kwargs['debug'] = False
@@ -189,13 +188,13 @@ def params(name):
 
 
 def headers(name):
-    headers = strategy.strategylist.dispatch[name].headers()
+    my_headers = strategy.strategylist.dispatch[name].headers()
     defaultData = params(name)
-    for i in range(len(headers)):
-        if 'defaultData' not in headers[i] and \
-               headers[i]['field'] in defaultData:
-            headers[i]['defaultData'] = defaultData[headers[i]['field']]
-    return headers
+    for header in my_headers:
+        if 'defaultData' not in header and \
+               header['field'] in defaultData:
+            header['defaultData'] = defaultData[header['field']]
+    return my_headers
 
 
 class TimeFilter(object):
