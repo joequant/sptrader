@@ -1,29 +1,44 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
+import {renderChar, renderNumber} from '../utils';
 var PositionTable = React.createClass({
     getInitialState: function() {
 	return {
 	    columnDefs: [
-		{headerName: "Qty",
-		 field: "Qty"},
 		{headerName: "Name",
 		 field: "ProdCode"},
-		{headerName: "In/Out",
-		 field: "LongShort"},
-		{headerName: "Day Long",
-		 field: "LongTotalAmt"},
-		{headerName: "Day Short",
-		 field: "ShortTotalAmt"},
-		{headerName: "Day Net",
-		 field: "DepTotalAmt"},
+		{headerName: "Qty",
+		 field: "Qty"},
+		{headerName: "DepQty",
+		 field: "DepQty"},
+		{headerName: "LongQty",
+		 field: "LongQty"},
+		{headerName: "ShortQty",
+		 field: "ShortQty"},
 		{headerName: "Net",
-		 field: "TotalAmt"},
+		 field: "TotalAmt",
+		 cellRenderer: renderNumber},
+		{headerName: "Day Long",
+		 field: "LongTotalAmt",
+		 cellRenderer: renderNumber},
+		{headerName: "Day Short",
+		 field: "ShortTotalAmt",
+		 cellRenderer: renderNumber},
+		{headerName: "Day Net",
+		 field: "DepTotalAmt",
+		 cellRenderer: renderNumber},
 		{headerName: "P/L",
-		 field: "PL"},
+		 field: "PL",
+		 cellRenderer: renderNumber},
 		{headerName: "ExchangeRate",
 		 field: "ExchangeRate"},
 		{headerName: "P/L (Base Ccy)",
-		 field: "PLBaseCcy"}]
+		 field: "PLBaseCcy",
+		 cellRenderer: renderNumber},
+		{headerName: "LongShort",
+		 field: "LongShort",
+		 cellRenderer: renderChar}
+	    ]
 	};
     },
     onGridReady(params) {

@@ -1,6 +1,6 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
-import {isNumber, formatNumber, renderNumber} from '../utils';
+import {renderNumber} from '../utils';
 
 var AccountTable = React.createClass({
     getInitialState() {

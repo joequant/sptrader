@@ -119,6 +119,7 @@ or ``BackTestCls``
         self.q_account = queue.Queue()
         self.q_ordercreate = queue.Queue()
         self.q_orderclose = queue.Queue()
+        self.streaming_events()
 
     def start(self, data=None, broker=None):
         # Datas require some processing to kickstart data reception
@@ -137,7 +138,6 @@ or ``BackTestCls``
         elif broker is not None:
             self.broker = broker
             self.broker_threads()
-            self.streaming_events()
 
     def stop(self):
         # signal end of thread

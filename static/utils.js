@@ -102,6 +102,11 @@ function renderBuySell(params) {
     }
 };
 
+function renderChar(params) {
+    var x = params.value;
+    return String.fromCharCode(x);
+};
+
 
 function zeroPad(num, places) {
     var zero = places - num.toString().length + 1;
@@ -163,3 +168,4 @@ module.exports.renderBuySell = renderBuySell;
 module.exports.StrategyControl = StrategyControl;
 module.exports.BacktestControl = BacktestControl;
 module.exports.renderLog = renderLog;
+module.exports.renderChar = renderChar;
