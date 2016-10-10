@@ -8,6 +8,7 @@ import backtrader as bt
 import matplotlib.pyplot as plt
 from backtrader.plot.plot import Plot
 from multiprocessing import Process, Queue
+import logging
 
 # must import first to initialize metaclass
 from spfeed import SharpPointCSVData
@@ -157,7 +158,8 @@ def run(kwargs):
     q = Queue()
     kwargs['newdata'] = True
     kwargs['keepalive'] = True
-    kwargs['debug'] = True
+    if 'loglevel' not in kwargs:
+        kwargs['loglevel'] = logging.WARNING
     kwargs['streaming'] = True
     if 'tickersource' not in kwargs:
         kwargs['tickersource'] = "ticker-%{instrument}.txt"
@@ -171,7 +173,8 @@ def run(kwargs):
 def backtest(kwargs):
     kwargs['newdata'] = False
     kwargs['keepalive'] = False
-    kwargs['debug'] = False
+    if 'loglevel' not in kwargs:
+        kwargs['loglevel'] = logging.WARNING
     kwargs['streaming'] = False
     try:
         return run_backtest(kwargs)

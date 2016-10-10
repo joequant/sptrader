@@ -25,6 +25,7 @@ import collections
 
 import backtrader as bt
 import spstore
+import logging
 from backtrader.order import Order, BuyOrder, SellOrder
 from backtrader.position import Position
 from backtrader.metabase import MetaParams
@@ -144,6 +145,7 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
         ('cash', 10000.0),
         ('eosbar', False),
         ('filler', None),
+        ('loglevel', logging.INFO)
     )
 
     def __init__(self, **kwargs):
@@ -206,7 +208,7 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
     getvalue = get_value
 
     def getposition(self, data):
-        return self.positions[data]
+        return self.o.getposition(data._dataname, clone=False)
 
     def orderstatus(self, order):
         o = self.orders[order.ref]

@@ -1,6 +1,7 @@
 import backtrader as bt
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
+import logging
 # Create a Strategy
 
 location = os.path.dirname(os.path.realpath(__file__))
@@ -12,7 +13,7 @@ class SampleStrategy(bt.Strategy):
         ('exitbars', 3),
         ('maperiod', 10),
         ('log', sys.stdout),
-        ('debug', False)
+        ('loglevel', logging.INFO)
     )
 
     @classmethod
@@ -25,10 +26,13 @@ class SampleStrategy(bt.Strategy):
             ]
     def log(self, *args, dt=None):
         ''' Logging function fot this strategy'''
+        if level < self.p.loglevel:
+            return
         dt = dt or self.datas[0].datetime.datetime()
         print('%s, ' % dt.isoformat(' '), *args, file=self.p.log)
 
     def __init__(self):
+        super().__init__()
         # Keep a reference to the "close" line in the data[0] dataseries
         self.dataclose = self.datas[1].close
 

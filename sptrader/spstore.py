@@ -28,11 +28,13 @@ import json
 import threading
 import requests
 import sseclient
-
+import logging
 import backtrader as bt
 from backtrader.metabase import MetaParams
 from backtrader.utils.py3 import queue, with_metaclass
 from backtrader.utils import AutoDict
+from backtrader.position import Position
+from copy import copy
 
 class MetaSingleton(MetaParams):
     '''Metaclass to make a metaclassed class a singleton'''
@@ -73,7 +75,7 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         ('account', ''),
         ('login', None),
         ('practice', False),
-        ('debug', False),
+        ('loglevel', logging.INFO),
         ('account_tmout', 30.0),
     )
 
@@ -99,6 +101,7 @@ or ``BackTestCls``
     def __init__(self):
         super(SharpPointStore, self).__init__()
 
+        self.positions = collections.defaultdict(Position)
         self.notifs = collections.deque()  # store notifications for cerebro
 
         self._env = None  # reference to cerebro for general notifications
@@ -176,6 +179,19 @@ or ``BackTestCls``
         t.daemon = True
         t.start()
 
+    def updateposition(self, data):
+        """Update position from streamer"""
+        position = Position(data['Qty'],
+                            abs(data['TotalAmt']/data['Qty']))
+        self.positions[data['ProdCode']] = position
+
+    def getposition(self, data, clone=False):
+        position =  self.positions[data]
+        if clone:
+            return copy(position)
+        else:
+            return position
+
     def _t_streaming_listener(self, q, tmout=None):
         response = self._get_request("log/subscribe", stream=True)
         client = sseclient.SSEClient(response)
@@ -183,22 +199,30 @@ or ``BackTestCls``
             data = json.loads(event.data)
             info = data.get('data', None)
             oref = 0
+
+            if event.event == "AccountPositionPush":
+                if self.p.loglevel <= logging.DEBUG:
+                    print(event.event, data)
+                self.updateposition(data)
+                continue
             try:
                 oref = int(info['Ref2'])
             except:
-                if self.p.debug:
+                if self.p.loglevel <= logging.DEBUG:
                     print("Unhandled event")
-                return                
+                continue
+            if self.p.loglevel <= logging.DEBUG:
+                print(event)
             if event.event == "OrderBeforeSendReport":
-                if self.p.debug:
+                if self.p.loglevel <= logging.DEBUG:
                     print(data)
                 self.broker._submit(oref)
             elif event.event == "OrderRequestFailed":
-                if self.p.debug:
+                if self.p.loglevel <= logging.DEBUG:
                     print(data)
                 self.broker._reject(oref)
             elif event.event == "OrderReport":
-                if self.p.debug:
+                if self.p.loglevel <= logging.DEBUG:
                     print(data)
                 status = int(info['Status'])
                 if status == 4:
@@ -206,7 +230,7 @@ or ``BackTestCls``
                 elif status == 6:
                     self.broker._cancel(oref)
             elif event.event == "TradeReport":
-                if self.p.debug:
+                if self.p.loglevel <= logging.DEBUG:
                     print(data)
                 qty = int(info['Qty'])
                 price = float(info['Price'])
@@ -252,7 +276,7 @@ or ``BackTestCls``
 
     def isloggedin(self):
         login_info = self._get_request("login-info").json()
-        if self.p.debug:
+        if self.p.loglevel <= logging.DEBUG:
             print("login-info", login_info)
         return int(login_info['status']) != -1
 
@@ -261,7 +285,7 @@ or ``BackTestCls``
         self.q_account.put(True)  # force an immediate update
 
     def _t_account(self):
-        if self.p.debug:
+        if self.p.loglevel <= logging.DEBUG:
             print("t_account")
         while True:
             try:
@@ -272,7 +296,7 @@ or ``BackTestCls``
                 pass
             try:
                 if self.p.login is not None and not self.isloggedin():
-                    if self.p.debug:
+                    if self.p.loglevel <= logging.DEBUG:
                         print("login", self.p.login)
                     r = self._post_request("login", json=self.p.login)
             except Exception as e:
@@ -297,7 +321,7 @@ or ``BackTestCls``
         okwargs['ProdCode'] = order.data._dataname
         okwargs['Ref'] = kwargs.get('Ref', '')
         okwargs['Ref2'] = str(order.ref)
-        if self.p.debug:
+        if self.p.loglevel <= logging.DEBUG:
             print(okwargs)
         self.q_ordercreate.put((order.ref, okwargs,))
         return order
@@ -308,7 +332,7 @@ or ``BackTestCls``
             if msg is None:
                 break
             oref, okwargs = msg
-            if self.p.debug:
+            if self.p.loglevel <= logging.DEBUG:
                 print(msg)
             try:
                 r = self._post_request("order/add", json=okwargs)

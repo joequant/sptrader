@@ -1,30 +1,42 @@
+"""Implements ImmediateStrategy"""
+
+import sys
+import logging
 import backtrader as bt
-import os.path  # To manage paths
-import sys  # To find out the script name (in argv[0])
 # Create a Strategy
 
 class ImmediateStrategy(bt.Strategy):
+    """Immediate strategy automatically executes an order"""
     params = (
         ('qty', 1),
         ('delay', 5),
         ('order', "B"),
-        ('log', sys.stdout)
+        ('log', sys.stdout),
+        ('loglevel', logging.INFO)
     )
 
     @classmethod
     def headers(cls):
+        """Headers for web interface"""
         return [
             {'headerName': "Order",
              'field': "order"},
             {'headerName': "Delay",
-             'field': "delay"}
+             'field': "delay"},
+            {"headerName": "Log level",
+             "field": "loglevel"}
             ]
-    def log(self, *args, dt=None):
+
+    def log(self, *args, dt=None, level=logging.INFO):
         ''' Logging function fot this strategy'''
+        if level < self.p.loglevel:
+            return
         dt = dt or self.datas[0].datetime.datetime()
-        print('%s, ' % dt.isoformat(' '), *args, file=self.p.log)
+        print('%s, ' % dt.isoformat(' '), *args,
+              file=self.p.log)
 
     def __init__(self):
+        super().__init__()
         # Keep a reference to the "close" line in the data[0] dataseries
         self.dataclose = self.datas[0].close
 
@@ -32,8 +44,9 @@ class ImmediateStrategy(bt.Strategy):
         self.order = None
         self.buyprice = None
         self.buycomm = None
-        
+
     def notify(self, order):
+        """Notify handler"""
         if order.status in [order.Submitted, order.Accepted]:
             # Buy/Sell order submitted/accepted to/by broker - Nothing to do
             return
@@ -56,11 +69,6 @@ class ImmediateStrategy(bt.Strategy):
                           order.executed.value,
                           order.executed.comm))
 
-            self.bar_executed = len(self)
-
-        # Write down: no pending order
-        self.order = None
-
     def notify_trade(self, trade):
         if not trade.isclosed:
             return
@@ -75,27 +83,25 @@ class ImmediateStrategy(bt.Strategy):
 
         # Check if an order is pending ... if yes, we cannot send a 2nd one
         if len(self.datas[0].close) > self.p.delay:
+            self.log("CLOSE!!!")
             self.close()
-            self.order = None
 
         if len(self.datas[0].close) < 1:
             return
 
-        if self.order:
+        print(self.order)
+        if self.order is not None:
             return
 
         # Check if we are in the market
         if self.p.order == "B":
             # BUY, BUY, BUY!!! (with default parameters)
             self.log('BUY CREATE, %.2f' % self.dataclose[0])
-            
+
             # Keep track of the created order to avoid a 2nd order
             self.order = self.buy()
         elif self.p.order == "S":
             self.log('SELL CREATE, %.2f' % self.dataclose[0])
-            
+
             # Keep track of the created order to avoid a 2nd order
             self.order = self.sell()
-
-
-
