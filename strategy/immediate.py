@@ -1,32 +1,25 @@
 """Implements ImmediateStrategy"""
-
-import sys
-import logging
-import backtrader as bt
 import spstrategy
 # Create a Strategy
+
 
 class ImmediateStrategy(spstrategy.SharpPointStrategy):
     """Immediate strategy automatically executes an order"""
     params = (
         ('qty', 1),
         ('delay', 5),
-        ('order', "B"),
-        ('log', sys.stdout),
-        ('loglevel', logging.INFO)
+        ('order', "B")
     )
 
     @classmethod
     def headers(cls):
         """Headers for web interface"""
         a = super().headers()
-        a.extend ([
+        a.extend([
             {'headerName': "Order",
              'field': "order"},
             {'headerName': "Delay",
-             'field': "delay"},
-            {"headerName": "Log level",
-             "field": "loglevel"}
+             'field': "delay"}
             ])
         return a
 
