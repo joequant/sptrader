@@ -37,6 +37,7 @@ class ImmediateStrategy(spstrategy.SharpPointStrategy):
         if len(self.datas[0].close) > self.p.delay:
             self.log("CLOSE!!!")
             self.close()
+            self.order = None
 
         if len(self.datas[0].close) < 1:
             return
