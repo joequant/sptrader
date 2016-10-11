@@ -3,9 +3,10 @@
 import sys
 import logging
 import backtrader as bt
+import spstrategy
 # Create a Strategy
 
-class ImmediateStrategy(bt.Strategy):
+class ImmediateStrategy(spstrategy.SharpPointStrategy):
     """Immediate strategy automatically executes an order"""
     params = (
         ('qty', 1),
@@ -18,22 +19,16 @@ class ImmediateStrategy(bt.Strategy):
     @classmethod
     def headers(cls):
         """Headers for web interface"""
-        return [
+        a = super().headers()
+        a.extend ([
             {'headerName': "Order",
              'field': "order"},
             {'headerName': "Delay",
              'field': "delay"},
             {"headerName": "Log level",
              "field": "loglevel"}
-            ]
-
-    def log(self, *args, dt=None, level=logging.INFO):
-        ''' Logging function fot this strategy'''
-        if level < self.p.loglevel:
-            return
-        dt = dt or self.datas[0].datetime.datetime()
-        print('%s, ' % dt.isoformat(' '), *args,
-              file=self.p.log)
+            ])
+        return a
 
     def __init__(self):
         super().__init__()
@@ -44,37 +39,6 @@ class ImmediateStrategy(bt.Strategy):
         self.order = None
         self.buyprice = None
         self.buycomm = None
-
-    def notify(self, order):
-        """Notify handler"""
-        if order.status in [order.Submitted, order.Accepted]:
-            # Buy/Sell order submitted/accepted to/by broker - Nothing to do
-            return
-
-        # Check if an order has been completed
-        # Attention: broker could reject order if not enougth cash
-        if order.status in [order.Completed, order.Canceled, order.Margin]:
-            if order.isbuy():
-                self.log(
-                    'BUY EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
-                    (order.executed.price,
-                     order.executed.value,
-                     order.executed.comm))
-
-                self.buyprice = order.executed.price
-                self.buycomm = order.executed.comm
-            else:  # Sell
-                self.log('SELL EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
-                         (order.executed.price,
-                          order.executed.value,
-                          order.executed.comm))
-
-    def notify_trade(self, trade):
-        if not trade.isclosed:
-            return
-
-        self.log('OPERATION PROFIT, GROSS %.2f, NET %.2f' %
-                 (trade.pnl, trade.pnlcomm))
 
     def next(self):
         # Simply log the closing price of the series from the reference
@@ -105,3 +69,9 @@ class ImmediateStrategy(bt.Strategy):
 
             # Keep track of the created order to avoid a 2nd order
             self.order = self.sell()
+
+    def notify_trade(self, trade):
+        if not trade.isclosed:
+            return
+        self.log('OPERATION PROFIT, GROSS %.2f, NET %.2f' %
+                 (trade.pnl, trade.pnlcomm))
