@@ -11,17 +11,12 @@ class ImmediateStrategy(spstrategy.SharpPointStrategy):
         ('order', "B")
     )
 
-    @classmethod
-    def headers(cls):
-        """Headers for web interface"""
-        a = super().headers()
-        a.extend([
-            {'headerName': "Order",
-             'field': "order"},
-            {'headerName': "Delay",
-             'field': "delay"}
-            ])
-        return a
+    headers = [
+        {'headerName': "Order",
+         'field': "order"},
+        {'headerName': "Delay",
+         'field': "delay"}
+        ]
 
     def __init__(self):
         super().__init__()

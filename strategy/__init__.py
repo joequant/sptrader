@@ -191,7 +191,7 @@ def params(name):
 
 
 def headers(name):
-    my_headers = strategy.strategylist.dispatch[name].headers()
+    my_headers = strategy.strategylist.dispatch[name].header_list()
     defaultData = params(name)
     for header in my_headers:
         if 'defaultData' not in header and \

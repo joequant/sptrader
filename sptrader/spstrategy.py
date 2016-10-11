@@ -3,6 +3,7 @@
 import sys  # To find out the script name (in argv[0])
 import logging
 import backtrader as bt
+import inspect
 
 # Create a Strategy
 
@@ -12,12 +13,18 @@ class SharpPointStrategy(bt.Strategy):
         ('loglevel', logging.INFO)
     )
 
+    headers =  [
+        {'headerName': "Loglevel",
+         'field': "loglevel"},
+        ]
+
     @classmethod
-    def headers(cls):
-        return [
-            {'headerName': "Loglevel",
-             'field': "loglevel"},
-            ]
+    def header_list(cls):
+        a = []
+        for base_class in inspect.getmro(cls):
+            if issubclass(base_class, SharpPointStrategy):
+                a[:0] = base_class.headers
+        return a
 
     def log(self, *args, dt=None, level=logging.INFO):
         ''' Logging function fot this strategy'''

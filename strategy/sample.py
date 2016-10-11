@@ -1,35 +1,21 @@
-import backtrader as bt
-import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
 import logging
+import spstrategy
+import backtrader as bt
 # Create a Strategy
 
-location = os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(0, location)
-sys.path.insert(0, os.path.join(location, "../sptrader"))
-
-class SampleStrategy(bt.Strategy):
+class SampleStrategy(spstrategy.SharpPointStrategy):
     params = (
         ('exitbars', 3),
         ('maperiod', 10),
-        ('log', sys.stdout),
-        ('loglevel', logging.INFO)
     )
 
-    @classmethod
-    def headers(cls):
-        return [
-            {'headerName': "Exitbars",
-             'field': "exitbars"},
-            {'headerName': "Maperiod",
-             'field': "maperiod"}
-            ]
-    def log(self, *args, dt=None):
-        ''' Logging function fot this strategy'''
-        if level < self.p.loglevel:
-            return
-        dt = dt or self.datas[0].datetime.datetime()
-        print('%s, ' % dt.isoformat(' '), *args, file=self.p.log)
+    headers =  [
+        {'headerName': "Exitbars",
+         'field': "exitbars"},
+        {'headerName': "Maperiod",
+         'field': "maperiod"}
+        ]
 
     def __init__(self):
         super().__init__()
