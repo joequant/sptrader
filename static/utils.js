@@ -6,26 +6,26 @@ var StrategyControl = React.createClass({
 	$.post(url, data);
     },
     start() {
-	var data = this.props.params.data;
-	console.log(this.props.params);
+	var data = this.props.data;
+	console.log(this.props);
 	this.post("/strategy/start", data);
     },
     pause() {
-	var data = this.props.params.data;
-	console.log(this.props.params);
+	var data = this.props.data;
+	console.log(this.props);
 	this.post("/strategy/pause", data);
     },
     stop() {
-	var data = this.props.params.data;
-	console.log(this.props.params);
+	var data = this.props.data;
+	console.log(this.props);
 	this.post("/strategy/stop", data);
     },
     render() {
-	var status = this.props.params.data.status;
+	console.log(this.props);
+	var status = this.props.data.status;
 	var start_disabled = true;
 	var pause_disabled = true;
 	var stop_disabled = true;
-	console.log(this.props.params);
 	if (status == undefined || status == "stopped"
 	    || status == "error" || status == "done") {
 	    start_disabled = false;
@@ -61,8 +61,8 @@ var BacktestControl = React.createClass({
 	});
     },
     backtest() {
-	var data = this.props.params.data;
-	console.log(this.props.params);
+	var data = this.props.data;
+	console.log(this.props);
 	this.post("/backtest", data);
     },
     render() {
