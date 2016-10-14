@@ -80,7 +80,6 @@ class SharpPointCSVData(with_metaclass(MetaSharpPointData, feed.CSVDataBase)):
             self.lines.volume[0] = self.p.nullvalue
             self.lines.openinterest[0] = self.p.nullvalue
         if self.p.streaming:
-            print("start price streaming")
             self.o.streaming_prices(self.p.dataname)
 
     def _load(self):
