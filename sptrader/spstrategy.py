@@ -37,7 +37,7 @@ class SharpPointStrategy(bt.Strategy):
     def __init__(self):
         super().__init__()
 
-    def notify(self, order):
+    def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
             # Buy/Sell order submitted/accepted to/by broker - Nothing to do
             return
