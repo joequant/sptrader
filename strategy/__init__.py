@@ -146,9 +146,16 @@ def run_backtest(kwargs):
     # Print out the final result
     print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue(),
           file=f)
-    retval = '<img src="data:image/svg+xml;base64,%s" /><br>' % \
+    retval = """
+<html>
+<head>
+<title>{} {:%Y%m%d%H%M%S}</title>
+</head>
+<body>
+""".format(kwargs['strategy'], datetime.datetime.now())
+    retval += '<img src="data:image/svg+xml;base64,%s" /><br>' % \
              base64.b64encode(imgdata.getvalue()).decode('ascii') + \
-             '<pre>%s</pre>' % f.getvalue()
+             '<pre>%s</pre></body></html>' % f.getvalue()
     imgdata.close()
     f.close()
     return retval
