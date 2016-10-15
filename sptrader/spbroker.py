@@ -153,7 +153,6 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
         self.o = spstore.SharpPointStore(**kwargs)
         self.startingcash = self.cash = self.p.cash
 
-        self.orders = collections.OrderedDict()  # orders by order id
         self.pending = collections.deque()  # popleft and append(right)
 
         self.positions = collections.defaultdict(Position)
@@ -211,7 +210,7 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
         return self.o.getposition(data._dataname, clone=False)
 
     def orderstatus(self, order):
-        o = self.orders[order.ref]
+        o = self.o.order_by_ref(order.ref)
         return o.status
 
     def submit(self, order):
@@ -219,32 +218,32 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
         return order
 
     def _submit(self, oref):
-        order = self.orders[oref]
+        order = self.o.order_by_ref(oref)
         order.submit(self)
         self.notify(order)
 
     def _reject(self, oref):
-        order = self.orders[oref]
+        order = self.o.order_by_ref(oref)
         order.reject(self)
         self.notify(order)
 
     def _accept(self, oref):
-        order = self.orders[oref]
+        order = self.o.order_by_ref(oref)
         order.accept()
         self.notify(order)
 
     def _cancel(self, oref):
-        order = self.orders[oref]
+        order = self.o.order_by_ref(oref)
         order.cancel(self)
         self.notify(order)
 
     def _expire(self, oref):
-        order = self.orders[oref]
+        order = self.o.order_by_ref(oref)
         order.expire(self)
         self.notify(order)
 
     def _fill(self, oref, size, price, **kwargs):
-        order = self.orders.get(oref, None)
+        order = self.o.order_by_ref(oref)
         if order is None:
             return
 
@@ -279,7 +278,6 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
                          exectype=exectype, valid=valid, tradeid=tradeid)
         order.addcomminfo(self.getcommissioninfo(data))
         order.addinfo(**kwargs)
-        self.orders[order.ref] = order
         return self.o.order_create(order)
 
     def sell(self, owner, data,
@@ -292,11 +290,9 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
                           exectype=exectype, valid=valid, tradeid=tradeid)
         order.addcomminfo(self.getcommissioninfo(data))
         order.addinfo(**kwargs)
-        self.orders[order.ref] = order
         return self.o.order_create(order)
 
     def cancel(self, order):
-        o = self.orders[order.ref]
         if order.status == Order.Cancelled:  # already cancelled
             return
         return self.o.order_cancel(order)

@@ -209,7 +209,7 @@ or ``BackTestCls``
                 continue
 
             try:
-                oref = int(info['Ref2'])
+                oref = info['Ref2']
             except:
                 if self.p.loglevel <= logging.DEBUG:
                     print("Unhandled event")
@@ -324,11 +324,16 @@ or ``BackTestCls``
         okwargs['Qty'] = abs(order.created.size)
         okwargs['ProdCode'] = order.data._dataname
         okwargs['Ref'] = kwargs.get('Ref', '')
+        order.ref = "{:%Y%m%d%H%M%S}".format(datetime.now())
+        self._orders[order.ref] = order
         okwargs['Ref2'] = str(order.ref)
         if self.p.loglevel <= logging.DEBUG:
             print(okwargs)
         self.q_ordercreate.put((order.ref, okwargs,))
         return order
+
+    def order_by_ref(self, oref):
+        return self._orders.get(oref, None)
 
     def _t_order_create(self):
         while True:
