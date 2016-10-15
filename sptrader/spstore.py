@@ -205,12 +205,16 @@ or ``BackTestCls``
                     print(event.event, data)
                 self.updateposition(data)
                 continue
+            if self.broker is None:
+                continue
+
             try:
                 oref = int(info['Ref2'])
             except:
                 if self.p.loglevel <= logging.DEBUG:
                     print("Unhandled event")
                 continue
+
             if self.p.loglevel <= logging.DEBUG:
                 print(event)
             if event.event == "OrderBeforeSendReport":
