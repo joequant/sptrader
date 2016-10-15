@@ -1,7 +1,24 @@
 import React from 'react';
-import {AgGridReact} from 'ag-grid-react';
+import {Button} from 'react-bootstrap';
+import {AgGridReact, reactCellRendererFactory} from 'ag-grid-react';
 import {shortnumberwidth, renderNumber, renderDateTime,
        renderBuySell} from '../utils';
+
+
+var OrderControl = React.createClass({
+    post(url, data) {
+    },
+    cancel() {
+	var data = this.props.data;
+	console.log(this.props);
+	this.post("/backtest", data);
+    },
+    render() {
+	return (
+		<Button onClick={this.cancel}>Cancel</Button>
+	);
+    }
+});
 
 var OrderTable = React.createClass({
     getInitialState() {
@@ -54,7 +71,11 @@ var OrderTable = React.createClass({
 		 width: shortnumberwidth},
 		{headerName: "Int.Order#",
 		 field: "IntOrderNo",
-		 width: shortnumberwidth}]
+		 width: shortnumberwidth},
+		{headerName: "Actions",
+		 field: "action",
+		 cellRenderer: reactCellRendererFactory(OrderControl)}
+	    ]
 	};
     },
     onGridReady(params) {

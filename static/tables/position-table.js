@@ -1,6 +1,18 @@
 import React from 'react';
-import {AgGridReact} from 'ag-grid-react';
+import {Button} from 'react-bootstrap';
+import {AgGridReact, reactCellRendererFactory} from 'ag-grid-react';
 import {renderChar, renderNumber} from '../utils';
+
+var PositionControl = React.createClass({
+    close() {
+    },
+    render() {
+	return (
+		<Button onClick={this.close}>Close</Button>
+	);
+    }
+});
+
 var PositionTable = React.createClass({
     getInitialState: function() {
 	return {
@@ -37,7 +49,10 @@ var PositionTable = React.createClass({
 		 cellRenderer: renderNumber},
 		{headerName: "LongShort",
 		 field: "LongShort",
-		 cellRenderer: renderChar}
+		 cellRenderer: renderChar},
+		{headerName: "Actions",
+		 field: "action",
+		 cellRenderer: reactCellRendererFactory(PositionControl)}
 	    ]
 	};
     },

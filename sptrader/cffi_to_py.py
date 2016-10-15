@@ -28,6 +28,7 @@ Usage example:
 {'a': 10, 'b': 'Hey'}
 """
 
+import copy
 
 class FfiConverter(object):
     """Converts dict to and from ffi cdata objects"""
@@ -66,8 +67,7 @@ class FfiConverter(object):
         else:
             return {}
 
-    def from_py(self, struct_t, data):
-        buffer = self.ffi.new("%s[1]" % struct_t)
+    def from_py(self, buffer, data):
         type = self.typedefs(buffer[0])
         for k, v in data.items():
             try:
@@ -87,7 +87,7 @@ class FfiConverter(object):
                 print("failed %s %s %s for %s" % (format(e), k, v,
                                                   type[k]['cname']))
                 raise
-        return buffer
+        return None
 
     def to_py(self, s):
         type = self.ffi.typeof(s)
@@ -105,7 +105,7 @@ class FfiConverter(object):
                     except:
                         return ''
                 else:
-                    return [s[i] for i in range(type.length)]
+                    return [copy.copy(s[i]) for i in range(type.length)]
             else:
                 return [self.to_py(s[i]) for i in range(type.length)]
         elif type.kind == 'primitive':

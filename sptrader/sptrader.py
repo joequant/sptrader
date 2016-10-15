@@ -590,7 +590,8 @@ class SPTrader(object):
     def order_add(self, data):
         data['AccNo'] = self.acc_no
         data['Initiator'] = self.user
-        buffer = self.ffi_conv.from_py("SPApiOrder", data)
+        buffer = self.ffi.new("SPApiOrder[1]")
+        self.ffi_conv.from_py(buffer, data)
         if buffer is None:
             return -2
         return self.api.SPAPI_AddOrder(buffer)

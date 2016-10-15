@@ -20,15 +20,23 @@ var StrategyControl = React.createClass({
 	console.log(this.props);
 	this.post("/strategy/stop", data);
     },
+    remove_row() {
+	var row = this.props.node;
+	var api = this.props.api;
+	console.log(this.props, row, api);
+	api.removeItems([row]);
+    },
     render() {
 	console.log(this.props);
 	var status = this.props.data.status;
 	var start_disabled = true;
 	var pause_disabled = true;
 	var stop_disabled = true;
+	var remove_row_disabled = true;
 	if (status == undefined || status == "stopped"
 	    || status == "error" || status == "done") {
 	    start_disabled = false;
+	    remove_row_disabled = false;
 	} else if (status == "paused") {
 	    start_disabled = false;
 	} else if (status == "running") {
@@ -39,10 +47,10 @@ var StrategyControl = React.createClass({
 		<div>
 		<Button onClick={this.start}
 	    disabled={start_disabled}>Start</Button>
-		<Button onClick={this.pause}
-	    disabled={pause_disabled}>Pause</Button>
 		<Button onClick={this.stop}
 	    disabled={stop_disabled}>Stop</Button>
+		<Button onClick={this.remove_row}
+	    disabled={remove_row_disabled}>Remove row</Button>
 		</div>
 	);
     }
