@@ -278,7 +278,7 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
                          exectype=exectype, valid=valid, tradeid=tradeid)
         order.addcomminfo(self.getcommissioninfo(data))
         order.addinfo(**kwargs)
-        return self.o.order_create(order)
+        return self.o.order_create(order, **kwargs)
 
     def sell(self, owner, data,
              size, price=None, plimit=None,
@@ -290,7 +290,7 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
                           exectype=exectype, valid=valid, tradeid=tradeid)
         order.addcomminfo(self.getcommissioninfo(data))
         order.addinfo(**kwargs)
-        return self.o.order_create(order)
+        return self.o.order_create(order, **kwargs)
 
     def cancel(self, order):
         if order.status == Order.Cancelled:  # already cancelled
