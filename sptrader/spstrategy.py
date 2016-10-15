@@ -10,7 +10,8 @@ import inspect
 class SharpPointStrategy(bt.Strategy):
     params = (
         ('log', sys.stdout),
-        ('loglevel', logging.INFO)
+        ('loglevel', logging.INFO),
+        ('id', None)
     )
 
     headers =  [
@@ -25,6 +26,16 @@ class SharpPointStrategy(bt.Strategy):
             if issubclass(base_class, SharpPointStrategy):
                 a[:0] = base_class.headers
         return a
+
+    def buy(self, **kwargs):
+        kwargs['Ref'] = self.p.id
+        self.log("buy", kwargs, level=logging.DEBUG)
+        super().buy(**kwargs)
+
+    def sell(self, **kwargs):
+        kwargs['Ref'] = self.p.id
+        self.log("sell", kwargs, level=logging.DEBUG)
+        super().sell(**kwargs)
 
     def log(self, *args, dt=None, level=logging.INFO):
         ''' Logging function fot this strategy'''
