@@ -22,13 +22,19 @@ except OSError as exception:
 
 ticker_file = os.path.join(data_dir, "ticker-%s.txt")
 
+with open(os.path.join(data_dir, "config-default.json")) as fp:
+    config = json.load(fp)
+
+try:
+    with open(os.path.join(data_dir, "config.json")) as fp:
+        config.update(json.load(fp))
+except Exception as error:
+    pass
 
 def get_ticker(s):
     if "/" in s:
         raise ValueError
     return ticker_file % s
-
-import config
 
 from sse import ServerSentEvent
 import sptrader
@@ -63,7 +69,7 @@ def send_cdata(event_id, data):
 
 @app.route("/login-info")
 def logininfo():
-    d = {"info": config.logininfo,
+    d = {"info": config['logininfo'],
          "status": "%d" % sp.get_login_status(80)}
     if info_cache['connected'] is not None:
         d['connected'] = info_cache['connected']
@@ -280,6 +286,15 @@ def login():
                       request.form["app_id"],
                       request.form["user_id"],
                       request.form["password"])
+    config['logininfo'] = {
+        "host": request.form['host'],
+        "port" : int(request.form['port']),
+        "license" : request.form['license'],
+        "app_id" : request.form['app_id'],
+        "user_id" : request.form['user_id']
+        }
+    with open(os.path.join(data_dir, "config.json"), 'w') as fp:
+        json.dump(config, fp)
     return jsonify({"retval": sp.login()})
 
 
