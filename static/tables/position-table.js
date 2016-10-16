@@ -3,19 +3,20 @@ import {Button} from 'react-bootstrap';
 import {AgGridReact, reactCellRendererFactory} from 'ag-grid-react';
 import {renderChar, renderNumber} from '../utils';
 
-var PositionControl = React.createClass({
+class PositionControl extends React.Component {
     close() {
-    },
+    }
     render() {
 	return (
-		<Button onClick={this.close}>Close</Button>
+		<Button onClick={this.close.bind(this)}>Close</Button>
 	);
     }
-});
+}
 
-var PositionTable = React.createClass({
-    getInitialState: function() {
-	return {
+class PositionTable extends React.Component {
+    constructor(props) {
+	super(props);
+	this.state = {
 	    columnDefs: [
 		{headerName: "Name",
 		 field: "ProdCode"},
@@ -55,15 +56,16 @@ var PositionTable = React.createClass({
 		 cellRenderer: reactCellRendererFactory(PositionControl)}
 	    ]
 	};
-    },
+	this.onGridReady = this.onGridReady.bind(this);
+    }
     onGridReady(params) {
 	this.api = params.api;
 	this.columnApi = params.columnApi;
-    },
+    }
     componentDidUpdate(prevprops, prevstate) {
 	this.api.setRowData(this.props.data);
-    },
-    render: function() {
+    }
+    render() {
 	return (
 	<AgGridReact
 	    // column definitions and row data are immutable, the grid
@@ -73,6 +75,6 @@ var PositionTable = React.createClass({
 	    onGridReady={this.onGridReady}
 	/>)
     }
-});
+}
     
 module.exports = PositionTable;
