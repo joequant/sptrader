@@ -19,13 +19,13 @@ import BacktestTab from './backtest-tab';
 // load (Polyfill) EventSource, in case browser does not support it...
 require('eventsource-polyfill');
 
-var AlertBox = React.createClass( {
+class AlertBox extends React.Component {
     ok() {
 	this.props.ok();
-    },
+    }
     clear() {
 	this.props.clear();
-    },
+    }
     render() {
 	return (<Modal show={this.props.show}>
 		<Modal.Header>
@@ -34,26 +34,25 @@ var AlertBox = React.createClass( {
 		<FormControl componentClass="textarea"
 		value={this.props.text} />
 		<Button
-		onClick={this.ok}>
+		onClick={this.ok.bind(this)}>
 		OK
 		</Button>
 		<Button
-		onClick={this.clear}>
+		onClick={this.clear.bind(this)}>
 		Clear
 		</Button>
 		</Modal.Body>
 		</Modal>);
     }
-});
+}
 
-var SubscribeBox = React.createClass( {
-    getInitialState() {
-	return {
+class SubscribeBox extends React.Component {
+    constructor(props) {
+	super(props);
+	this.state = {
 	    source: this.connect()
 	}
-    },
-    componentDidMount() {
-    },
+    }
     connect() {
 	var source = new EventSource(this.props.url); 
 
@@ -65,7 +64,7 @@ var SubscribeBox = React.createClass( {
 	    obj.props.onerror(e);
 	};
 	return source;
-    },
+    }
     reconnect(callback) {
 	console.log("reconnect", this.state.source.readyState);
 	if (this.state.source.readyState == EventSource.CLOSED) {
@@ -75,11 +74,11 @@ var SubscribeBox = React.createClass( {
 	} 
 	console.log("callback");
 	callback();
-    },
+    }
     render() {
         return null;
     }
-});
+}
 
 function publish() {
     $.get("/ping");
