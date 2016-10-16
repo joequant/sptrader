@@ -1,32 +1,32 @@
-{"//" : "fix react and ag-grid versions to avoid collapsing ag-grid",
- "//" : "bug.  debug which version is a problem later",
-    "name" : "Sptrader",
-    "version" : "0.2.3",
-    "author" : "Joseph C Wang <joequant@gmail.com>",
-    "license" : "BSD-2-Clause",
-    "repository" : {
-	"type" : "git",
-	"url" : "https://github.com/joequant/sptrader.git"
-    },
-    "dependencies" : {
-	"react" : "15.3.x",
-	"react-dom" : "15.3.x",
-	"react-bootstrap" : "0.30.x",
-	"react-addons-linked-state-mixin" : "latest",
-	"ag-grid": "6.2.x",
-	"ag-grid-react": "6.2.x",
-	"eventsource-polyfill" : "0.9.x"
-    },
-    "devDependencies" : {
-	"browserify" : "latest",
-	"watchify" : "latest",
-	"babelify" : "latest",
-	"babel-preset-es2015" : "latest",
-	"babel-preset-react" : "latest",
-	"babel-preset-stage-2" : "latest"
-    },
+{
+  "name": "Sptrader",
+  "version": "0.3.0",
+  "author": "Joseph C Wang <joequant@gmail.com>",
+  "license": "BSD-2-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joequant/sptrader.git"
+  },
+  "dependencies": {
+    "ag-grid": "6.2.x",
+    "ag-grid-react": "6.2.x",
+    "eventsource-polyfill": "0.9.x",
+    "react": "15.3.x",
+    "react-addons-linked-state-mixin": "latest",
+    "react-bootstrap": "0.30.x",
+      "react-dom": "15.3.x",
+      "babel-runtime": "latest"
+  },
+  "devDependencies": {
+    "babel-loader": "latest",
+    "babel-plugin-transform-runtime": "latest",
+    "babel-preset-es2015": "latest",
+    "babel-preset-react": "latest",
+    "babel-preset-stage-2": "latest",
+    "webpack": "latest"
+  },
     "scripts": {
-	"build-js": "browserify -d -t [ babelify --presets [ es2015 react stage-2 ] ]  static/sptrader.js -o static/bundle.js",
-	"watch-js": "watchify -d -t  [ babelify --presets [ es2015 react stage-2 ] ] static/sptrader.js -o static/bundle.js"
-    }
+	"build-prod": "NODE_ENV=production webpack -p",
+	"build-dev": "webpack"
+  }
 }
