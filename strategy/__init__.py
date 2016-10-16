@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from backtrader.plot.plot import Plot
 from multiprocessing import Process, Queue
 import logging
+import pprint
 
 # must import first to initialize metaclass
 from spfeed import SharpPointCSVData
@@ -65,13 +66,16 @@ def run_strategy(kwargs, q):
         cerebro.adddata(data2)
 
         # Print out the starting conditions
-        print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue(),
+        print('Starting strategy "{}" at "{}"'.format(kwargs['strategy'],
+                                                      datetime.datetime.now()),
               file=f)
-
+        print('{}'.format(pprint.pformat(kwargs)), file=f)
         # Run over everything
         cerebro.run()
         # Print out the final result
-        print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+        print('Finishing strategy "{}" at "{}"'.format(kwargs['strategy'],
+                                                       datetime.datetime.now()),
+              file=f)
         f.close()
         q.put((kwargs['strategy'], kwargs['id'], "done", ""))
         return None
@@ -137,8 +141,12 @@ def run_backtest(kwargs):
 #    cerebro.broker.setcommission(commission=0.0)
 
     # Print out the starting conditions
-    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue(),
+
+    print('Starting strategy "{}" at "{}"'.format(kwargs['strategy'],
+                                                  datetime.datetime.now()),
           file=f)
+    print('{}'.format(pprint.pformat(kwargs)), file=f)
+    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue(), file=f)
 
     # Run over everything
     cerebro.run()
@@ -150,6 +158,9 @@ def run_backtest(kwargs):
 
     # Print out the final result
     print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue(),
+          file=f)
+    print('Finishing strategy "{}" at "{}"'.format(kwargs['strategy'],
+                                                   datetime.datetime.now()),
           file=f)
     retval = """
 <html>
