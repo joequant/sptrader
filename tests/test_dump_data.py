@@ -67,7 +67,7 @@ def run_strategy():
 
     # Run over everything
     cerebro.run()
-    cerebro.plot(style='candle')
+    cerebro.plot(style='candle', bardownfill=False)
     # Print out the final result
     retval = retval + \
              ('Finishing')
