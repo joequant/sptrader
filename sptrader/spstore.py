@@ -164,12 +164,14 @@ or ``BackTestCls``
         pass
 
     def _get_request(self, method, **kwargs):
-        return requests.get(self.p.gateway + method,
-                            **kwargs)
+        if self.p.gateway is not None:
+            return requests.get(self.p.gateway + method,
+                                **kwargs)
 
     def _post_request(self, method, **kwargs):
-        return requests.post(self.p.gateway + method,
-                             **kwargs)
+        if self.p.gateway is not None:
+            return requests.post(self.p.gateway + method,
+                                 **kwargs)
 
     def streaming_events(self, tmout=None):
         q = queue.Queue()
