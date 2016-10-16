@@ -34,9 +34,8 @@ var StrategyTable = React.createClass({
 			   cellRenderer: renderLog},
 			  {headerName: "Actions",
 			   field: "start",
-			   volatile: true,
-			   cellRenderer:
-			   reactCellRendererFactory(StrategyControl)
+			   cellRendererFramework: StrategyControl,
+			   parent: l
 			  }];
 		      for (var i=0; i < d.length; i++) {
 			  d[i]['editable'] = true;
@@ -66,8 +65,19 @@ var StrategyTable = React.createClass({
 	    counter:0,
 	    columnDefs: [],
 	    rowData: [],
+	    idList: new Set(),
 	    defaultData: {}
 	};
+    },
+    removeRow(props) {
+	console.log("removeRow");
+	var row = props.node;
+	var api = props.api;
+	var rowIndex = props.rowIndex;
+	console.log(props, row, api);
+	api.removeItems([row]);
+	this.state.rowData.splice(rowIndex, 1);
+	this.state.idList.delete(props.data.id);
     },
     // in onGridReady, store the api for later use
     componentWillReceiveProps(newprops) {
@@ -92,14 +102,19 @@ var StrategyTable = React.createClass({
     },
     addRow() {
 	var r = Object.assign({}, this.state.defaultData);
-	var c = this.state.counter;
+	var c = this.state.idList;
 	var rows = this.state.rowData;
-	c = c+1;
-	r['id'] = r.strategy + "-" + pad(c, 5);
+	var i = 0;
+	var id = "";
+	do {
+	    i += 1;
+	    id = r.strategy + "-" + pad(i, 5);
+	} while (c.has(id));
+	r['id'] = id;
+	c.add(id);
 	rows.push(r);
-	console.log(rows);
 	this.setState({rowData: rows,
-		       counter: c});
+		       idList: c});
 	this.api.setRowData(rows);
     },
     status() {

@@ -20,11 +20,8 @@ var StrategyControl = React.createClass({
 	console.log(this.props);
 	this.post("/strategy/stop", data);
     },
-    remove_row() {
-	var row = this.props.node;
-	var api = this.props.api;
-	console.log(this.props, row, api);
-	api.removeItems([row]);
+    removeRow() {
+	this.props.colDef.parent.removeRow(this.props);
     },
     render() {
 	console.log(this.props);
@@ -49,7 +46,7 @@ var StrategyControl = React.createClass({
 	    disabled={start_disabled}>Start</Button>
 		<Button onClick={this.stop}
 	    disabled={stop_disabled}>Stop</Button>
-		<Button onClick={this.remove_row}
+		<Button onClick={this.removeRow}
 	    disabled={remove_row_disabled}>Remove row</Button>
 		</div>
 	);
