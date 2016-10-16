@@ -70,9 +70,15 @@ var BacktestControl = React.createClass({
 	console.log(this.props);
 	this.post("/backtest", data);
     },
+    removeRow() {
+	this.props.colDef.parent.removeRow(this.props);
+    },
     render() {
 	return (
+	    <div>
 		<Button onClick={this.backtest}>Backtest</Button>
+		<Button onClick={this.removeRow}>Remove row</Button>
+	    </div>
 	);
     }
 });
@@ -162,6 +168,12 @@ function renderLog(params) {
 	params.data.id + "' target='_blank'>Log</a>";
 };
 
+function pad(num, size) {
+    var s = num+"";
+    while (s.length < size) s = "0" + s;
+    return s;
+}
+
 module.exports.isNumber = isNumber;
 module.exports.formatNumber = formatNumber;
 module.exports.renderNumber = renderNumber;
@@ -174,3 +186,4 @@ module.exports.StrategyControl = StrategyControl;
 module.exports.BacktestControl = BacktestControl;
 module.exports.renderLog = renderLog;
 module.exports.renderChar = renderChar;
+module.exports.pad = pad;

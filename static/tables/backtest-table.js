@@ -1,7 +1,7 @@
 import React from 'react';
 import {AgGridReact, reactCellRendererFactory} from 'ag-grid-react';
 import {Button} from 'react-bootstrap';
-import {BacktestControl, renderLog} from '../../static/utils';
+import {BacktestControl, renderLog, pad} from '../../static/utils';
 
 Date.prototype.Format = function (fmt) { //author: meizz
     var o = {
@@ -25,6 +25,8 @@ var BacktestTable = React.createClass({
 	$.getJSON("/strategy/headers/" + l.props.strategy,
 		  function(d) {
 		      var start = [
+			  {headerName: "Id",
+			   field: "id"},
 			  {headerName: "Instrument",
 			   field: "dataname",
 			   volatile: true,
@@ -58,11 +60,10 @@ var BacktestTable = React.createClass({
 			  {headerName: "Backtest",
 			   field: "backtest",
 			   volatile: true,
-			   cellRenderer:
-			   reactCellRendererFactory(BacktestControl)
+			   cellRendererFramework: BacktestControl,
+			   parent: l
 			  }];
 
-		      
 		      for (var i=0; i < d.length; i++) {
 			  d[i]['editable'] = true;
 			  d[i]['volatile'] = true;
@@ -90,6 +91,7 @@ var BacktestTable = React.createClass({
 	return {
 	    columnDefs: [],
 	    rowData: [],
+	    idList: new Set(),
 	    defaultData: {}
 	};
     },
@@ -99,10 +101,23 @@ var BacktestTable = React.createClass({
     },
     addRow() {
 	var r = Object.assign({}, this.state.defaultData);
+	var c = this.state.idList;
 	var rows = this.state.rowData;
-	rows.push(r);
-	this.setState({rowData: rows});
+	var i = 0;
+	var id = undefined;
+	do {
+	    i += 1;
+	    id = r.strategy + "-backtest-" + pad(i, 5);
+	} while (c.has(id));
+	r['id'] = id;
+	this.state.rowData.push(r);
+	this.state.idList.add(id);
 	this.api.setRowData(rows);
+    },
+    removeRow(props) {
+	props.api.removeItems([props.node]);
+	this.state.rowData.splice(props.rowIndex, 1);
+	this.state.idList.delete(props.data.id);
     },
     render() {
 	return (

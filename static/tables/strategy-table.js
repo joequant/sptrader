@@ -1,13 +1,7 @@
 import React from 'react';
 import {AgGridReact, reactCellRendererFactory} from 'ag-grid-react';
 import {Button} from 'react-bootstrap';
-import {StrategyControl, renderLog} from '../../static/utils';
-
-function pad(num, size) {
-    var s = num+"";
-    while (s.length < size) s = "0" + s;
-    return s;
-}
+import {StrategyControl, renderLog, pad} from '../../static/utils';
 
 var StrategyTable = React.createClass({
     getInitialState() {
@@ -69,14 +63,25 @@ var StrategyTable = React.createClass({
 	    defaultData: {}
 	};
     },
+    addRow() {
+	var r = Object.assign({}, this.state.defaultData);
+	var c = this.state.idList;
+	var rows = this.state.rowData;
+	var i = 0;
+	var id = undefined;
+	do {
+	    i += 1;
+	    id = r.strategy + "-" + pad(i, 5);
+	} while (c.has(id));
+	r['id'] = id;
+	this.state.rowData.push(r);
+	this.state.idList.add(id);
+	this.api.setRowData(rows);
+    },
     removeRow(props) {
-	console.log("removeRow");
-	var row = props.node;
-	var api = props.api;
-	var rowIndex = props.rowIndex;
-	console.log(props, row, api);
-	api.removeItems([row]);
-	this.state.rowData.splice(rowIndex, 1);
+	console.log("remove row", props);
+	props.api.removeItems([props.node]);
+	this.state.rowData.splice(props.rowIndex, 1);
 	this.state.idList.delete(props.data.id);
     },
     // in onGridReady, store the api for later use
@@ -99,25 +104,6 @@ var StrategyTable = React.createClass({
     onGridReady(params) {
 	this.api = params.api;
 	this.columnApi = params.columnApi;
-    },
-    addRow() {
-	var r = Object.assign({}, this.state.defaultData);
-	var c = this.state.idList;
-	var rows = this.state.rowData;
-	var i = 0;
-	var id = "";
-	do {
-	    i += 1;
-	    id = r.strategy + "-" + pad(i, 5);
-	} while (c.has(id));
-	r['id'] = id;
-	c.add(id);
-	rows.push(r);
-	this.setState({rowData: rows,
-		       idList: c});
-	this.api.setRowData(rows);
-    },
-    status() {
     },
     render() {
 	return (
