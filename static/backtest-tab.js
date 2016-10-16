@@ -7,12 +7,16 @@ var BacktestTab = React.createClass( {
     },
     render: function() {
 	var info = this.props.info;
+	var l = this;
 	return (
 		<div>
 		{this.props.strategylist.map(function(s) {
 		    return (<div key={s}><b>{s}</b><br/>
 			    <BacktestTable
-			    strategy={s}/></div>);
+			    strategy={s}
+			    data={l.props.data[s]}
+			    header={l.props.headers[s]}
+			    /></div>);
 		})}
 	    </div>);
     }

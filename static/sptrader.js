@@ -123,6 +123,12 @@ var SpTraderApp = React.createClass({
 	    if (d.strategy_list != undefined) {
 	    	l.setState({strategy_list: d.strategy_list});
 	    }
+	    if (d.strategy_data != undefined) {
+	    	l.setState({strategy_data: d.strategy_data});
+	    }
+	    if (d.strategy_headers != undefined) {
+	    	l.setState({strategy_headers: d.strategy_headers});
+	    }
 	    l.setState({info: d.info});
 	});
 
@@ -141,6 +147,8 @@ var SpTraderApp = React.createClass({
 	    positions: [],
 	    account_fields: [],
 	    strategy_info: {},
+	    strategy_data: {},
+	    strategy_headers: {},
 	    strategy_list: []
 	};
     },
@@ -369,10 +377,16 @@ var SpTraderApp = React.createClass({
 		</Tab>
 		<Tab eventKey={2} title="Strategy" >
 		<StrategyTab info={this.state.strategy_info}
-	    strategylist={this.state.strategy_list} />
+	       strategylist={this.state.strategy_list}
+	       headers={this.state.strategy_headers}
+	       data={this.state.strategy_data}
+	       />
 		</Tab>
 		<Tab eventKey={3} title="Backtest" >
-		<BacktestTab strategylist={this.state.strategy_list} />
+	       <BacktestTab strategylist={this.state.strategy_list}
+	       headers={this.state.strategy_headers}
+	       data={this.state.strategy_data}	       
+	       />
 		</Tab>
 		<Tab eventKey={4} title="Scratchpad">
 		<ButtonToolbar>

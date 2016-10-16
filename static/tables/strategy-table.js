@@ -5,58 +5,7 @@ import {StrategyControl, renderLog, pad} from '../../static/utils';
 
 var StrategyTable = React.createClass({
     getInitialState() {
-	var l = this;
-	$.getJSON("/strategy/headers/" + l.props.strategy,
-		  function(d) {
-		      var start = [
-			  {headerName: "Id",
-			   field: "id"},
-			  {headerName: "Status",
-			   volatile: true,
-			   field: "status"},
-			  {headerName: "Comment",
-			   volatile: true,
-			   field: "comment"},
-			  {headerName: "Instrument",
-			   field: "dataname",
-			   editable: true,
-			   defaultData: ''}
-		      ];
-		      var end = [
-			  {headerName: "Log",
-			   field: "log",
-			   cellRenderer: renderLog},
-			  {headerName: "Actions",
-			   field: "start",
-			   cellRendererFramework: StrategyControl,
-			   parent: l
-			  }];
-		      for (var i=0; i < d.length; i++) {
-			  d[i]['editable'] = true;
-			  d[i]['volatile'] = true;
-		      }
-		      var items = start.concat(d).concat(end);
-		      var defaultData = {};
-		      for (var i=0; i < items.length; i++) {
-			  if (items[i].defaultData != undefined) {
-			      defaultData[items[i].field] =
-				  items[i].defaultData;
-			  }
-		      }
-		      defaultData['status'] = 'stopped';
-		      defaultData['strategy'] = l.props.strategy;
-		      l.setState({columnDefs: items,
-				  defaultData: defaultData});
-		      $.getJSON("/strategy/data/" + l.props.strategy,
-				function(d) {
-				    var counter = d.data.length;
-				    l.setState({rowData: d.data,
-						   counter: counter});
-				    l.api.setRowData(d.data);
-		      });
-		  });
 	return {
-	    counter:0,
 	    columnDefs: [],
 	    rowData: [],
 	    idList: new Set(),
@@ -86,20 +35,67 @@ var StrategyTable = React.createClass({
     },
     // in onGridReady, store the api for later use
     componentWillReceiveProps(newprops) {
-	if (newprops.info == undefined) {
-	    return;
-	}
-	var r = this.state.rowData;
-	for(var i=0; i < r.length; i++) {
-	    var newr = newprops.info[r[i]['id']];
-	    if (newr != undefined) {
-		for (var attrname in newr){
+	var l = this;
+	if (newprops.info != undefined) {
+	    var r = this.state.rowData;
+	    for(var i=0; i < r.length; i++) {
+		var newr = newprops.info[r[i]['id']];
+		if (newr != undefined) {
+		    for (var attrname in newr){
 		    r[i][attrname] = newr[attrname];
+		    }
 		}
 	    }
+	    this.setState({rowData: r});
+	    this.api.setRowData(r);
 	}
-	this.setState({rowData: r});
-	this.api.setRowData(r);
+	if (newprops.header != undefined) {
+	    var d = newprops.header;
+	    var start = [
+		{headerName: "Id",
+		 field: "id"},
+		{headerName: "Status",
+		 volatile: true,
+		 field: "status"},
+		{headerName: "Comment",
+		 volatile: true,
+		 field: "comment"},
+		{headerName: "Instrument",
+		 field: "dataname",
+		 editable: true,
+		 defaultData: ''}
+	    ];
+	    var end = [
+		{headerName: "Log",
+		 field: "log",
+		 cellRenderer: renderLog},
+		{headerName: "Actions",
+		 field: "start",
+		 cellRendererFramework: StrategyControl,
+		 parent: l
+		}];
+	    for (var i=0; i < d.length; i++) {
+		d[i]['editable'] = true;
+		d[i]['volatile'] = true;
+	    }
+	    var items = start.concat(d).concat(end);
+	    var defaultData = {};
+	    for (var i=0; i < items.length; i++) {
+		if (items[i].defaultData != undefined) {
+		    defaultData[items[i].field] =
+			items[i].defaultData;
+		}
+	    }
+	    defaultData['status'] = 'stopped';
+	    defaultData['strategy'] = l.props.strategy;
+	    l.setState({columnDefs: items,
+			defaultData: defaultData});
+	}
+	if (newprops.data != undefined) {
+	    var d = newprops.data;
+	    l.setState({rowData: d});
+	    l.api.setRowData(d);
+	}
     },
     onGridReady(params) {
 	this.api = params.api;

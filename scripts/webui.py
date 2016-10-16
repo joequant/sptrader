@@ -77,6 +77,11 @@ def logininfo():
         d['account_info'] = info_cache['account_info']
     d['account_fields'] = sp.fields("SPApiAccInfo")
     d['strategy_list'] = strategy.strategy_list()
+    d['strategy_headers'] = {}
+    d['strategy_data'] = {}
+    for i in strategy.strategy_list():
+        d['strategy_headers'][i] = strategy.headers(i)
+        d['strategy_data'][i] = stratlist.data(i)
     return jsonify(d)
 
 
