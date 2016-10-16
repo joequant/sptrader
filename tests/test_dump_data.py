@@ -51,9 +51,9 @@ def run_strategy():
         loglevel=0,
         streaming=False
         )
+    data.addfilter(jitter.JitterFilter)
     data2 = bt.DataClone(dataname=data)
     data2.addfilter(bt.ReplayerMinutes, compression=5)
-    data2.addfilter(jitter.JitterFilter)
     cerebro.adddata(data)
     cerebro.adddata(data2)
 
