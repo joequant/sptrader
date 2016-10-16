@@ -12,32 +12,39 @@ function FieldGroup({ id, label, help, ...props }) {
   );
 }
 
-var OrderForm = React.createClass({
-    getInitialState: function() {
-	var l = this;
-	return {
+class OrderForm extends React.Component {
+    constructor(props) {
+	super(props);
+	this.state = {
 	    data: {
 	    },
 	    confirm_text: '',
 	    confirm_show: false
 	};
-    },
-    onChange: function(e) {
+	this.onChange = this.onChange.bind(this);
+	this.onChangeFloat = this.onChangeFloat.bind(this);
+	this.onChangeInt = this.onChangeInt.bind(this);
+	this.onBuy = this.onBuy.bind(this);
+	this.onSell = this.onSell.bind(this);
+	this.onCancel = this.onCancel.bind(this);
+	this.onConfirm = this.onConfirm.bind(this);
+    }
+    onChange(e) {
 	var change = this.state.data;
 	change[e.target.name] = e.target.value;
 	this.setState({"data": change});
-    },
-    onChangeFloat: function(e) {
+    }
+    onChangeFloat(e) {
 	var change = this.state.data;
 	change[e.target.name] = e.target.value;
 	this.setState({"data": change});
-    },
-    onChangeInt: function(e) {
+    }
+    onChangeInt(e) {
 	var change = this.state.data;
 	change[e.target.name] = parseInt(e.target.value);
 	this.setState({"data": change});
-    },
-    onBuy: function(e) {
+    }
+    onBuy(e) {
 	var d = this.state.data;
 	d['BuySell'] = 'B';
 	d['CondType'] = 0;
@@ -46,8 +53,8 @@ var OrderForm = React.createClass({
 	this.setState({"confirm_show": true,
 		       "data": d,
 		       "confirm_text" : JSON.stringify(d)});
-    },
-    onSell: function(e) {
+    }
+    onSell(e) {
 	var d = this.state.data;
 	d['BuySell'] = 'S';
 	d['CondType'] = 0;
@@ -56,16 +63,16 @@ var OrderForm = React.createClass({
 	this.setState({"confirm_show": true,
 		       "data": d,
 		       "confirm_text" : JSON.stringify(d)});
-    },
-    onConfirm: function(e) {
+    }
+    onConfirm(e) {
 	this.setState({"confirm_show": false});
 	this.props.onSubmit(this.state.data);
-    },
-    onCancel: function(e) {
+    }
+    onCancel(e) {
 	this.setState({"confirm_show": false});
 	this.props.onCancel();
-    },
-    render: function() {
+    }
+    render() {
 	return (<div>
 		<Modal show={this.state.confirm_show}>
 		<Modal.Header>
@@ -162,5 +169,5 @@ var OrderForm = React.createClass({
 		</div>
 	);
     }
-});
+}
 module.exports = OrderForm;

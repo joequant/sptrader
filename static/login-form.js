@@ -14,9 +14,10 @@ function FieldGroup({ id, label, help, ...props }) {
   );
 }
 
-var LoginForm = React.createClass({
-    getInitialState() {
-	return {
+class LoginForm extends React.Component {
+    constructor(props) {
+	super(props);
+	this.state = {
 	    data: {
 		host: '',
 		port: 8080,
@@ -26,22 +27,24 @@ var LoginForm = React.createClass({
 		password: ''
 	    }
 	};
-    },
+	this.onChange = this.onChange.bind(this);
+	this.onSubmit = this.onSubmit.bind(this);
+    }
     componentWillReceiveProps(nextProps) {
 	var d = nextProps.data;
 	if (d != undefined) {
 	    d.password = '';
 	    this.setState({data: d});
 	}
-    },
+    }
     onChange(e) {
 	var change = this.state.data;
 	change[e.target.name] = e.target.value;
 	this.setState({"data": change});
-    },
+    }
     onSubmit(e) {
 	this.props.onSubmit(this.state.data);
-    },
+    }
     render() {
 	return (<form>
 		<Modal show={this.props.show}>
@@ -110,5 +113,5 @@ var LoginForm = React.createClass({
 		</form>
 	);
     }
-});
+}
 module.exports = LoginForm;
