@@ -138,10 +138,11 @@ def run_backtest(kwargs):
 
     # Run over everything
     cerebro.run()
-    plotter = Plot(style='candle')
+    plotter = Plot(style='candle', bardownfill=False)
     cerebro.plot(plotter)
     imgdata = io.BytesIO()
     plt.savefig(imgdata, format='svg')
+
 
     # Print out the final result
     print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue(),
@@ -157,6 +158,7 @@ def run_backtest(kwargs):
              base64.b64encode(imgdata.getvalue()).decode('ascii') + \
              '<pre>%s</pre></body></html>' % f.getvalue()
     imgdata.close()
+    plt.close('all')
     f.close()
     return retval
 
