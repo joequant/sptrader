@@ -13,6 +13,7 @@ from spbroker import SharpPointBroker
 from spbacktester import SharpPointBackTester
 import spstrategy
 import spstore
+import jitter
 
 class DumpStrategy(spstrategy.SharpPointStrategy):
     def __init__(self):
@@ -32,7 +33,7 @@ def run_strategy():
 
     cerebro = bt.Cerebro()
     cerebro.addstrategy(strategy=DumpStrategy)
-    store = spstore.SharpPointStore()
+    store = spstore.SharpPointStore(gateway=None)
     broker = store.getbroker(backtest=True)
     cerebro.setbroker(broker)
     
@@ -52,6 +53,7 @@ def run_strategy():
         )
     data2 = bt.DataClone(dataname=data)
     data2.addfilter(bt.ReplayerMinutes, compression=5)
+    data2.addfilter(jitter.JitterFilter)
     cerebro.adddata(data)
     cerebro.adddata(data2)
 
