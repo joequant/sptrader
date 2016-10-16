@@ -86,8 +86,29 @@ function publish() {
 
 var data = [];
 
-var SpTraderApp = React.createClass({
-    getInitialState() {
+class SpTraderApp extends React.Component {
+    constructor(props) {
+	super(props);
+		this.state = {
+	    log: '',
+	    loginLabel: '',
+	    account_info: {},
+	    connection_info: {},
+	    showLoginForm: true,
+	    showOrderForm: false,
+	    showAlertBox: false,
+	    alertText: '',
+	    tickers: [],
+	    orders: [],
+	    trades: [],
+	    positions: [],
+	    account_fields: [],
+	    strategy_info: {},
+	    strategy_data: {},
+	    strategy_headers: {},
+	    strategy_list: []
+	};
+
 	var l = this;
 	$.getJSON("/login-info", function(d) {
 	    if (parseInt(d.status) != -1) {
@@ -114,48 +135,46 @@ var SpTraderApp = React.createClass({
 	    }
 	    l.setState({info: d.info});
 	});
-
-	return {
-	    log: '',
-	    loginLabel: '',
-	    account_info: {},
-	    connection_info: {},
-	    showLoginForm: true,
-	    showOrderForm: false,
-	    showAlertBox: false,
-	    alertText: '',
-	    tickers: [],
-	    orders: [],
-	    trades: [],
-	    positions: [],
-	    account_fields: [],
-	    strategy_info: {},
-	    strategy_data: {},
-	    strategy_headers: {},
-	    strategy_list: []
-	};
-    },
+	this.submitModal = this.submitModal.bind(this);
+	this.logout = this.logout.bind(this);
+	this.onerror = this.onerror.bind(this);
+	this.addToLog = this.addToLog.bind(this);
+	this.loginReply = this.loginReply.bind(this);
+	this.connectedReply = this.connectedReply.bind(this);
+	this.showOrderForm = this.showOrderForm.bind(this);
+	this.hideOrderForm = this.hideOrderForm.bind(this);
+	this.hideAlertBox = this.hideAlertBox.bind(this);
+	this.clearAlertBox = this.clearAlertBox.bind(this);
+	this.orderFailed = this.orderFailed.bind(this);
+	this.submitOrder = this.submitOrder.bind(this);
+	this.accountInfoPush = this.accountInfoPush.bind(this);
+	this.updateTickers = this.updateTickers.bind(this);
+	this.updateTrades = this.updateTrades.bind(this);
+	this.updateOrders = this.updateOrders.bind(this);
+	this.updatePositions = this.updatePositions.bind(this);
+	this.strategyStatus = this.strategyStatus.bind(this);
+    }
     submitModal(data) {
 	this._subscribe_box.reconnect(function() {
 	    $.post('/login', data);
 	});
-    },
+    }
     logout() {
 	$.get("/logout");
 	this.setState({loginLabel: '',
 		       showLoginForm: true});
-    },
+    }
     onerror(event) {
 	if (!this.state.showLoginForm) {
 	    this.setState({loginLabel: 'Connection broken',
 			   showLoginForm: true});
 	}
-    },
+    }
     addToLog(event) {
 	data = JSON.parse(event.data);
 	console.log(data);
 	this.setState({log: this.state.log + event.data + "\n"});
-    },
+    }
     loginReply(event) {
 	data = JSON.parse(event.data);
 	console.log(data);
@@ -165,7 +184,7 @@ var SpTraderApp = React.createClass({
 	} else {
 	    this.setState({showLoginForm: false});
 	}
-    },
+    }
     connectedReply(event) {
 	data = JSON.parse(event.data);
 	console.log(data);
@@ -179,7 +198,7 @@ var SpTraderApp = React.createClass({
 	    parseInt(con_status) == 2) {
 	    this.fillTables();
 	}
-    },
+    }
     fillTables() {
 	var l = this;
 	$.getJSON("/account-info");
@@ -192,39 +211,39 @@ var SpTraderApp = React.createClass({
 	$.getJSON("/trade/list", function(d) {
 	    l.setState({trades: d.data});
 	});
-    },
+    }
     showOrderForm(event) {
 	this.setState({showOrderForm: true});
-    },
+    }
     hideOrderForm(event) {
 	this.setState({showOrderForm: false});
-    },
+    }
     hideAlertBox(event) {
 	this.setState({showAlertBox: false});
-    },
+    }
     clearAlertBox(event) {
 	this.setState({alertText: ""});
-    },
+    }
     orderFailed(event) {
 	this.setState({alertText: this.state.alertText + "\n" +
 		       JSON.stringify(event.data),
 		       showAlertBox: true});
-    },
+    }
     submitOrder(data) {
 	console.log(data);
 	$.post('/order/add', data);
 	this.setState({showOrderForm: false});
-    },
+    }
     accountInfoPush(event) {
 	data = JSON.parse(event.data);
 	console.log(data);
 	this.setState({account_info: data.data});
-    },
+    }
     updateTickers(event) {
 	data = JSON.parse(event.data);
 	console.log(data);
 	this.setState({tickers: data.data});
-    },
+    }
     updateTrades(event) {
 	var data = JSON.parse(event.data).data;
 	var d = this.state.trades;
@@ -240,7 +259,7 @@ var SpTraderApp = React.createClass({
 	    d.push(data);
 	}
 	this.setState({trades: d});
-    },
+    }
     updateOrders(event) {
 	var data = JSON.parse(event.data).data;
 	console.log(data);
@@ -258,7 +277,7 @@ var SpTraderApp = React.createClass({
 	}
 	console.log("orders", d);
 	this.setState({orders: d});
-    },
+    }
     updatePositions(event) {
 	var data = JSON.parse(event.data).data;
 	console.log(data);
@@ -276,7 +295,7 @@ var SpTraderApp = React.createClass({
 	}
 	console.log("position", d);
 	this.setState({positions: d});
-    },
+    }
     strategyStatus(event) {
 	var data = JSON.parse(event.data);
 	console.log(data);
@@ -289,7 +308,7 @@ var SpTraderApp = React.createClass({
 	     comment: data['comment']};
 	console.log(d);
 	this.setState({strategy_info: d});
-    },
+    }
     render() {
 	var events = {
 	    "ping" : this.addToLog,
@@ -388,7 +407,7 @@ var SpTraderApp = React.createClass({
 	       </div>
 	)
     }
-});
+}
 
 ReactDOM.render(
     <SpTraderApp />,
