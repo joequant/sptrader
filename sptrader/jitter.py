@@ -33,7 +33,6 @@ class JitterFilter(with_metaclass(metabase.MetaParams, object)):
                          datadt.hour,
                          datadt.minute,
                          0)
-        print(datadt, newdt)
         dseconds = (datadt - newdt).seconds
 
         if dseconds <= self.p.jitter:
