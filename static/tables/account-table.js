@@ -2,9 +2,10 @@ import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
 import {renderNumber} from '../utils';
 
-var AccountTable = React.createClass({
-    getInitialState() {
-	return {
+class AccountTable extends React.Component {
+    constructor(props) {
+	super(props);
+	this.state = {
 	    columnDefs: [
 		{headerName: "Name",
 		 field: "name",
@@ -14,8 +15,8 @@ var AccountTable = React.createClass({
 		 field: "value",
 		 cellRenderer: renderNumber}],
 	    fields: []
-	};
-    },
+	}
+    }
     render() {
         var rowData = []
 	if (this.props.data != undefined) {
@@ -35,6 +36,6 @@ var AccountTable = React.createClass({
 		/>
 	)
     }
-});
+}
 
 module.exports = AccountTable;

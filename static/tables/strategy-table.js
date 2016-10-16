@@ -3,15 +3,19 @@ import {AgGridReact} from 'ag-grid-react';
 import {Button} from 'react-bootstrap';
 import {StrategyControl, renderLog, pad} from '../../static/utils';
 
-var StrategyTable = React.createClass({
-    getInitialState() {
-	return {
+class StrategyTable extends React.Component {
+    constructor(props) {
+	super(props);
+	this.state = {
 	    columnDefs: [],
 	    rowData: [],
 	    idList: new Set(),
 	    defaultData: {}
 	};
-    },
+	this.onGridReady = this.onGridReady.bind(this);
+	this.addRow = this.addRow.bind(this);
+	this.removeRow = this.removeRow.bind(this);
+    }
     addRow() {
 	var r = Object.assign({}, this.state.defaultData);
 	var c = this.state.idList;
@@ -26,13 +30,13 @@ var StrategyTable = React.createClass({
 	this.state.rowData.push(r);
 	this.state.idList.add(id);
 	this.api.setRowData(rows);
-    },
+    }
     removeRow(props) {
 	console.log("remove row", props);
 	props.api.removeItems([props.node]);
 	this.state.rowData.splice(props.rowIndex, 1);
 	this.state.idList.delete(props.data.id);
-    },
+    }
     // in onGridReady, store the api for later use
     componentWillReceiveProps(newprops) {
 	var l = this;
@@ -96,11 +100,11 @@ var StrategyTable = React.createClass({
 	    l.setState({rowData: d});
 	    l.api.setRowData(d);
 	}
-    },
+    }
     onGridReady(params) {
 	this.api = params.api;
 	this.columnApi = params.columnApi;
-    },
+    }
     render() {
 	return (
 	    <div>
@@ -114,6 +118,6 @@ var StrategyTable = React.createClass({
 		/></div>
 	)
     }
-});
+}
     
 module.exports.StrategyTable = StrategyTable;

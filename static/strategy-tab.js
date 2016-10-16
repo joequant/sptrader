@@ -1,11 +1,8 @@
 import React from 'react';
 import {StrategyTable} from './tables/strategy-table';
 
-var StrategyTab = React.createClass( {
-    getInitialState: function() {
-	return null;
-    },
-    render: function() {
+class StrategyTab extends React.Component {
+    render() {
 	var info = this.props.info;
 	var l = this;
 	return (
@@ -20,7 +17,7 @@ var StrategyTab = React.createClass( {
 		})}
 	    </div>);
     }
-});
+}
 
 module.exports = StrategyTab;
 

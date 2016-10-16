@@ -1,10 +1,7 @@
 import React from 'react';
 import {BacktestTable} from './tables/backtest-table';
 
-var BacktestTab = React.createClass( {
-    getInitialState() {
-	return null;
-    },
+class BacktestTab extends React.Component {
     render() {
 	var l = this;
 	return (
@@ -19,7 +16,7 @@ var BacktestTab = React.createClass( {
 		})}
 	    </div>);
     }
-});
+}
 
 module.exports = BacktestTab;
 

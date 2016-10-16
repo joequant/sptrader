@@ -19,19 +19,23 @@ Date.prototype.Format = function (fmt) { //author: meizz
     return fmt;
 }
 
-var BacktestTable = React.createClass({
-    getInitialState() {
-	return {
+class BacktestTable extends React.Component {
+    constructor(props) {
+	super(props);
+	this.state = {
 	    columnDefs: [],
 	    rowData: [],
 	    idList: new Set(),
 	    defaultData: {}
 	};
-    },
+	this.onGridReady = this.onGridReady.bind(this);
+	this.addRow = this.addRow.bind(this);
+	this.removeRow = this.removeRow.bind(this);
+    }
     onGridReady(params) {
 	this.api = params.api;
 	this.columnApi = params.columnApi;
-    },
+    }
     addRow() {
 	var r = Object.assign({}, this.state.defaultData);
 	var c = this.state.idList;
@@ -46,12 +50,12 @@ var BacktestTable = React.createClass({
 	this.state.rowData.push(r);
 	this.state.idList.add(id);
 	this.api.setRowData(rows);
-    },
+    }
     removeRow(props) {
 	props.api.removeItems([props.node]);
 	this.state.rowData.splice(props.rowIndex, 1);
 	this.state.idList.delete(props.data.id);
-    },
+    }
     componentWillReceiveProps(newprops) {
 	var l = this;
 	if (newprops.header != undefined) {
@@ -121,7 +125,7 @@ var BacktestTable = React.createClass({
 	    l.setState({columnDefs: items,
 			defaultData: defaultData});   
 	}
-    },
+    }
     render() {
 	return (
 	    <div>
@@ -135,6 +139,6 @@ var BacktestTable = React.createClass({
 		/></div>
 	)
     }
-});
-    
+}
+
 module.exports.BacktestTable = BacktestTable;
