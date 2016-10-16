@@ -34,7 +34,12 @@ var BacktestTable = React.createClass({
 			   field: "tickersource",
 			   volatile: true,
 			   editable: true,
-			   defaultData: 'ticker-%{instrument}.txt'}
+			   defaultData: 'ticker-%{instrument}.txt'},
+			  {headerName: "Jitter",
+			   field: "jitter",
+			   volatile: true,
+			   editable: true,
+			   defaultData: 0}
 		      ];
 		      var end = [
 			  {headerName: "Initial cash",

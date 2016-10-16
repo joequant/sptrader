@@ -19,6 +19,7 @@ import strategy.strategylist
 import datetime
 from pytz import timezone
 import traceback
+import jitter
 
 
 def check_params(kwargs, slist):
@@ -121,6 +122,9 @@ def run_backtest(kwargs):
 
     # Create a Data Feed
     data = store.getdata(**kwargs)
+    if float(kwargs['jitter']) >= 0.0:
+        data.addfilter(jitter.JitterFilter,
+                       jitter=float(kwargs['jitter']))
     data2 = bt.DataClone(dataname=data)
     data2.addfilter(bt.ReplayerMinutes, compression=5)
     cerebro.adddata(data)
