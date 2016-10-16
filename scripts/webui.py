@@ -498,22 +498,6 @@ def strategy_log(strategy_id):
     return monitor_file(os.path.join(data_dir,
                                      "log-%s.txt" % strategy_id))
 
-
-@app.route("/strategy/list")
-def strategy_list():
-    return json.dumps(strategy.strategy_list())
-
-
-@app.route('/strategy/headers/<string:stratname>')
-def strategy_headers(stratname):
-    return json.dumps(strategy.headers(stratname))
-
-
-@app.route('/strategy/data/<string:stratname>')
-def strategy_data(stratname):
-    return json.dumps({"data": stratlist.data(stratname)})
-
-
 # -----------------------------
 @app.route("/backtest", methods=['POST'])
 def backtest():
