@@ -26,5 +26,4 @@ class SharpPointBackTester(with_metaclass(MetaSharpPointBackTester,
             self.setcommission(stocklike=False, mult=10.0,
                                name=data._name,
                                commtype=CommInfoBase.COMM_FIXED)
-        print(self.comminfo)
         return super(SharpPointBackTester, self).getcommissioninfo(data)
