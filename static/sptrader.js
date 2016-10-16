@@ -83,25 +83,9 @@ var SubscribeBox = React.createClass( {
 
 function publish() {
     $.get("/ping");
-};
-
-var columns = [
-    { name : 'index' },
-    { name : 'firstName' },
-    { name : 'city' }
-]
+}
 
 var data = [];
-
-function FieldGroup({ id, label, help, ...props }) {
-  return (
-    <div>
-      <label>{label}</label>
-      <FormControl {...props} />
-      {help && <HelpBlock>{help}</HelpBlock>}
-    </div>
-  );
-}
 
 var SpTraderApp = React.createClass({
     getInitialState() {

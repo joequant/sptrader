@@ -1,5 +1,5 @@
 import React from 'react';
-import {AgGridReact, reactCellRendererFactory} from 'ag-grid-react';
+import {AgGridReact} from 'ag-grid-react';
 import {Button} from 'react-bootstrap';
 import {StrategyControl, renderLog, pad} from '../../static/utils';
 

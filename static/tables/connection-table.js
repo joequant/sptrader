@@ -1,7 +1,7 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
 var ConnectionTable = React.createClass({
-    getInitialState: function() {
+    getInitialState() {
 	return {
 	    columnDefs: [
 		{headerName: "Link",
@@ -31,7 +31,7 @@ var ConnectionTable = React.createClass({
 		     88: "Information Link"}
 	};
     },
-    render: function() {
+    render() {
 	var rowData = [];
 	var ports = this.state.ports;
 	for (var i=0, length=ports.length; i < length; i++) {

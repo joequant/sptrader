@@ -15,8 +15,7 @@ function FieldGroup({ id, label, help, ...props }) {
 }
 
 var LoginForm = React.createClass({
-    getInitialState: function() {
-	var l = this;
+    getInitialState() {
 	return {
 	    data: {
 		host: '',
@@ -28,22 +27,22 @@ var LoginForm = React.createClass({
 	    }
 	};
     },
-    componentWillReceiveProps: function(nextProps) {
+    componentWillReceiveProps(nextProps) {
 	var d = nextProps.data;
 	if (d != undefined) {
 	    d.password = '';
 	    this.setState({data: d});
 	}
     },
-    onChange: function(e) {
+    onChange(e) {
 	var change = this.state.data;
 	change[e.target.name] = e.target.value;
 	this.setState({"data": change});
     },
-    onSubmit: function(e) {
+    onSubmit(e) {
 	this.props.onSubmit(this.state.data);
     },
-    render: function() {
+    render() {
 	return (<form>
 		<Modal show={this.props.show}>
 		<Modal.Header>

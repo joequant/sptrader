@@ -2,11 +2,10 @@ import React from 'react';
 import {BacktestTable} from './tables/backtest-table';
 
 var BacktestTab = React.createClass( {
-    getInitialState: function() {
+    getInitialState() {
 	return null;
     },
-    render: function() {
-	var info = this.props.info;
+    render() {
 	var l = this;
 	return (
 		<div>
