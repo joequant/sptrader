@@ -37,12 +37,12 @@ class SharpPointStrategy(bt.Strategy):
     def buy(self, **kwargs):
         kwargs['Ref'] = self.p.id
         self.log("buy", kwargs, level=logging.DEBUG)
-        super().buy(**kwargs)
+        return super().buy(**kwargs)
 
     def sell(self, **kwargs):
         kwargs['Ref'] = self.p.id
         self.log("sell", kwargs, level=logging.DEBUG)
-        super().sell(**kwargs)
+        return super().sell(**kwargs)
 
     def log(self, *args, dt=None, level=logging.INFO):
         ''' Logging function fot this strategy'''
