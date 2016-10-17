@@ -1,3 +1,11 @@
+0.3.0 - 17 October 2016
+
+New Features:
+* Saves previous login information
+* Jitter feature for backtester
+* Fix a lot of bugs in backtester and strategy
+
+
 0.2
 
 New Features:
