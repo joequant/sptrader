@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8; py-indent-offset:4 -*-
+###############################################################################
+#
+# Copyright (C) 2016 Bitquant Research Laboratories (Asia) Limited
+#
+# Licensed under the Simplified BSD License
+#
+###############################################################################
 
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)

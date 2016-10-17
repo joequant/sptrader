@@ -1,4 +1,11 @@
 """Base class for spstrategy classes"""
+###############################################################################
+#
+# Copyright (C) 2016 Bitquant Research Laboratories (Asia) Limited
+#
+# Licensed under the Simplified BSD License
+#
+###############################################################################
 
 import sys  # To find out the script name (in argv[0])
 import logging

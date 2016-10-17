@@ -1,4 +1,12 @@
 #!/usr/bin/python3
+###############################################################################
+#
+# Copyright (C) 2016 Bitquant Research Laboratories (Asia) Limited
+#
+# License under the Simplified BSD License
+#
+###############################################################################
+
 import os
 import sys
 import time

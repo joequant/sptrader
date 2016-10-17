@@ -1,3 +1,11 @@
+###############################################################################
+#
+# Copyright (C) 2016 Bitquant Research Laboratories (Asia) Limited
+#
+# Licensed under the Simplified BSD License
+#
+###############################################################################
+
 from cffi import FFI
 import atexit
 import os

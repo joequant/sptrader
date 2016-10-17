@@ -28,6 +28,14 @@ Usage example:
 {'a': 10, 'b': 'Hey'}
 """
 
+###############################################################################
+#
+# Copyright (C) 2016 Bitquant Research Laboratories (Asia) Limited
+#
+# Licensed under the Simplified BSD License
+#
+###############################################################################
+
 import copy
 
 class FfiConverter(object):

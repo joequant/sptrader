@@ -1,3 +1,11 @@
+###############################################################################
+#
+# Copyright (C) 2016 Bitquant Research Laboratories (Asia) Limited
+#
+# Licensed under the Simplified BSD License
+#
+###############################################################################
+
 import spstore
 import logging
 from backtrader.metabase import MetaParams

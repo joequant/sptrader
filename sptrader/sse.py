@@ -1,6 +1,12 @@
 import json
 # SSE "protocol" is described here: http://mzl.la/UPFyxY
-
+###############################################################################
+#
+# Copyright (C) 2016 Bitquant Research Laboratories (Asia) Limited
+#
+# Licensed under the Simplified BSD License
+#
+###############################################################################
 
 class ServerSentEvent(object):
     def __init__(self, data, event=None, id=None):
