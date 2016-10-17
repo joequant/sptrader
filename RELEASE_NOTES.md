@@ -4,6 +4,7 @@ New Features:
 * Saves previous login information
 * Jitter feature for backtester
 * Fix a lot of bugs in backtester and strategy
+* use webpack rather than browserify for smaller executables
 
 
 0.2

@@ -15,6 +15,7 @@ Copy-Item ..\sptrader\*.md sptrader
 Copy-Item ..\sptrader\*.ps1 sptrader
 Copy-Item ..\sptrader\*.psm1 sptrader
 Copy-Item ..\sptrader\*.json sptrader
+Copy-Item ..\sptrader\*.config sptrader
 Copy-Item ..\sptrader\sptrader\*.py sptrader\sptrader
 Copy-Item ..\sptrader\strategy\*.py sptrader\strategy
 Copy-Item ..\sptrader\strategy\*.js sptrader\strategy
