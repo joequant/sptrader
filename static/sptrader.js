@@ -105,6 +105,7 @@ class SpTraderApp extends React.Component {
 	    account_fields: [],
 	    strategy_info: {},
 	    strategy_data: {},
+	    backtest_data: {},
 	    strategy_headers: {},
 	    strategy_list: []
 	};
@@ -129,6 +130,9 @@ class SpTraderApp extends React.Component {
 	    }
 	    if (d.strategy_data != undefined) {
 	    	l.setState({strategy_data: d.strategy_data});
+	    }
+	    if (d.backtest_data != undefined) {
+	    	l.setState({backtest_data: d.backtest_data});
 	    }
 	    if (d.strategy_headers != undefined) {
 	    	l.setState({strategy_headers: d.strategy_headers});
@@ -387,7 +391,7 @@ class SpTraderApp extends React.Component {
 		<Tab eventKey={3} title="Backtest" >
 	       <BacktestTab strategylist={this.state.strategy_list}
 	       headers={this.state.strategy_headers}
-	       data={this.state.strategy_data}	       
+	       data={this.state.backtest_data}	       
 	       />
 		</Tab>
 		<Tab eventKey={4} title="Scratchpad">

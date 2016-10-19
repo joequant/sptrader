@@ -30,14 +30,6 @@ except OSError as exception:
 
 ticker_file = os.path.join(data_dir, "ticker-%s.txt")
 
-with open(os.path.join(data_dir, "config-default.json")) as fp:
-    config = json.load(fp)
-
-try:
-    with open(os.path.join(data_dir, "config.json")) as fp:
-        config.update(json.load(fp))
-except Exception as error:
-    pass
 
 def get_ticker(s):
     if "/" in s:
@@ -71,13 +63,68 @@ def send_dict(event_id, msg):
         sub.put((event_id, msg))
 
 
+class Config(object):
+    def __init__(self):
+        with open(os.path.join(data_dir, "config-default.json")) as fp:
+            self.config = json.load(fp)
+        if "strategy_data" not in self.config:
+            self.config['strategy_data'] = {}
+        if "backtest_data" not in self.config:
+            self.config['backtest_data'] = {}
+        try:
+            with open(os.path.join(data_dir, "config.json")) as fp:
+                self.config.update(json.load(fp))
+        except IOError as error:
+            pass
+        for r in ['strategy_data']:
+            for k in self.config[r]:
+                self.config[r][k]['status'] = "stopped"
+                self.config[r][k]['comment'] = ""
+                send_dict("LocalStrategyStatus",
+                          {"strategy":  self.config[r][k]['strategy'],
+                           "id": self.config[r][k]['id'],
+                           "status": "stopped",
+                           "comment": ""})
+
+    def save(self):
+        with open(os.path.join(data_dir, "config.json"), 'w') as fp:
+            json.dump(self.config, fp)
+
+    def get(self, s):
+        return self.config[s]
+
+    def set(self, s, v, save=True):
+        self.config[s] = v
+        if save:
+            self.save()
+
+    def save_stratdata(self, root, kwargs, save=True):
+        sid = kwargs['id']
+        self.config[root][sid] = kwargs
+        if save:
+            self.save()
+
+    def get_stratdata_by_strategy(self, root):
+        d = {}
+        for k, v in self.config[root].items():
+            if v['strategy'] not in d:
+                d[v['strategy']] = []
+            d[v['strategy']].append(v)
+        for k in strategy.strategy_list():
+            if k not in d:
+                d[k] = []
+        return d
+
+my_config = Config()
+
+
 def send_cdata(event_id, data):
     send_dict(event_id, {"data": sp.cdata_to_py(data[0])})
 
 
 @app.route("/login-info")
 def logininfo():
-    d = {"info": config['logininfo'],
+    d = {"info": my_config.get('logininfo'),
          "status": "%d" % sp.get_login_status(80)}
     if info_cache['connected'] is not None:
         d['connected'] = info_cache['connected']
@@ -86,10 +133,10 @@ def logininfo():
     d['account_fields'] = sp.fields("SPApiAccInfo")
     d['strategy_list'] = strategy.strategy_list()
     d['strategy_headers'] = {}
-    d['strategy_data'] = {}
     for i in strategy.strategy_list():
         d['strategy_headers'][i] = strategy.headers(i)
-        d['strategy_data'][i] = stratlist.data(i)
+    d['strategy_data'] = my_config.get_stratdata_by_strategy('strategy_data')
+    d['backtest_data'] = my_config.get_stratdata_by_strategy('backtest_data')
     return jsonify(d)
 
 
@@ -102,7 +149,7 @@ def login_reply(ret_code, ret_msg):
     send_dict("LoginReply", {
         "ret_code": ret_code,
         "ret_msg": ret_msg
-        })
+    })
 sp.register_login_reply(login_reply)
 
 
@@ -111,7 +158,7 @@ def connected_reply(host_type, con_status):
     send_dict("ConnectedReply", {
         "host_type": host_type,
         "con_status": con_status
-        })
+    })
     info_cache['connected'][host_type] = con_status
     if host_type == 83 and con_status == 2:
         sp.register_ticker_update(ticker_update)
@@ -135,7 +182,7 @@ def order_report(rec_no, data):
     send_dict("OrderReport", {
         "rec_no": rec_no,
         "data": sp.cdata_to_py(data[0])
-        })
+    })
 sp.register_order_report(order_report)
 
 
@@ -151,7 +198,7 @@ def account_login_reply(accNo, ret_code, ret_msg):
         "accNo": accNo,
         "ret_code": ret_code,
         "ret_msg": ret_msg
-        })
+    })
 sp.register_account_login_reply(account_login_reply)
 
 
@@ -160,7 +207,7 @@ def account_logout_reply(ret_code, ret_msg):
     send_dict("AccountLogoutReply", {
         "ret_code": ret_code,
         "ret_msg": ret_msg
-        })
+    })
 sp.register_account_logout_reply(account_logout_reply)
 
 
@@ -209,8 +256,8 @@ sp.register_ticker_update(api_ticker_update)
 
 @sp.ffi.callback("PswChangeReplyAddr")
 def psw_change_reply(ret_code, ret_msg):
-    send_cdata("PswChangeReply", {"ret_code" : ret_code,
-                                  "ret_msg" : ret_msg})
+    send_cdata("PswChangeReply", {"ret_code": ret_code,
+                                  "ret_msg": ret_msg})
 sp.register_psw_change_reply(psw_change_reply)
 
 
@@ -238,7 +285,7 @@ sp.register_instrument_list_reply(instrument_list_reply)
 def business_date_reply(business_date):
     send_dict("BusinessDateReply", {
         "business_date": business_date
-        })
+    })
 sp.register_business_date_reply(business_date_reply)
 
 
@@ -299,15 +346,14 @@ def login():
                       request.form["app_id"],
                       request.form["user_id"],
                       request.form["password"])
-    config['logininfo'] = {
+    my_config.set('logininfo', {
         "host": request.form['host'],
-        "port" : int(request.form['port']),
-        "license" : request.form['license'],
-        "app_id" : request.form['app_id'],
-        "user_id" : request.form['user_id']
-        }
-    with open(os.path.join(data_dir, "config.json"), 'w') as fp:
-        json.dump(config, fp)
+        "port": int(request.form['port']),
+        "license": request.form['license'],
+        "app_id": request.form['app_id'],
+        "user_id": request.form['user_id']
+    })
+
     return jsonify({"retval": sp.login()})
 
 
@@ -315,7 +361,7 @@ def login():
 def ping():
     msg = {
         "msg": "Ping"
-        }
+    }
     for sub in log_subscriptions[:]:
         sub.put(("ping", msg))
     return "OK"
@@ -398,17 +444,18 @@ def clear_ticker(product):
 
 
 class StrategyList(object):
+
     def __init__(self):
         self.stratlist = {}
 
     def start(self, kwargs):
         if id not in self.stratlist or \
-               self.stratlist[id][0] is None:
+                self.stratlist[kwargs['id']][0] is None:
             (p, q) = strategy.run(kwargs)
+            self.stratlist[kwargs['id']] = (p, q)
             kwargs['status'] = 'running'
             kwargs['comment'] = ''
-            strategy_id = kwargs['id']
-            self.stratlist[strategy_id] = (p, q, kwargs)
+            my_config.save_stratdata('strategy_data', kwargs)
             t = threading.Thread(target=strategy_listener, args=(p, q))
             t.daemon = True
             t.start()
@@ -422,21 +469,22 @@ class StrategyList(object):
     def stop(self, info, terminate=False):
         sid = info.get('id', None)
         if sid in self.stratlist:
-            (p, q, cache) = self.stratlist[sid]
+            (p, q) = self.stratlist[sid]
+            cache = my_config.config['strategy_data'][sid]
             cache['status'] = info['status']
             cache['comment'] = info['comment']
-            info = cache
+            my_config.save_stratdata('strategy_data', cache)
             if q is not None:
                 q.close()
             if p is not None and terminate:
                 p.terminate()
                 p.join()
-        self.stratlist[sid] = (None, None, info)
+        self.stratlist.pop(sid)
         send_dict("LocalStrategyStatus",
                   {"strategy": info['strategy'],
                    "id": info['id'],
                    "status": info['status'],
-                   "comment" : info['comment']})
+                   "comment": info['comment']})
         return "OK"
 
     def data(self, stratname):
@@ -494,11 +542,10 @@ def strategy_stop():
     return stratlist.stop(f, terminate=True)
 
 
-@app.route("/strategy/pause", methods=['POST'])
-def strategy_pause():
-    if not request.form:
-        abort(400)
-    return stratlist.pause(request.form.to_dict())
+@app.route("/strategy/remove-row/<string:sid>")
+def strategy_remove(sid):
+    del my_config.config['strategy_data'][sid]
+    return "OK"
 
 
 @app.route("/strategy/log/<string:strategy_id>")
@@ -506,13 +553,25 @@ def strategy_log(strategy_id):
     return monitor_file(os.path.join(data_dir,
                                      "log-%s.txt" % strategy_id))
 
+
 # -----------------------------
 @app.route("/backtest", methods=['POST'])
 def backtest():
-    return strategy.backtest(request.form.to_dict())
+    d = request.form.to_dict()
+    my_config.config['backtest_data'][d['id']] = d
+    my_config.save()
+    return strategy.backtest(d)
 
+
+@app.route("/backtest/remove-row/<string:sid>")
+def backtest_remove(sid):
+    del my_config.config['backtest_data'][sid]
+    my_config.save()
+    return "OK"
 
 # ---------------------------
+
+
 @app.route("/orders/read")
 def orders_read():
     pass

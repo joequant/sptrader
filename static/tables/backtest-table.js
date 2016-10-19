@@ -55,6 +55,7 @@ class BacktestTable extends React.Component {
 	props.api.removeItems([props.node]);
 	this.state.rowData.splice(props.rowIndex, 1);
 	this.state.idList.delete(props.data.id);
+	$.get("/backtest/remove-row/" + props.data.id);
     }
     componentWillReceiveProps(newprops) {
 	var l = this;
@@ -124,6 +125,11 @@ class BacktestTable extends React.Component {
 		d.Format("yyyy-MM-dd hh:mm:ss");
 	    l.setState({columnDefs: items,
 			defaultData: defaultData});   
+	}
+	if (newprops.data != undefined) {
+	    var d = newprops.data;
+	    l.setState({rowData: d});
+	    l.api.setRowData(d);
 	}
     }
     render() {

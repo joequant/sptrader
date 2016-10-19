@@ -36,6 +36,7 @@ class StrategyTable extends React.Component {
 	props.api.removeItems([props.node]);
 	this.state.rowData.splice(props.rowIndex, 1);
 	this.state.idList.delete(props.data.id);
+	$.get("/strategy/remove-row/" + props.data.id);
     }
     // in onGridReady, store the api for later use
     componentWillReceiveProps(newprops) {
