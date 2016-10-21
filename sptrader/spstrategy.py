@@ -11,6 +11,7 @@ import sys  # To find out the script name (in argv[0])
 import logging
 import backtrader as bt
 import inspect
+import spreport
 
 # Create a Strategy
 
@@ -18,13 +19,21 @@ class SharpPointStrategy(bt.Strategy):
     params = (
         ('log', sys.stdout),
         ('loglevel', logging.INFO),
+        ('report', "debug"),
         ('id', None)
     )
 
     headers =  [
         {'headerName': "Loglevel",
          'field': "loglevel"},
+        {'headerName': "Report",
+         'field': "report",
+         'select' : ["debug", "trade"]}
         ]
+
+    def __init__(self):
+        super().__init__()
+        self.report = spreport.report_list[self.p.report](self)
 
     @classmethod
     def header_list(cls):
@@ -34,58 +43,24 @@ class SharpPointStrategy(bt.Strategy):
                 a[:0] = base_class.headers
         return a
 
+    def log(self, *args, dt=None, level=logging.INFO):
+        self.report.log(*args, dt=dt, level=level)
+
     def buy(self, **kwargs):
         kwargs['Ref'] = self.p.id
-        self.log("buy", kwargs, level=logging.DEBUG)
+        self.report.buy(kwargs)
         return super().buy(**kwargs)
 
     def sell(self, **kwargs):
         kwargs['Ref'] = self.p.id
-        self.log("sell", kwargs, level=logging.DEBUG)
+        self.report.sell(kwargs)
         return super().sell(**kwargs)
 
-    def log(self, *args, dt=None, level=logging.INFO):
-        ''' Logging function fot this strategy'''
-        if level < self.p.loglevel:
-            return
-        dt = dt or self.datas[0].datetime.datetime()
-        print('%s, ' % dt.isoformat(' '), *args,
-              file=self.p.log)
-
-    def __init__(self):
-        super().__init__()
-
     def notify_order(self, order):
-        if order.status in [order.Submitted, order.Accepted]:
-            # Buy/Sell order submitted/accepted to/by broker - Nothing to do
-            return
-
-        if order.status in [order.Rejected]:
-            self.log("REJECTED")
-            return
-
-        # Check if an order has been completed
-        # Attention: broker could reject order if not enougth cash
-        if order.status in [order.Completed, order.Canceled, order.Margin]:
-            if order.isbuy():
-                self.log(
-                    'BUY EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
-                    (order.executed.price,
-                     order.executed.value,
-                     order.executed.comm))
-            else:  # Sell
-                self.log('SELL EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
-                         (order.executed.price,
-                          order.executed.value,
-                          order.executed.comm))
-
+        self.report.notify_order(order)
 
     def notify_trade(self, trade):
-        if not trade.isclosed:
-            return
-
-        self.log('OPERATION PROFIT, GROSS %.2f, NET %.2f' %
-                 (trade.pnl, trade.pnlcomm))
+        self.report.notify_trade(trade)
 
     def next(self):
         raise NotImplementedError
