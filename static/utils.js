@@ -7,24 +7,20 @@ var StrategyControl = React.createClass({
     },
     start() {
 	var data = this.props.data;
-	console.log(this.props);
 	this.post("/strategy/start", data);
     },
     pause() {
 	var data = this.props.data;
-	console.log(this.props);
 	this.post("/strategy/pause", data);
     },
     stop() {
 	var data = this.props.data;
-	console.log(this.props);
 	this.post("/strategy/stop", data);
     },
     removeRow() {
 	this.props.colDef.parent.removeRow(this.props);
     },
     render() {
-	console.log(this.props);
 	var status = this.props.data.status;
 	var start_disabled = true;
 	var pause_disabled = true;
@@ -67,7 +63,6 @@ var BacktestControl = React.createClass({
     },
     backtest() {
 	var data = this.props.data;
-	console.log(this.props);
 	this.post("/backtest", data);
     },
     removeRow() {
@@ -177,7 +172,6 @@ function pad(num, size) {
 class SelectCellEditor extends React.Component {
     constructor (props) {
 	super(props);
-	console.log("SelectCellEditor", props);
 	this.state = this.createInitialState(props);
 	this.handleChange = this.handleChange.bind(this);
     }
@@ -191,15 +185,16 @@ class SelectCellEditor extends React.Component {
 	return this.state.value;
     }
     handleChange(event) {
+	console.log(event);
 	this.setState({value: event.target.value});
     }
     render() {
-	return (<select value={this.state.value}
+	return (<FormControl componentClass="select" value={this.state.value}
 		onChange={this.handleChange}
 		>
 		{this.state.select.map(function(s) {
 		    return (<option key={s} value={s}>{s}</option>)
-		})}</select>);
+		})}</FormControl>);
     }
 }
 
@@ -208,7 +203,6 @@ function process_headers(l, start, finish, d, default_columns) {
 	d[i]['editable'] = true;
 	d[i]['volatile'] = true;
 	if ("select" in d[i]) {
-	    console.log("select");
 	    d[i]['cellEditorFramework'] = SelectCellEditor;
 	}
     }
