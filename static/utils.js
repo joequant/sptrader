@@ -169,41 +169,15 @@ function pad(num, size) {
     return s;
 }
 
-class SelectCellEditor extends React.Component {
-    constructor (props) {
-	super(props);
-	this.state = this.createInitialState(props);
-	this.handleChange = this.handleChange.bind(this);
-    }
-    createInitialState(props) {
-	return {
-	    value: props.value,
-	    select: props.column.colDef.select
-	}
-    }
-    getValue() {
-	return this.state.value;
-    }
-    handleChange(event) {
-	console.log(event);
-	this.setState({value: event.target.value});
-    }
-    render() {
-	return (<FormControl componentClass="select" value={this.state.value}
-		onChange={this.handleChange}
-		>
-		{this.state.select.map(function(s) {
-		    return (<option key={s} value={s}>{s}</option>)
-		})}</FormControl>);
-    }
-}
-
 function process_headers(l, start, finish, d, default_columns) {
     for (var i=0; i < d.length; i++) {
 	d[i]['editable'] = true;
 	d[i]['volatile'] = true;
 	if ("select" in d[i]) {
-	    d[i]['cellEditorFramework'] = SelectCellEditor;
+	    d[i]['cellEditor'] = 'select';
+	    d[i]['cellEditorParams'] = {
+		values: d[i]['select']
+	    }
 	}
     }
     var items = start.concat(d).concat(finish);
