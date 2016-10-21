@@ -174,10 +174,43 @@ function pad(num, size) {
     return s;
 }
 
+class SelectCellEditor extends React.Component {
+    constructor (props) {
+	super(props);
+	console.log("SelectCellEditor", props);
+	this.state = this.createInitialState(props);
+	this.handleChange = this.handleChange.bind(this);
+    }
+    createInitialState(props) {
+	return {
+	    value: props.value,
+	    select: props.column.colDef.select
+	}
+    }
+    getValue() {
+	return this.state.value;
+    }
+    handleChange(event) {
+	this.setState({value: event.target.value});
+    }
+    render() {
+	return (<select value={this.state.value}
+		onChange={this.handleChange}
+		>
+		{this.state.select.map(function(s) {
+		    return (<option key={s} value={s}>{s}</option>)
+		})}</select>);
+    }
+}
+
 function process_headers(l, start, finish, d, default_columns) {
     for (var i=0; i < d.length; i++) {
 	d[i]['editable'] = true;
 	d[i]['volatile'] = true;
+	if ("select" in d[i]) {
+	    console.log("select");
+	    d[i]['cellEditorFramework'] = SelectCellEditor;
+	}
     }
     var items = start.concat(d).concat(finish);
     var defaultData = default_columns;
