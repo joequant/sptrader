@@ -20,7 +20,9 @@ class SharpPointStrategy(bt.Strategy):
         ('log', sys.stdout),
         ('loglevel', logging.INFO),
         ('report', "debug"),
-        ('id', None)
+        ('id', None),
+        ('tickersource', None),
+        ('dataname', None),
     )
 
     headers =  [
@@ -34,6 +36,7 @@ class SharpPointStrategy(bt.Strategy):
     def __init__(self):
         super().__init__()
         self.report = spreport.report_list[self.p.report](self)
+        self.set_tradehistory(True)
 
     @classmethod
     def header_list(cls):

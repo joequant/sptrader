@@ -68,8 +68,27 @@ class DebugReport(ReportBase):
 
 
 class TradeReport(ReportBase):
-    def __init__(self):
+    def __init__(self, strategy):
         super(TradeReport, self).__init__(strategy)
+    def notify_order(self, order):
+        pass
+    def notify_trade(self, trade):
+        if not trade.isclosed:
+            return
+        tickersource = self.strategy.p.tickersource
+        tickersource = tickersource.replace("%{instrument}",
+                                            self.strategy.p.dataname)
+        self.log("TRADE:", self.strategy.p, trade,
+                 level=logging.DEBUG)
+        qty = trade.history[0].status['size']
+        print(",".join([tickersource, str(abs(qty)),
+                        ("L" if qty > 1 else "S"),
+                        str(trade.history[0].status['price']),
+                        str(trade.history[-1].status['price']),
+                        str(trade.pnl),
+                        "{:%H%M}".format(trade.open_datetime()),
+                        "{:%H%M}".format(trade.close_datetime())]),
+              file=self.strategy.p.log)
 
 report_list = {
     "debug" : DebugReport,
