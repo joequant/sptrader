@@ -1,7 +1,8 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
 import {Button} from 'react-bootstrap';
-import {StrategyControl, renderLog, pad} from '../../static/utils';
+import {StrategyControl, renderLog,
+	pad, process_headers} from '../../static/utils';
 
 class StrategyTable extends React.Component {
     constructor(props) {
@@ -55,8 +56,7 @@ class StrategyTable extends React.Component {
 	    this.api.setRowData(r);
 	}
 	if (newprops.header != undefined) {
-	    var d = newprops.header;
-	    var start = [
+	    process_headers(l, [
 		{headerName: "Id",
 		 field: "id"},
 		{headerName: "Status",
@@ -69,8 +69,7 @@ class StrategyTable extends React.Component {
 		 field: "dataname",
 		 editable: true,
 		 defaultData: ''}
-	    ];
-	    var end = [
+	    ], [
 		{headerName: "Log",
 		 field: "log",
 		 cellRenderer: renderLog},
@@ -78,23 +77,12 @@ class StrategyTable extends React.Component {
 		 field: "start",
 		 cellRendererFramework: StrategyControl,
 		 parent: l
-		}];
-	    for (var i=0; i < d.length; i++) {
-		d[i]['editable'] = true;
-		d[i]['volatile'] = true;
-	    }
-	    var items = start.concat(d).concat(end);
-	    var defaultData = {};
-	    for (var i=0; i < items.length; i++) {
-		if (items[i].defaultData != undefined) {
-		    defaultData[items[i].field] =
-			items[i].defaultData;
-		}
-	    }
-	    defaultData['status'] = 'stopped';
-	    defaultData['strategy'] = l.props.strategy;
-	    l.setState({columnDefs: items,
-			defaultData: defaultData});
+		}],
+			    newprops.header,
+			    {'status': 'stopped',
+			     'strategy': l.props.strategy}
+			   );
+	    
 	}
 	if (newprops.data != undefined) {
 	    var d = newprops.data;

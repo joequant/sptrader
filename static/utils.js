@@ -174,6 +174,23 @@ function pad(num, size) {
     return s;
 }
 
+function process_headers(l, start, finish, d, default_columns) {
+    for (var i=0; i < d.length; i++) {
+	d[i]['editable'] = true;
+	d[i]['volatile'] = true;
+    }
+    var items = start.concat(d).concat(finish);
+    var defaultData = default_columns;
+    for (var i=0; i < items.length; i++) {
+	if (items[i].defaultData != undefined) {
+	    defaultData[items[i].field] =
+		items[i].defaultData;
+	}
+    }
+    l.setState({columnDefs: items,
+		defaultData: defaultData});
+}
+
 module.exports.isNumber = isNumber;
 module.exports.formatNumber = formatNumber;
 module.exports.renderNumber = renderNumber;
@@ -187,3 +204,4 @@ module.exports.BacktestControl = BacktestControl;
 module.exports.renderLog = renderLog;
 module.exports.renderChar = renderChar;
 module.exports.pad = pad;
+module.exports.process_headers = process_headers;

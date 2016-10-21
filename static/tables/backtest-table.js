@@ -1,7 +1,8 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
 import {Button} from 'react-bootstrap';
-import {BacktestControl, renderLog, pad} from '../../static/utils';
+import {BacktestControl, renderLog, pad,
+       process_headers} from '../../static/utils';
 
 Date.prototype.Format = function (fmt) { //author: meizz
     var o = {
@@ -59,9 +60,16 @@ class BacktestTable extends React.Component {
     }
     componentWillReceiveProps(newprops) {
 	var l = this;
+	var d = new Date();
+	// Get previous monday
+	d.setDate(d.getDate() - (d.getDay() + 6) % 7);
+	d.setHours(0);
+	d.setMinutes(0);
+	d.setSeconds(0);
+	d.setMilliseconds(0);
+	
 	if (newprops.header != undefined) {
-	    var d = newprops.header;
-	    var start = [
+	    process_headers(l, [
 		{headerName: "Id",
 		 field: "id"},
 		{headerName: "Instrument",
@@ -79,8 +87,7 @@ class BacktestTable extends React.Component {
 		 volatile: true,
 		 editable: true,
 		 defaultData: 0}
-	    ];
-	    var end = [
+	    ], [
 		{headerName: "Initial cash",
 		 field: "initial_cash",
 		 volatile: true,
@@ -99,32 +106,10 @@ class BacktestTable extends React.Component {
 		 volatile: true,
 		 cellRendererFramework: BacktestControl,
 		 parent: l
-		}];
-	    
-	    for (var i=0; i < d.length; i++) {
-		d[i]['editable'] = true;
-		d[i]['volatile'] = true;
-	    }
-	    var items = start.concat(d).concat(end);
-	    var defaultData = {};
-	    for (var i=0; i < items.length; i++) {
-		if (items[i].defaultData != undefined) {
-		    defaultData[items[i].field] =
-			items[i].defaultData;
-		}
-	    }
-	    defaultData['strategy'] = l.props.strategy;
-	    var d = new Date();
-	    // Get previous monday
-	    d.setDate(d.getDate() - (d.getDay() + 6) % 7);
-	    d.setHours(0);
-	    d.setMinutes(0);
-	    d.setSeconds(0);
-	    d.setMilliseconds(0);
-	    defaultData['backtest_start_time'] =
-		d.Format("yyyy-MM-dd hh:mm:ss");
-	    l.setState({columnDefs: items,
-			defaultData: defaultData});   
+		}], newprops.header, {
+		    "strategy" : l.props.strategy,
+		    "backtest_start_time": d.Format("yyyy-MM-dd hh:mm:ss")
+		});
 	}
 	if (newprops.data != undefined) {
 	    var d = newprops.data;
