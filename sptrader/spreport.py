@@ -18,8 +18,10 @@ class ReportBase(object):
         super(ReportBase, self).__init__()
         self.strategy = strategy
 
-    def log(self, *args, dt=None, level=logging.INFO):
+    def log(self, *args, dt=None, level=None):
         ''' Logging function fot this strategy'''
+        if level is None:
+            level = self.strategy.p.loglevel_default
         if level < self.strategy.p.loglevel:
             return
         dt = dt or self.strategy.datas[0].datetime.datetime()
@@ -70,6 +72,7 @@ class DebugReport(ReportBase):
 class TradeReport(ReportBase):
     def __init__(self, strategy):
         super(TradeReport, self).__init__(strategy)
+        self.strategy.p.loglevel_default = logging.DEBUG
     def notify_order(self, order):
         pass
     def notify_trade(self, trade):
@@ -84,7 +87,7 @@ class TradeReport(ReportBase):
         print(",".join([tickersource, str(abs(qty)),
                         ("L" if qty > 1 else "S"),
                         str(trade.history[0].status['price']),
-                        str(trade.history[-1].status['price']),
+                        str(trade.history[-1].event['price']),
                         str(trade.pnl),
                         "{:%H%M}".format(trade.open_datetime()),
                         "{:%H%M}".format(trade.close_datetime())]),

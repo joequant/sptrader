@@ -23,6 +23,7 @@ class SharpPointStrategy(bt.Strategy):
         ('id', None),
         ('tickersource', None),
         ('dataname', None),
+        ('loglevel_default', logging.INFO),
     )
 
     headers =  [
@@ -46,7 +47,7 @@ class SharpPointStrategy(bt.Strategy):
                 a[:0] = base_class.headers
         return a
 
-    def log(self, *args, dt=None, level=logging.INFO):
+    def log(self, *args, dt=None, level=None):
         self.report.log(*args, dt=dt, level=level)
 
     def buy(self, **kwargs):
