@@ -65,12 +65,8 @@ def send_dict(event_id, msg):
 
 class Config(object):
     def __init__(self):
-        with open(os.path.join(data_dir, "config-default.json")) as fp:
-            self.config = json.load(fp)
-        if "strategy_data" not in self.config:
-            self.config['strategy_data'] = {}
-        if "backtest_data" not in self.config:
-            self.config['backtest_data'] = {}
+        self.config['strategy_data'] = {}
+        self.config['backtest_data'] = {}
         try:
             with open(os.path.join(data_dir, "config.json")) as fp:
                 self.config.update(json.load(fp))
