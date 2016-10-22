@@ -1,3 +1,10 @@
+0.4.0 - 23 October 2016
+
+New Features:
+* Backtest does not require login
+* Saves previous strategy/backtest information
+
+
 0.3.0 - 17 October 2016
 
 New Features:
