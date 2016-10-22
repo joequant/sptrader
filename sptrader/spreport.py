@@ -85,7 +85,7 @@ class TradeReport(ReportBase):
                  level=logging.DEBUG)
         qty = trade.history[0].status['size']
         print(",".join([tickersource, str(abs(qty)),
-                        ("L" if qty > 1 else "S"),
+                        ("L" if qty > 0 else "S"),
                         str(trade.history[0].status['price']),
                         str(trade.history[-1].event['price']),
                         str(trade.pnl),
