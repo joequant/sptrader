@@ -13,7 +13,7 @@ class PositionControl extends React.Component {
     }
 }
 
-class PositionTable extends React.Component {
+export default class PositionTable extends React.Component {
     constructor(props) {
 	super(props);
 	this.state = {
@@ -76,5 +76,3 @@ class PositionTable extends React.Component {
 	/>)
     }
 }
-    
-module.exports = PositionTable;

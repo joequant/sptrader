@@ -20,9 +20,10 @@ var OrderControl = React.createClass({
     }
 });
 
-var OrderTable = React.createClass({
-    getInitialState() {
-	return {
+export default class OrderTable extends React.Component {
+    constructor(props) {
+	super(props);
+	this.state = {
 	    columnDefs: [
 		{headerName: "Ref",
 		 field: "Ref"},
@@ -77,14 +78,15 @@ var OrderTable = React.createClass({
 		 cellRenderer: reactCellRendererFactory(OrderControl)}
 	    ]
 	};
-    },
+	this.onGridReady = this.onGridReady.bind(this);
+    }
     onGridReady(params) {
 	this.api = params.api;
 	this.columnApi = params.columnApi;
-    },
+    }
     componentDidUpdate(prevprops, prevstate) {
 	this.api.setRowData(this.props.data);
-    },
+    }
     render() {
 	return (
 	<AgGridReact
@@ -96,6 +98,4 @@ var OrderTable = React.createClass({
 	/>
 	)
     }
-});
-    
-module.exports = OrderTable;
+}

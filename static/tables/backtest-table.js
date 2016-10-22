@@ -20,7 +20,7 @@ Date.prototype.Format = function (fmt) { //author: meizz
     return fmt;
 }
 
-class BacktestTable extends React.Component {
+export class BacktestTable extends React.Component {
     constructor(props) {
 	super(props);
 	this.state = {
@@ -131,5 +131,3 @@ class BacktestTable extends React.Component {
 	)
     }
 }
-
-module.exports.BacktestTable = BacktestTable;

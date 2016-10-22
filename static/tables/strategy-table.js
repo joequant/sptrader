@@ -4,7 +4,7 @@ import {Button} from 'react-bootstrap';
 import {StrategyControl, renderLog,
 	pad, process_headers} from '../../static/utils';
 
-class StrategyTable extends React.Component {
+export class StrategyTable extends React.Component {
     constructor(props) {
 	super(props);
 	this.state = {
@@ -107,5 +107,3 @@ class StrategyTable extends React.Component {
 	)
     }
 }
-    
-module.exports.StrategyTable = StrategyTable;
