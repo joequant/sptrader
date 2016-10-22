@@ -1,25 +1,27 @@
 import React from 'react';
 import {Button,Checkbox,FormControl,FormGroup,Form} from 'react-bootstrap';
 
-var StrategyControl = React.createClass({
+export class StrategyControl extends React.Component {
+    constructor(props) {
+	super(props);
+	this.start = this.start.bind(this);
+	this.stop = this.stop.bind(this);
+	this.removeRow = this.removeRow.bind(this);
+    }
     post(url, data) {
 	$.post(url, data);
-    },
+    }
     start() {
 	var data = this.props.data;
 	this.post("/strategy/start", data);
-    },
-    pause() {
-	var data = this.props.data;
-	this.post("/strategy/pause", data);
-    },
+    }
     stop() {
 	var data = this.props.data;
 	this.post("/strategy/stop", data);
-    },
+    }
     removeRow() {
 	this.props.colDef.parent.removeRow(this.props);
-    },
+    }
     render() {
 	var status = this.props.data.status;
 	var start_disabled = true;
@@ -47,9 +49,15 @@ var StrategyControl = React.createClass({
 		</div>
 	);
     }
-});
+}
 
-var BacktestControl = React.createClass({
+export class BacktestControl extends React.Component {
+    constructor(props) {
+	super(props);
+	this.backtest = this.backtest.bind(this);
+	this.removeRow = this.removeRow.bind(this);
+    }
+
     post(url, data) {
 	var myWindow = window.open("", "Backtest " + Date.now().toString());
 	myWindow.document.open();
@@ -60,14 +68,15 @@ var BacktestControl = React.createClass({
 		myWindow.document.write(data);
 		myWindow.document.close();
 	});
-    },
+    }
+    
     backtest() {
 	var data = this.props.data;
 	this.post("/backtest", data);
-    },
+    }
     removeRow() {
 	this.props.colDef.parent.removeRow(this.props);
-    },
+    }
     render() {
 	return (
 	    <div>
@@ -76,19 +85,19 @@ var BacktestControl = React.createClass({
 	    </div>
 	);
     }
-});
+}
 
 
 
-function isNumber(obj) {
+export function isNumber(obj) {
     return !isNaN(parseFloat(obj))
 };
 
-function formatNumber(n, d) {
+export function formatNumber(n, d) {
     return Number(n).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
 };
 
-function renderNumber(params) {
+export function renderNumber(params) {
     var x = params.value;
     if (isNumber(x)) {
 	return formatNumber(x, 2);
@@ -97,7 +106,7 @@ function renderNumber(params) {
     }
 };
 
-function renderBuySell(params) {
+export function renderBuySell(params) {
     var x = params.value;
     if (x == 66) {
 	return "Buy";
@@ -108,7 +117,7 @@ function renderBuySell(params) {
     }
 };
 
-function renderChar(params) {
+export function renderChar(params) {
     var x = params.value;
     return String.fromCharCode(x);
 };
@@ -118,7 +127,8 @@ function zeroPad(num, places) {
     var zero = places - num.toString().length + 1;
     return Array(+(zero > 0 && zero)).join("0") + num;
 }
-function renderDateTime(params) {
+
+export function renderDateTime(params) {
     var x = parseInt(params.value);
     var a = new Date(x * 1000);
     var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -134,7 +144,7 @@ function renderDateTime(params) {
     return time;
 };
 
-function renderDate(params) {
+export function renderDate(params) {
     var x = parseInt(params.value);
     var a = new Date(x * 1000);
     var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -147,7 +157,7 @@ function renderDate(params) {
     return time;
 };
 
-function renderTime(params) {
+export function renderTime(params) {
     var x = parseInt(params.value);
     var a = new Date(x * 1000);
     var hour = zeroPad(a.getHours(), 2);
@@ -158,18 +168,18 @@ function renderTime(params) {
 };
 
 
-function renderLog(params) {
+export function renderLog(params) {
     return "<a href='/strategy/log/" +
 	params.data.id + "' target='_blank'>Log</a>";
 };
 
-function pad(num, size) {
+export function pad(num, size) {
     var s = num+"";
     while (s.length < size) s = "0" + s;
     return s;
 }
 
-function process_headers(l, start, finish, d, default_columns) {
+export function process_headers(l, start, finish, d, default_columns) {
     for (var i=0; i < d.length; i++) {
 	d[i]['editable'] = true;
 	d[i]['volatile'] = true;
@@ -192,17 +202,9 @@ function process_headers(l, start, finish, d, default_columns) {
 		defaultData: defaultData});
 }
 
-module.exports.isNumber = isNumber;
-module.exports.formatNumber = formatNumber;
-module.exports.renderNumber = renderNumber;
-module.exports.shortnumberwidth = 100;
-module.exports.renderDateTime = renderDateTime;
-module.exports.renderDate = renderDate;
-module.exports.renderTime = renderTime;
-module.exports.renderBuySell = renderBuySell;
-module.exports.StrategyControl = StrategyControl;
-module.exports.BacktestControl = BacktestControl;
-module.exports.renderLog = renderLog;
-module.exports.renderChar = renderChar;
-module.exports.pad = pad;
-module.exports.process_headers = process_headers;
+export var shortnumberwidth = 100;
+
+
+
+
+
