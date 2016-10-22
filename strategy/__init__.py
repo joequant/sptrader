@@ -10,6 +10,7 @@ from backtrader.plot.plot import Plot
 from multiprocessing import Process, Queue
 import logging
 import pprint
+import copy
 
 # must import first to initialize metaclass
 from spfeed import SharpPointCSVData
@@ -118,14 +119,15 @@ def run_backtest(kwargs):
     broker = store.getbroker(backtest=kwargs.get('backtest', True))
     cerebro.setbroker(broker)
 
+    feedargs = copy.copy(kwargs)
     if kwargs.get('backtest_start_time', '').strip() != '':
-        kwargs['fromdate'] = parse_date(kwargs['backtest_start_time'])
+        feedargs['fromdate'] = parse_date(kwargs['backtest_start_time'])
 
     if kwargs.get('backtest_end_time', '').strip() != '':
-        kwargs['todate'] = parse_date(kwargs['backtest_end_time'])
+        feedargs['todate'] = parse_date(kwargs['backtest_end_time'])
 
     # Create a Data Feed
-    data = store.getdata(**kwargs)
+    data = store.getdata(**feedargs)
     if float(kwargs['jitter']) >= 0.0:
         data.addfilter(jitter.JitterFilter,
                        jitter=float(kwargs['jitter']))
