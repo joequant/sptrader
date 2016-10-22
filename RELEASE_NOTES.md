@@ -3,6 +3,7 @@
 New Features:
 * Backtest does not require login
 * Saves previous strategy/backtest information
+* Add trade/debug reports
 
 
 0.3.0 - 17 October 2016
