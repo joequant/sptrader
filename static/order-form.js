@@ -12,7 +12,7 @@ function FieldGroup({ id, label, help, ...props }) {
   );
 }
 
-class OrderForm extends React.Component {
+export default class OrderForm extends React.Component {
     constructor(props) {
 	super(props);
 	this.state = {
@@ -170,4 +170,3 @@ class OrderForm extends React.Component {
 	);
     }
 }
-module.exports = OrderForm;

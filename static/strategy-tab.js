@@ -1,7 +1,7 @@
 import React from 'react';
 import {StrategyTable} from './tables/strategy-table';
 
-class StrategyTab extends React.Component {
+export default class StrategyTab extends React.Component {
     render() {
 	var info = this.props.info;
 	var l = this;
@@ -18,7 +18,5 @@ class StrategyTab extends React.Component {
 	    </div>);
     }
 }
-
-module.exports = StrategyTab;
 
 

@@ -14,7 +14,7 @@ function FieldGroup({ id, label, help, ...props }) {
   );
 }
 
-class LoginForm extends React.Component {
+export default class LoginForm extends React.Component {
     constructor(props) {
 	super(props);
 	this.state = {
@@ -122,4 +122,3 @@ class LoginForm extends React.Component {
 	);
     }
 }
-module.exports = LoginForm;

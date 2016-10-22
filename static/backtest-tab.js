@@ -1,7 +1,7 @@
 import React from 'react';
 import {BacktestTable} from './tables/backtest-table';
 
-class BacktestTab extends React.Component {
+export default class BacktestTab extends React.Component {
     render() {
 	var l = this;
 	return (
@@ -17,7 +17,5 @@ class BacktestTab extends React.Component {
 	    </div>);
     }
 }
-
-module.exports = BacktestTab;
 
 
