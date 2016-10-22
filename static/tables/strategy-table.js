@@ -33,7 +33,6 @@ class StrategyTable extends React.Component {
 	this.api.setRowData(rows);
     }
     removeRow(props) {
-	console.log("remove row", props);
 	props.api.removeItems([props.node]);
 	this.state.rowData.splice(props.rowIndex, 1);
 	this.state.idList.delete(props.data.id);
@@ -42,7 +41,6 @@ class StrategyTable extends React.Component {
     // in onGridReady, store the api for later use
     componentWillReceiveProps(newprops) {
 	var l = this;
-	console.log("strategy-table", newprops);
 	if (newprops.info != undefined) {
 	    var r = this.state.rowData;
 	    for(var i=0; i < r.length; i++) {

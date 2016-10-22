@@ -55,7 +55,6 @@ class SubscribeBox extends React.Component {
     }
     connect() {
 	var source = new EventSource(this.props.url); 
-
 	var obj = this;
 	$.each(this.props.event, function(k, v) {
 	    source.addEventListener(k, v);
@@ -95,14 +94,16 @@ class SpTraderApp extends React.Component {
 	    loginLabel: '',
 	    account_info: {},
 	    connection_info: {},
-	    showLoginForm: true,
+		    showLoginForm: false,
+		    isLogin: false,
 	    showOrderForm: false,
 	    showAlertBox: false,
 	    alertText: '',
 	    tickers: [],
 	    orders: [],
 	    trades: [],
-	    positions: [],
+		    positions: [],
+		    label: "",
 	    account_fields: [],
 	    strategy_info: {},
 	    strategy_data: {},
@@ -113,7 +114,9 @@ class SpTraderApp extends React.Component {
 
 	var l = this;
 	this.fill_data();
-	this.submitModal = this.submitModal.bind(this);
+	this.loginSubmit = this.loginSubmit.bind(this);
+	this.loginClose = this.loginClose.bind(this);
+	this.login = this.login.bind(this);
 	this.logout = this.logout.bind(this);
 	this.onerror = this.onerror.bind(this);
 	this.addToLog = this.addToLog.bind(this);
@@ -132,7 +135,7 @@ class SpTraderApp extends React.Component {
 	this.updatePositions = this.updatePositions.bind(this);
 	this.strategyStatus = this.strategyStatus.bind(this);
     }
-    submitModal(data) {
+    loginSubmit(data) {
 	var l = this;
 	this._subscribe_box.reconnect().then(function() {
 	    $.post('/login', data)
@@ -140,12 +143,17 @@ class SpTraderApp extends React.Component {
 		l.fill_data();
 	});
     }
+    loginClose(data) {
+	this.setState({showLoginForm: false});
+    }
     fill_data() {
 	var l = this;
 	$.getJSON("/login-info").done(function(d) {
 	    var new_state = {};
 	    if (parseInt(d.status) != -1) {
 		new_state.showLoginForm = false;
+		new_state.isLogin = true;
+		new_state.label = "";
 		l.fillTables();
 	    }
 	    if (d.connected != undefined) {
@@ -173,15 +181,21 @@ class SpTraderApp extends React.Component {
 	    l.setState(new_state);
 	});
     }
-    logout() {
-	$.get("/logout");
+    login() {
 	this.setState({loginLabel: '',
 		       showLoginForm: true});
+    }
+    logout() {
+	$.get("/logout");
+	this.setState({isLogin: false,
+		       connection_info: {}
+		      });
     }
     onerror(event) {
 	if (!this.state.showLoginForm) {
 	    this.setState({loginLabel: 'Connection broken',
-			   showLoginForm: true});
+			   label: "Connection broken",
+			   isLogin: false});
 	}
     }
     addToLog(event) {
@@ -194,9 +208,15 @@ class SpTraderApp extends React.Component {
 	console.log(data);
 	this.setState({log: this.state.log + event.data + "\n"});
 	if (parseInt(data.ret_code) != 0) {
-	    this.setState({loginLabel: data.ret_msg});
+	    this.setState({
+		isLogin: false,
+		label: data.ret_msg,
+		loginLabel: data.ret_msg});
 	} else {
-	    this.setState({showLoginForm: false});
+	    this.setState({
+		isLogin: true,
+		label: "",
+		showLoginForm: false});
 	}
     }
     connectedReply(event) {
@@ -215,14 +235,14 @@ class SpTraderApp extends React.Component {
     }
     fillTables() {
 	var l = this;
-	$when($.getJSON("/account-info"),
-	      $.getJSON("/ticker/list"),
-	      $.getJSON("/order/list"),
-	      $.getJSON("/trade/list")).done(function(d1, d2, d3, d4) {
-		  l.setState({tickers: d2.data,
-			      orders: d3.data,
-			      trades: d4.data});
-	      });
+	$.when($.getJSON("/account-info"),
+	       $.getJSON("/ticker/list"),
+	       $.getJSON("/order/list"),
+	       $.getJSON("/trade/list")).done(function(d1, d2, d3, d4) {
+		   l.setState({tickers: d2.data,
+			       orders: d3.data,
+			       trades: d4.data});
+	       });
     }
     showOrderForm(event) {
 	this.setState({showOrderForm: true});
@@ -351,22 +371,31 @@ class SpTraderApp extends React.Component {
 	       onerror={this.onerror}
 	       ref={(c) => this._subscribe_box = c}
 	       />
-
+	       <Button disabled={this.state.isLogin}
+	       onClick={this.login}>Login</Button>
+	       <Button disabled={!this.state.isLogin}
+	       onClick={this.logout}>Logout</Button><br/>
+	       	<label>{this.state.label}</label><br/>
 		<Tabs id="tabs">
 		<Tab eventKey={1} title="Account" >
 		<LoginForm show={this.state.showLoginForm}
 	    label={this.state.loginLabel}
 	    data={this.state.info}
-	    onSubmit={this.submitModal}/>
-		<Button bsStyle="success" onClick={this.logout}>Logout</Button>
+	       onSubmit={this.loginSubmit}
+	       onClose={this.loginClose}
+	       />
 		<ConnectionTable data={this.state.connection_info}/>
 		<Tabs id="tab1">
-		<Tab eventKey={1} title="Account" >
+	       <Tab eventKey={1} title="Account"
+	       disabled={!this.state.isLogin}
+	       >
 		<AccountTable
 	    fields={this.state.account_fields} 
 	    data={this.state.account_info} />
 		</Tab>
-		<Tab eventKey={2} title="Order" >
+	       <Tab eventKey={2} title="Order"
+	       disabled={!this.state.isLogin}
+	       >
 		<AlertBox show={this.state.showAlertBox}
 	    text={this.state.alertText}
 	    ok={this.hideAlertBox}
@@ -378,30 +407,38 @@ class SpTraderApp extends React.Component {
 		<Button bsStyle="success" onClick={this.showOrderForm}>Show Order Form</Button>
 		<OrderTable data={this.state.orders} />
 		</Tab>
-		<Tab eventKey={3} title="Position" >
+	       <Tab eventKey={3} title="Position"
+	       disabled={!this.state.isLogin}
+	       >
 		<PositionTable data={this.state.positions} />
 		</Tab>
-		<Tab eventKey={4} title="Trade" >
+	       <Tab eventKey={4} title="Trade"
+	       disabled={!this.state.isLogin}
+	       >
 		<TradeTable data={this.state.trades}/>
 		</Tab>
-		<Tab eventKey={5} title="Ticker" >
+	       <Tab eventKey={5} title="Ticker"
+	       disabled={!this.state.isLogin}
+	       >
 		<TickerControl tickers={this.state.tickers}/>
 		</Tab>
 		</Tabs>
 		</Tab>
-		<Tab eventKey={2} title="Strategy" >
+		<Tab eventKey={2} title="Backtest" >
+	       <BacktestTab strategylist={this.state.strategy_list}
+	       headers={this.state.strategy_headers}
+	       data={this.state.backtest_data}	       
+	       />
+	       </Tab>
+	       <Tab eventKey={3} title="Strategy"
+	       disabled={!this.state.isLogin} >
 		<StrategyTab info={this.state.strategy_info}
 	       strategylist={this.state.strategy_list}
 	       headers={this.state.strategy_headers}
 	       data={this.state.strategy_data}
 	       />
 		</Tab>
-		<Tab eventKey={3} title="Backtest" >
-	       <BacktestTab strategylist={this.state.strategy_list}
-	       headers={this.state.strategy_headers}
-	       data={this.state.backtest_data}	       
-	       />
-		</Tab>
+
 		<Tab eventKey={4} title="Scratchpad">
 		<ButtonToolbar>
 		<Button bsStyle="success" onClick={publish}>Ping</Button>

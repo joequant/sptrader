@@ -29,6 +29,7 @@ class LoginForm extends React.Component {
 	};
 	this.onChange = this.onChange.bind(this);
 	this.onSubmit = this.onSubmit.bind(this);
+	this.onClose = this.onClose.bind(this);
     }
     componentWillReceiveProps(nextProps) {
 	var d = nextProps.data;
@@ -44,6 +45,9 @@ class LoginForm extends React.Component {
     }
     onSubmit(e) {
 	this.props.onSubmit(this.state.data);
+    }
+    onClose(e) {
+	this.props.onClose(this.state.data);
     }
     render() {
 	return (<form>
@@ -107,6 +111,10 @@ class LoginForm extends React.Component {
 		<Button
 	    onClick={this.onSubmit}>
 		Login
+	    </Button>
+		<Button
+	    onClick={this.onClose}>
+		Close
 	    </Button>
 		</Modal.Footer>
 		</Modal>

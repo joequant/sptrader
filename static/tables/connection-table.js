@@ -15,7 +15,7 @@ var ConnectionTable = React.createClass({
 		 width: 150, pinned: true,
 	     cellRenderer: function(params) {
 		 if (params.data.status == undefined) {
-		     return "";
+		     return "Closed";
 		 };
 		 var status = ["In progress",
 			       "Established",
