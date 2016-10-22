@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import {Tabs, Tab, ButtonToolbar, Button, FormControl,
 	FormGroup, ControlLabel, HelpBlock, Modal,
 	Form,Checkbox} from 'react-bootstrap';
-import ReactAddonsLinkedStateMixin from 'react-addons-linked-state-mixin';
 import {AgGridReact} from 'ag-grid-react';
 import LoginForm from './login-form';
 import ConnectionTable from './tables/connection-table';
