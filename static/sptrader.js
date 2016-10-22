@@ -65,15 +65,16 @@ class SubscribeBox extends React.Component {
 	};
 	return source;
     }
-    reconnect(callback) {
+    reconnect() {
 	console.log("reconnect", this.state.source.readyState);
 	if (this.state.source.readyState == EventSource.CLOSED) {
 	    console.log("closed");
 	    var source = this.connect();
 	    this.setState({source: source});
 	} 
-	console.log("callback");
-	callback();
+	return new Promise(function(resolve, reject) {
+	    resolve();
+	});
     }
     render() {
         return null;
@@ -111,34 +112,7 @@ class SpTraderApp extends React.Component {
 	};
 
 	var l = this;
-	$.getJSON("/login-info", function(d) {
-	    if (parseInt(d.status) != -1) {
-		l.setState({showLoginForm: false});
-		l.fillTables();
-	    }
-	    if (d.connected != undefined) {
-		l.setState({connection_info: d.connected});
-	    }
-	    if (d.account_info != undefined) {
-		l.setState({account_info: d.account_info});
-	    }
-	    if (d.account_fields != undefined) {
-	    	l.setState({account_fields: d.account_fields});
-	    }
-	    if (d.strategy_list != undefined) {
-	    	l.setState({strategy_list: d.strategy_list});
-	    }
-	    if (d.strategy_data != undefined) {
-	    	l.setState({strategy_data: d.strategy_data});
-	    }
-	    if (d.backtest_data != undefined) {
-	    	l.setState({backtest_data: d.backtest_data});
-	    }
-	    if (d.strategy_headers != undefined) {
-	    	l.setState({strategy_headers: d.strategy_headers});
-	    }
-	    l.setState({info: d.info});
-	});
+	this.fill_data();
 	this.submitModal = this.submitModal.bind(this);
 	this.logout = this.logout.bind(this);
 	this.onerror = this.onerror.bind(this);
@@ -159,8 +133,44 @@ class SpTraderApp extends React.Component {
 	this.strategyStatus = this.strategyStatus.bind(this);
     }
     submitModal(data) {
-	this._subscribe_box.reconnect(function() {
-	    $.post('/login', data);
+	var l = this;
+	this._subscribe_box.reconnect().then(function() {
+	    $.post('/login', data)
+	}).then (function() {
+		l.fill_data();
+	});
+    }
+    fill_data() {
+	var l = this;
+	$.getJSON("/login-info").done(function(d) {
+	    var new_state = {};
+	    if (parseInt(d.status) != -1) {
+		new_state.showLoginForm = false;
+		l.fillTables();
+	    }
+	    if (d.connected != undefined) {
+		new_state.connection_info = d.connected;
+	    }
+	    if (d.account_info != undefined) {
+		new_state.account_info = d.account_info;
+	    }
+	    if (d.account_fields != undefined) {
+	    	new_state.account_fields = d.account_fields;
+	    }
+	    if (d.strategy_list != undefined) {
+	    	new_state.strategy_list = d.strategy_list;
+	    }
+	    if (d.strategy_data != undefined) {
+	    	new_state.strategy_data = d.strategy_data;
+	    }
+	    if (d.backtest_data != undefined) {
+	    	new_state.backtest_data = d.backtest_data;
+	    }
+	    if (d.strategy_headers != undefined) {
+	    	new_state.strategy_headers = d.strategy_headers;
+	    }
+	    new_state.info = d.info;
+	    l.setState(new_state);
 	});
     }
     logout() {
@@ -205,16 +215,14 @@ class SpTraderApp extends React.Component {
     }
     fillTables() {
 	var l = this;
-	$.getJSON("/account-info");
-	$.getJSON("/ticker/list", function(d) {
-	    l.setState({tickers: d.data});
-	});
-	$.getJSON("/order/list", function(d) {
-	    l.setState({orders: d.data});
-	});
-	$.getJSON("/trade/list", function(d) {
-	    l.setState({trades: d.data});
-	});
+	$when($.getJSON("/account-info"),
+	      $.getJSON("/ticker/list"),
+	      $.getJSON("/order/list"),
+	      $.getJSON("/trade/list")).done(function(d1, d2, d3, d4) {
+		  l.setState({tickers: d2.data,
+			      orders: d3.data,
+			      trades: d4.data});
+	      });
     }
     showOrderForm(event) {
 	this.setState({showOrderForm: true});
