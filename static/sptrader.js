@@ -114,27 +114,8 @@ class SpTraderApp extends React.Component {
 
 	var l = this;
 	this.fill_data();
-	this.loginSubmit = this.loginSubmit.bind(this);
-	this.loginClose = this.loginClose.bind(this);
-	this.login = this.login.bind(this);
-	this.logout = this.logout.bind(this);
-	this.onerror = this.onerror.bind(this);
-	this.addToLog = this.addToLog.bind(this);
-	this.loginReply = this.loginReply.bind(this);
-	this.connectedReply = this.connectedReply.bind(this);
-	this.showOrderForm = this.showOrderForm.bind(this);
-	this.hideOrderForm = this.hideOrderForm.bind(this);
-	this.hideAlertBox = this.hideAlertBox.bind(this);
-	this.clearAlertBox = this.clearAlertBox.bind(this);
-	this.orderFailed = this.orderFailed.bind(this);
-	this.submitOrder = this.submitOrder.bind(this);
-	this.accountInfoPush = this.accountInfoPush.bind(this);
-	this.updateTickers = this.updateTickers.bind(this);
-	this.updateTrades = this.updateTrades.bind(this);
-	this.updateOrders = this.updateOrders.bind(this);
-	this.updatePositions = this.updatePositions.bind(this);
-	this.strategyStatus = this.strategyStatus.bind(this);
     }
+    
     loginSubmit(data) {
 	var l = this;
 	this._subscribe_box.reconnect().then(function() {
@@ -343,46 +324,46 @@ class SpTraderApp extends React.Component {
     }
     render() {
 	var events = {
-	    "ping" : this.addToLog,
-	    "LoginReply" : this.loginReply,
-	    "ConnectedReply" : this.connectedReply,
-	    "OrderRequestFailed" : this.orderFailed,
-	    "OrderReport" : this.updateOrders,
-	    "OrderBeforeSendReport" : this.addToLog,
-	    "AccountLoginReply" : this.addToLog,
-	    "AccountInfoPush" : this.accountInfoPush,
-	    "AccountPositionPush" : this.updatePositions,
-	    "UpdatedAccountPositionPush" : this.addToLog,
-	    "UpdatedAccountBalancePush" : this.addToLog,
-	    "TradeReport" : this.updateTrades,
-	    "PriceUpdate" : this.addToLog,
-	    "TickerUpdate" : this.updateTickers,
-	    "PswChangeReply" : this.addToLog,
-	    "ProductListByCodeReply" : this.addToLog,
-	    "InstrumentListReply" : this.addToLog,
-	    "BusinessDateReply" : this.addToLog,
-	    "MMOrderBeforeSendReport" : this.addToLog,
-	    "MMOrderRequestFailed" : this.addToLog,
-	    "QuoteRequestReceived" : this.addToLog,
-	    "LocalStrategyStatus" : this.strategyStatus
+	    "ping" : ::this.addToLog,
+	    "LoginReply" : ::this.loginReply,
+	    "ConnectedReply" : ::this.connectedReply,
+	    "OrderRequestFailed" : ::this.orderFailed,
+	    "OrderReport" : ::this.updateOrders,
+	    "OrderBeforeSendReport" : ::this.addToLog,
+	    "AccountLoginReply" : ::this.addToLog,
+	    "AccountInfoPush" : ::this.accountInfoPush,
+	    "AccountPositionPush" : ::this.updatePositions,
+	    "UpdatedAccountPositionPush" : ::this.addToLog,
+	    "UpdatedAccountBalancePush" : ::this.addToLog,
+	    "TradeReport" : ::this.updateTrades,
+	    "PriceUpdate" : ::this.addToLog,
+	    "TickerUpdate" : ::this.updateTickers,
+	    "PswChangeReply" : ::this.addToLog,
+	    "ProductListByCodeReply" : ::this.addToLog,
+	    "InstrumentListReply" : ::this.addToLog,
+	    "BusinessDateReply" : ::this.addToLog,
+	    "MMOrderBeforeSendReport" : ::this.addToLog,
+	    "MMOrderRequestFailed" : ::this.addToLog,
+	    "QuoteRequestReceived" : ::this.addToLog,
+	    "LocalStrategyStatus" : ::this.strategyStatus
 	}
 	return(<div>
 	    	<SubscribeBox url="/log/subscribe" event={events}
-	       onerror={this.onerror}
+	       onerror={::this.onerror}
 	       ref={(c) => this._subscribe_box = c}
 	       />
 	       <Button disabled={this.state.isLogin}
-	       onClick={this.login}>Login</Button>
+	       onClick={::this.login}>Login</Button>
 	       <Button disabled={!this.state.isLogin}
-	       onClick={this.logout}>Logout</Button><br/>
+	       onClick={::this.logout}>Logout</Button><br/>
 	       	<label>{this.state.label}</label><br/>
 		<Tabs id="tabs">
 		<Tab eventKey={1} title="Account" >
 		<LoginForm show={this.state.showLoginForm}
 	    label={this.state.loginLabel}
 	    data={this.state.info}
-	       onSubmit={this.loginSubmit}
-	       onClose={this.loginClose}
+	       onSubmit={::this.loginSubmit}
+	       onClose={::this.loginClose}
 	       />
 		<ConnectionTable data={this.state.connection_info}/>
 		<Tabs id="tab1">
@@ -398,13 +379,13 @@ class SpTraderApp extends React.Component {
 	       >
 		<AlertBox show={this.state.showAlertBox}
 	    text={this.state.alertText}
-	    ok={this.hideAlertBox}
-	    clear={this.clearAlertBox} />
-		<OrderForm show={this.state.showOrderForm}
-	    onSubmit={this.submitOrder}
-	    onCancel={this.hideOrderForm}/>
+	       ok={::this.hideAlertBox}
+	       clear={::this.clearAlertBox} />
+	       <OrderForm show={this.state.showOrderForm}
+	       onSubmit={::this.submitOrder}
+	       onCancel={::this.hideOrderForm}/>
 
-		<Button bsStyle="success" onClick={this.showOrderForm}>Show Order Form</Button>
+	       <Button bsStyle="success" onClick={::this.showOrderForm}>Show Order Form</Button>
 		<OrderTable data={this.state.orders} />
 		</Tab>
 	       <Tab eventKey={3} title="Position"
