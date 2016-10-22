@@ -65,6 +65,7 @@ def send_dict(event_id, msg):
 
 class Config(object):
     def __init__(self):
+        self.config = {}
         self.config['strategy_data'] = {}
         self.config['backtest_data'] = {}
         try:
