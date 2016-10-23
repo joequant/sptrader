@@ -88,7 +88,7 @@ class Config(object):
             json.dump(self.config, fp)
 
     def get(self, s):
-        return self.config[s]
+        return self.config.get(s, None)
 
     def set(self, s, v, save=True):
         self.config[s] = v
@@ -121,8 +121,9 @@ def send_cdata(event_id, data):
 
 @app.route("/login-info")
 def logininfo():
-    d = {"info": my_config.get('logininfo'),
-         "status": "%d" % sp.get_login_status(80)}
+    d = {"status": "%d" % sp.get_login_status(80)}
+    if my_config.get('logininfo') is not None:
+        d['info'] = my_config.get('logininfo')
     if info_cache['connected'] is not None:
         d['connected'] = info_cache['connected']
     if info_cache['account_info'] is not None:
