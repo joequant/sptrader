@@ -22,6 +22,11 @@ sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 sys.path.insert(0, os.path.join(location, ".."))
 data_dir = os.path.join(location, "..", "data")
 
+from sse import ServerSentEvent
+import sptrader
+import strategy
+import strategy.strategylist
+
 try:
     os.makedirs(data_dir)
 except OSError as exception:
@@ -32,14 +37,10 @@ ticker_file = os.path.join(data_dir, "ticker-%s.txt")
 
 
 def get_ticker(s):
+    '''Get ticker file'''
     if "/" in s:
         raise ValueError
     return ticker_file % s
-
-from sse import ServerSentEvent
-import sptrader
-import strategy
-import strategy.strategylist
 
 sp = sptrader.SPTrader()
 log_subscriptions = []
@@ -55,15 +56,18 @@ app = Flask(__name__,
 
 @app.route("/")
 def hello():
+    '''Main application file'''
     return app.send_static_file("sptrader.html")
 
 
 def send_dict(event_id, msg):
+    '''Send dictionary as event'''
     for sub in log_subscriptions[:]:
         sub.put((event_id, msg))
 
 
 class Config(object):
+    '''Load and save config'''
     def __init__(self):
         self.config = {}
         self.config['strategy_data'] = {}
