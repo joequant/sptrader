@@ -302,4 +302,3 @@ BrokerSharpPoint = SharpPointBroker
 if __name__ == '__main__':
     s = SharpPointBroker()
     s.start()
-

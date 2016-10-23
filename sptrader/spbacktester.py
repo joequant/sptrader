@@ -6,12 +6,13 @@
 #
 ###############################################################################
 
-import spstore
 import logging
-from backtrader.metabase import MetaParams
-from backtrader.utils.py3 import with_metaclass
 from backtrader.brokers.bbroker import BackBroker
 from backtrader.comminfo import CommInfoBase
+from backtrader.metabase import MetaParams
+from backtrader.utils.py3 import with_metaclass
+import spstore
+
 
 class MetaSharpPointBackTester(MetaParams):
     def __init__(cls, name, bases, dct):
@@ -19,13 +20,16 @@ class MetaSharpPointBackTester(MetaParams):
         # Initialize the class
         spstore.SharpPointStore.BackTestCls = cls
 
+
 class SharpPointBackTester(with_metaclass(MetaSharpPointBackTester,
                                           BackBroker)):
     params = (
         ('loglevel', logging.INFO),
         )
+
     def init(self):
         super(SharpPointBackTester, self).init()
+
     def getcommissioninfo(self, data):
         if data._name in self.comminfo:
             return self.comminfo[data._name]
@@ -37,6 +41,4 @@ class SharpPointBackTester(with_metaclass(MetaSharpPointBackTester,
             self.setcommission(stocklike=False, mult=10.0,
                                name=data._name,
                                commtype=CommInfoBase.COMM_FIXED)
-        if self.p.loglevel <= logging.DEBUG:
-            print(comminfo)
         return super(SharpPointBackTester, self).getcommissioninfo(data)

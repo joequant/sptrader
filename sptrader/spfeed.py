@@ -19,6 +19,7 @@ from backtrader.feeds import feed
 from backtrader.utils import date2num
 from backtrader.utils.py3 import with_metaclass
 
+
 class MetaSharpPointData(feed.MetaCSVDataBase):
     def __init__(cls, name, bases, dct):
         '''Class has already been created ... register'''
@@ -61,10 +62,10 @@ class SharpPointCSVData(with_metaclass(MetaSharpPointData, feed.CSVDataBase)):
                                             self.p.dataname)
                 dataname = os.path.join(modpath, '..', 'data', dataname)
             if hasattr(dataname, 'readline'):
-                self.f =dataname
+                self.f = dataname
             else:
                 # Let an exception propagate to let the caller know
-                open(dataname,'a').close()
+                open(dataname, 'a').close()
                 self.f = io.open(dataname, 'r')
 
         super(SharpPointCSVData, self).start()
