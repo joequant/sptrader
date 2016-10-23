@@ -109,13 +109,15 @@ export default class LoginForm extends React.Component {
 		</Modal.Body>
 		<Modal.Footer>
 		<Button
+	    onClick={this.onClose}>
+		Close
+		</Button>
+		<Button
+		bsStyle="primary"
 	    onClick={this.onSubmit}>
 		Login
 	    </Button>
-		<Button
-	    onClick={this.onClose}>
-		Close
-	    </Button>
+
 		</Modal.Footer>
 		</Modal>
 		</form>
