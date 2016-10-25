@@ -47,7 +47,7 @@ export class BacktestTable extends React.Component {
 	    i += 1;
 	    id = r.strategy + "-backtest-" + pad(i, 5);
 	} while (c.has(id));
-	r['id'] = id;
+	r.id = id;
 	this.state.rowData.push(r);
 	this.state.idList.add(id);
 	this.api.setRowData(rows);
@@ -113,6 +113,10 @@ export class BacktestTable extends React.Component {
 	}
 	if (newprops.data != undefined) {
 	    var d = newprops.data;
+	    this.state.idList.clear();
+	    for(var i=0; i < d.length; i++) {
+		this.state.idList.add(d[i].id);
+	    }
 	    l.setState({rowData: d});
 	    l.api.setRowData(d);
 	}

@@ -27,7 +27,7 @@ export class StrategyTable extends React.Component {
 	    i += 1;
 	    id = r.strategy + "-" + pad(i, 5);
 	} while (c.has(id));
-	r['id'] = id;
+	r.id = id;
 	this.state.rowData.push(r);
 	this.state.idList.add(id);
 	this.api.setRowData(rows);
@@ -44,7 +44,7 @@ export class StrategyTable extends React.Component {
 	if (newprops.info != undefined) {
 	    var r = this.state.rowData;
 	    for(var i=0; i < r.length; i++) {
-		var newr = newprops.info[r[i]['id']];
+		var newr = newprops.info[r[i].id];
 		if (newr != undefined) {
 		    for (var attrname in newr){
 		    r[i][attrname] = newr[attrname];
@@ -85,6 +85,10 @@ export class StrategyTable extends React.Component {
 	}
 	if (newprops.data != undefined) {
 	    var d = newprops.data;
+	    this.state.idList.clear();
+	    for(var i=0; i < d.length; i++) {
+		this.state.idList.add(d[i].id);
+	    }
 	    l.setState({rowData: d});
 	    l.api.setRowData(d);
 	}
