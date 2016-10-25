@@ -172,9 +172,13 @@ or ``BackTestCls``
 
     def updateposition(self, data):
         """Update position from streamer"""
-        position = Position(data['Qty'],
-                            abs(data['TotalAmt']/data['Qty']))
-        self.positions[data['ProdCode']] = position
+        try:
+            position = Position(data['Qty'],
+                                abs(data['TotalAmt']/data['Qty']))
+            self.positions[data['ProdCode']] = position
+        except KeyError:
+            print("key-error in updateposition", data)
+
 
     def getposition(self, data, clone=False):
         position =  self.positions[data]
@@ -193,8 +197,8 @@ or ``BackTestCls``
 
             if event.event == "AccountPositionPush":
                 if self.p.loglevel <= logging.DEBUG:
-                    print(event.event, data)
-                self.updateposition(data)
+                    print(event.event, data['data'])
+                self.updateposition(data['data'])
                 continue
             if self.broker is None:
                 continue
