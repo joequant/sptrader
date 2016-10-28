@@ -19,9 +19,11 @@ export default class OrderForm extends React.Component {
 	    data: {
 	    },
 	    confirm_text: '',
-	    confirm_show: false
+	    confirm_show: false,
+	    stoplevel_disabled: true
 	};
 	this.onChange = this.onChange.bind(this);
+	this.onChangeOrderType = this.onChangeOrderType.bind(this);
 	this.onChangeFloat = this.onChangeFloat.bind(this);
 	this.onChangeInt = this.onChangeInt.bind(this);
 	this.onBuy = this.onBuy.bind(this);
@@ -44,12 +46,40 @@ export default class OrderForm extends React.Component {
 	change[e.target.name] = parseInt(e.target.value);
 	this.setState({"data": change});
     }
+    onChangeOrderType(e) {
+	var change = this.state.data;
+	var stoplevel_disabled = false;
+	change[e.target.name] = e.target.value;
+	if (e.target.value != "stop-limit") {
+	    stoplevel_disabled = true;
+	    change['StopLevel'] = '';
+	}
+	this.setState({"data": change,
+		       'stoplevel_disabled': stoplevel_disabled});
+    }
+
+    set_order(d) {
+	d['Price'] = parseFloat(d['Price']);
+	if (d['MyOrderType'] == "limit") {
+	    d['CondType'] = 0;
+	    d['OrderType'] = 0;
+	    d['StopLevel'] = 0;
+	} else if (d['MyOrderType'] == "stop-limit") {
+	    d['CondType'] = 1;
+	    d['OrderType'] = 0;
+	    d['StopType'] = 'L';
+	} else if (d['MyOrderType'] == "stop-market") {
+	    d['CondType'] = 1;
+	    d['Price']=0;
+	    d['OrderType'] = 6;
+	    d['StopType'] = 'L';
+	}
+	delete d['MyOrderType'];
+    }
     onBuy(e) {
 	var d = this.state.data;
 	d['BuySell'] = 'B';
-	d['CondType'] = 0;
-	d['OrderType'] = 0;
-	d['Price'] = parseFloat(d['Price']);
+	this.set_order(d);
 	this.setState({"confirm_show": true,
 		       "data": d,
 		       "confirm_text" : JSON.stringify(d)});
@@ -57,9 +87,7 @@ export default class OrderForm extends React.Component {
     onSell(e) {
 	var d = this.state.data;
 	d['BuySell'] = 'S';
-	d['CondType'] = 0;
-	d['OrderType'] = 0;
-	d['Price'] = parseFloat(d['Price']);
+	this.set_order(d);
 	this.setState({"confirm_show": true,
 		       "data": d,
 		       "confirm_text" : JSON.stringify(d)});
@@ -133,12 +161,22 @@ export default class OrderForm extends React.Component {
 <FormGroup controlId="formControlsSelect">
 <ControlLabel>Order Type</ControlLabel>
 <FormControl componentClass="select" placeholder="select"
-		name="OrderType" onChange={this.onChangeInt}
-		value={this.state.data.CondType}
+		name="MyOrderType" onChange={this.onChangeOrderType}
+		value={this.state.data.MyOrderType}
 		>
-<option value="0">Limit</option>
+		<option value="limit">Limit</option>
+		<option value="stop-limit">Stop/Limit</option>
+		<option value="stop-market">Stop Market</option>
 </FormControl>
 </FormGroup>
+		<FieldGroup
+	    name="StopLevel"
+	    type="text"
+		label="Stop Level"
+		disabled={this.state.stoplevel_disabled}
+	    onChange={this.onChange}
+	    value={this.state.data.StopLevel}
+		/>
 		<FieldGroup
 	    name="Ref"
 	    type="text"

@@ -604,6 +604,25 @@ class SPTrader(object):
             return -2
         return self.api.SPAPI_AddOrder(buffer)
 
+    def order_delete(self, data):
+        accOrderNo = int(data['IntOrderNo'])
+        return self.api.SPAPI_DeleteOrderBy(self.user,
+                                            self.acc_no,
+                                            accOrderNo,
+                                            data['clOrderId'])
+
+    def order_activate(self, data):
+        accOrderNo = int(data['IntOrderNo'])
+        return self.api.SPAPI_ActivateOrderBy(self.user,
+                                              self.acc_no,
+                                              accOrderNo)
+
+    def order_inactivate(self, data):
+        accOrderNo = int(data['IntOrderNo'])
+        return self.api.SPAPI_InactivateOrderBy(self.user,
+                                                self.acc_no,
+                                                accOrderNo)
+
     def __del__(self):
         pass
 #        self.api.SPAPI_Uninitialize()

@@ -11,11 +11,32 @@ var OrderControl = React.createClass({
     cancel() {
 	var data = this.props.data;
 	console.log(this.props);
-	this.post("/backtest", data);
+	var d = {}
+	d['clOrderId'] = data.clOrderId;
+	d['IntOrderNo'] = data.IntOrderNo;
+	this.post("/order/delete", d);
+    },
+    activate() {
+	var data = this.props.data;
+	console.log(this.props);
+	var d = {}
+	d['IntOrderNo'] = data.IntOrderNo;
+	this.post("/order/activate", d);
+    },
+    inactivate() {
+	var data = this.props.data;
+	console.log(this.props);
+	var d = {}
+	d['IntOrderNo'] = data.IntOrderNo;
+	this.post("/order/inactivate", d);
     },
     render() {
 	return (
+	    <div>
 		<Button onClick={this.cancel}>Cancel</Button>
+		<Button onClick={this.activate}>Activate</Button>
+		<Button onClick={this.inactivate}>Inactivate</Button>
+		</div>
 	);
     }
 });

@@ -602,6 +602,43 @@ def order_add():
         abort(400)
     return str(sp.order_add(f))
 
+@app.route("/order/delete", methods=['POST'])
+def order_delete():
+    if request.form:
+        f = request.form.to_dict()
+    elif request.json:
+        f = request.json
+    else:
+        abort(400)
+    if 'IntOrderNo' not in f and \
+       'clOrderId' not in f:
+        abort(400)
+    return str(sp.order_delete(f))
+
+@app.route("/order/activate", methods=['POST'])
+def order_activate():
+    if request.form:
+        f = request.form.to_dict()
+    elif request.json:
+        f = request.json
+    else:
+        abort(400)
+    if 'IntOrderNo' not in f:
+        abort(400)
+    return str(sp.order_activate(f))
+
+@app.route("/order/inactivate", methods=['POST'])
+def order_inactivate():
+    if request.form:
+        f = request.form.to_dict()
+    elif request.json:
+        f = request.json
+    else:
+        abort(400)
+    if 'IntOrderNo' not in f:
+        abort(400)
+    return str(sp.order_inactivate(f))
+
 
 @app.route("/price/subscribe/<string:products>")
 def subscribe_price(products):
