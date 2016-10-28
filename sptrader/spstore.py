@@ -316,6 +316,17 @@ or ``BackTestCls``
         elif order.issell():
             okwargs['BuySell'] = "S"
         okwargs['Price'] = order.created.price
+        if order.exectype == bt.Order.Stop:
+            okwargs['StopType'] = 'L'
+            okwargs['Price'] = 0
+            okwargs['OrderType'] = 6
+            okwargs['CondType'] = 1
+        elif order.exectype == bt.order.StopLimit:
+            okwargs['StopLevel'] = order.created.price
+            okwargs['Price'] = order.created.pricelimit
+            okwargs['CondType'] = 1
+            okwargs['StopType'] = 'L'
+
         okwargs['Qty'] = abs(order.created.size)
         okwargs['ProdCode'] = order.data._dataname
         okwargs['Ref'] = kwargs.get('Ref', '')
