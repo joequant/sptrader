@@ -3,7 +3,7 @@ Import-module $ScriptDir\modules
 
 #filenames
 $pyversion = "3.5.2"
-$nodeversion = "v4.4.7"
+$nodeversion = "v7.0.0"
 
 #$pyfile = "python-$($pyversion)-webinstall.exe"
 #$pypath = "c:\\Program Files (x86)\\Python35-32\\Scripts"
