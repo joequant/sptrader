@@ -113,11 +113,12 @@ export class BacktestTable extends React.Component {
 	}
 	if (newprops.data != undefined) {
 	    var d = newprops.data;
-	    this.state.idList.clear();
+	    var idList = new Set();
 	    for(var i=0; i < d.length; i++) {
-		this.state.idList.add(d[i].id);
+		idList.add(d[i].id);
 	    }
-	    l.setState({rowData: d});
+	    l.setState({rowData: d,
+			idList: idList});
 	    l.api.setRowData(d);
 	}
     }
