@@ -109,7 +109,7 @@ class SpTraderApp extends React.Component {
 	    backtest_data: {},
 	    strategy_headers: {},
             strategy_list: [],
-	    backend_version: "not set"
+	    versions: []
 	};
 
 	var l = this;
@@ -158,8 +158,8 @@ class SpTraderApp extends React.Component {
 	    if (d.strategy_headers != undefined) {
 	    	new_state.strategy_headers = d.strategy_headers;
 	    }
-	    if (d.backend_version != undefined) {
-		new_state.backend_version = d.backend_version;
+	    if (d.versions != undefined) {
+		new_state.versions = d.versions;
 	    }
 	    new_state.info = d.info;
 	    l.setState(new_state);
@@ -359,7 +359,6 @@ class SpTraderApp extends React.Component {
 	       onClick={::this.login}>Login</Button>
 	       <Button disabled={!this.state.isLogin}
 	       onClick={::this.logout}>Logout</Button>
-	       <label>Backend Version: {this.state.backend_version}</label>
 	       <br/>
 	       	<label>{this.state.label}</label><br/>
 		<Tabs id="tabs">
@@ -425,7 +424,12 @@ class SpTraderApp extends React.Component {
 	       />
 		</Tab>
 
-		<Tab eventKey={4} title="Scratchpad">
+	       <Tab eventKey={4} title="Diagnostics">
+	       <h3>Versions</h3>
+	       {this.state.versions.map(function(s) {
+		   return(<span key={s[0]}><label>{s[0]}: {s[1]}</label><br/></span>)
+	       })}
+	       <br/>
 		<ButtonToolbar>
 		<Button bsStyle="success" onClick={publish}>Ping</Button>
 		</ButtonToolbar>

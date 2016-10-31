@@ -147,7 +147,10 @@ def logininfo():
         d['strategy_headers'][i] = strategy.headers(i)
     d['strategy_data'] = my_config.get_stratdata_by_strategy('strategy_data')
     d['backtest_data'] = my_config.get_stratdata_by_strategy('backtest_data')
-    d['backend_version'] = VERSION
+    d['versions'] = [
+        ["web-backend", VERSION],
+        ["backtrader", btversion]
+        ]
     return jsonify(d)
 
 
