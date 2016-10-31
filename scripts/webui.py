@@ -34,7 +34,7 @@ except OSError as exception:
         raise
 
 ticker_file = os.path.join(data_dir, "ticker-%s.txt")
-
+VERSION="0.4.2"
 
 def get_ticker(s):
     '''Get ticker file'''
@@ -139,6 +139,7 @@ def logininfo():
         d['strategy_headers'][i] = strategy.headers(i)
     d['strategy_data'] = my_config.get_stratdata_by_strategy('strategy_data')
     d['backtest_data'] = my_config.get_stratdata_by_strategy('backtest_data')
+    d['backend_version'] = VERSION
     return jsonify(d)
 
 
