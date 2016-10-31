@@ -11,6 +11,7 @@ from multiprocessing import Process, Queue
 import logging
 import pprint
 import copy
+import inspect
 
 # must import first to initialize metaclass
 from spfeed import SharpPointCSVData
@@ -52,7 +53,7 @@ def run_strategy(kwargs, q):
                 else:
                     stratargs[k] = v
         stratargs['log'] = f
-        stratargs['strategy'] = strategylist.dispatch[kwargs['strategy']]
+        stratargs['strategy'] = module
         cerebro = bt.Cerebro()
         cerebro.addstrategy(**stratargs)
         store = spstore.SharpPointStore()
@@ -69,6 +70,8 @@ def run_strategy(kwargs, q):
         # Print out the starting conditions
         print('Starting strategy "{}" at "{}"'.format(kwargs['strategy'],
                                                       datetime.datetime.now()),
+              file=f)
+        print('Using module file "{}"'.format(inspect.getsourcefile(module)),
               file=f)
         print('{}'.format(pprint.pformat(kwargs)), file=f)
         # Run over everything
@@ -146,6 +149,8 @@ def run_backtest(kwargs):
 
     print('Starting strategy "{}" at "{}"'.format(kwargs['strategy'],
                                                   datetime.datetime.now()),
+          file=f)
+    print('Using module file "{}"'.format(inspect.getsourcefile(module)),
           file=f)
     print('{}'.format(pprint.pformat(kwargs)), file=f)
     print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue(), file=f)
