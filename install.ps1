@@ -27,7 +27,7 @@ wget "https://www.python.org/ftp/python/$($pyversion)/$($pyfile)" -OutFile "$($e
 Start-Process "$($env:TEMP)/$($pyfile)" "PrependPath=1 InstallAllUsers=1 Include_test=0" -Wait
 Remove-Item "$($env:TEMP)/$($pyfile)"
 $env:Path += ";$($pypath)"
-Start-Process pip3 "install --upgrade cffi flask backtrader matplotlib sseclient-py requests pytz" -Verb runAs -Wait
+Start-Process pip3 "install --upgrade cffi flask backtrader==1.9.12.99 matplotlib sseclient-py requests pytz" -Verb runAs -Wait
 
 Write-Output "Installing VC redistribution"
 wget "http://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/$($vcredist)" -OutFile "$($env:TEMP)/$($vcredist)"

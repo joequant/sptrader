@@ -14,6 +14,7 @@ import threading
 import json
 import errno
 import datetime
+import pkg_resources
 from queue import Queue
 
 from flask import Flask, Response, jsonify, request, abort
@@ -21,6 +22,13 @@ location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 sys.path.insert(0, os.path.join(location, ".."))
 data_dir = os.path.join(location, "..", "data")
+
+#blacklist backtrader version
+btversion = pkg_resources.get_distribution("backtrader").version
+
+if btversion == "1.9.13.102":
+    print("WARNING!!!!")
+    print("BACKTRADER 1.9.13.102 is BROKEN with sptrader")
 
 from sse import ServerSentEvent
 import sptrader
