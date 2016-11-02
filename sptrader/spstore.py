@@ -321,7 +321,7 @@ or ``BackTestCls``
             okwargs['Price'] = 0
             okwargs['OrderType'] = 6
             okwargs['CondType'] = 1
-        elif order.exectype == bt.order.StopLimit:
+        elif order.exectype == bt.Order.StopLimit:
             okwargs['StopLevel'] = order.created.price
             okwargs['Price'] = order.created.pricelimit
             okwargs['CondType'] = 1
