@@ -172,10 +172,10 @@ def run_backtest(kwargs):
     retval = """
 <html>
 <head>
-<title>{} {:%Y%m%d%H%M%S}</title>
+<title>Backtest - {}</title>
 </head>
 <body>
-""".format(kwargs['strategy'], datetime.datetime.now())
+""".format(kwargs['id'])
     retval += '<img src="data:image/svg+xml;base64,%s" /><br>' % \
              base64.b64encode(imgdata.getvalue()).decode('ascii') + \
              '<pre>%s</pre></body></html>' % f.getvalue()
