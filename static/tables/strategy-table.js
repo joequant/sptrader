@@ -1,7 +1,7 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
 import {Button} from 'react-bootstrap';
-import {StrategyControl, renderLog,
+import {actionBoxWidth, StrategyControl, renderLog,
 	pad, process_headers} from '../../static/utils';
 
 export class StrategyTable extends React.Component {
@@ -75,6 +75,7 @@ export class StrategyTable extends React.Component {
 		{headerName: "Actions",
 		 field: "start",
 		 cellRendererFramework: StrategyControl,
+		 width: actionBoxWidth,
 		 parent: l
 		}],
 			    newprops.header,

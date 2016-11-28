@@ -1,7 +1,7 @@
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
 import {Button} from 'react-bootstrap';
-import {BacktestControl, renderLog, pad,
+import {actionBoxWidth, BacktestControl, renderLog, pad,
        process_headers} from '../../static/utils';
 
 Date.prototype.Format = function (fmt) { //author: meizz
@@ -104,6 +104,7 @@ export class BacktestTable extends React.Component {
 		{headerName: "Backtest",
 		 field: "backtest",
 		 volatile: true,
+		 width: actionBoxWidth,
 		 cellRendererFramework: BacktestControl,
 		 parent: l
 		}], newprops.header, {

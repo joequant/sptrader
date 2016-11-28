@@ -1,12 +1,49 @@
 import React from 'react';
 import {Button,Checkbox,FormControl,FormGroup,Form} from 'react-bootstrap';
 
+
+function download(strData, strFileName, strMimeType) {
+    var D = document,
+	a = D.createElement("a");
+    strMimeType= strMimeType || "application/octet-stream";
+
+
+    if (navigator.msSaveBlob) { // IE10
+	return navigator.msSaveBlob(new Blob([strData], {type: strMimeType}), strFileName);
+    } /* end if(navigator.msSaveBlob) */
+
+
+    if ('download' in a) { //html5 A[download]
+	a.href = "data:" + strMimeType + "," + encodeURIComponent(strData);
+	a.setAttribute("download", strFileName);
+	a.innerHTML = "downloading...";
+	D.body.appendChild(a);
+	setTimeout(function() {
+	    a.click();
+	    D.body.removeChild(a);
+	}, 66);
+	return true;
+    } /* end if('download' in a) */
+
+
+    //do iframe dataURL download (old ch+FF):
+    var f = D.createElement("iframe");
+    D.body.appendChild(f);
+    f.src = "data:" +  strMimeType   + "," + encodeURIComponent(strData);
+
+    setTimeout(function() {
+	D.body.removeChild(f);
+    }, 333);
+    return true;
+} /* end download() */
+
 export class StrategyControl extends React.Component {
     constructor(props) {
 	super(props);
 	this.start = this.start.bind(this);
 	this.stop = this.stop.bind(this);
 	this.removeRow = this.removeRow.bind(this);
+	this.exportParams = this.exportParams.bind(this);
     }
     post(url, data) {
 	$.post(url, data);
@@ -21,6 +58,10 @@ export class StrategyControl extends React.Component {
     }
     removeRow() {
 	this.props.colDef.parent.removeRow(this.props);
+    }
+    exportParams() {
+	download(JSON.stringify(this.props.data),
+		 this.props.data['id'] + '.json');
     }
     render() {
 	var status = this.props.data.status;
@@ -38,6 +79,7 @@ export class StrategyControl extends React.Component {
 	    pause_disabled = false;
 	    stop_disabled = false;
 	}
+	export_params_disabled = false;
 	return (
 		<div>
 		<Button onClick={this.start}
@@ -46,6 +88,8 @@ export class StrategyControl extends React.Component {
 	    disabled={stop_disabled}>Stop</Button>
 		<Button onClick={this.removeRow}
 	    disabled={remove_row_disabled}>Remove row</Button>
+		<Button onClick={this.exportParams}
+	    disabled={export_params_disabled}>Export parameters</Button>
 		</div>
 	);
     }
@@ -56,6 +100,7 @@ export class BacktestControl extends React.Component {
 	super(props);
 	this.backtest = this.backtest.bind(this);
 	this.removeRow = this.removeRow.bind(this);
+	this.exportParams = this.exportParams.bind(this);
     }
 
     post(url, data) {
@@ -77,11 +122,16 @@ export class BacktestControl extends React.Component {
     removeRow() {
 	this.props.colDef.parent.removeRow(this.props);
     }
+    exportParams() {
+	download(JSON.stringify(this.props.data),
+		 this.props.data['id'] + '.json');
+    }
     render() {
 	return (
 	    <div>
 		<Button onClick={this.backtest}>Backtest</Button>
 		<Button onClick={this.removeRow}>Remove row</Button>
+		<Button onClick={this.exportParams}>Export parameters</Button>
 	    </div>
 	);
     }
@@ -203,7 +253,7 @@ export function process_headers(l, start, finish, d, default_columns) {
 }
 
 export var shortnumberwidth = 100;
-
+export var actionBoxWidth = 300;
 
 
 
