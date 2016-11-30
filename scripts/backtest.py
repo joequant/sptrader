@@ -7,14 +7,18 @@ import requests
 import re
 import os
 
-for i in sys.argv[1:]:
-	if re.search('\.json$', i):
-		with open(i) as data_file:
-			data = json.load(data_file)
+config_file = sys.argv[1]
+items = sys.argv[2:]
+with open(config_file) as data_file:
+	data = json.load(data_file)
+
+for k, v in data['backtest_data'].items():
+	for i in items:
+		if k.startswith(i):
+			print("loading configuration", k)
 			r = requests.post("http://localhost:5000/backtest",
-					  data)
-			outfile = re.sub('\.json$', '.html',
-					 os.path.basename(i))
+					  v)
+			outfile = k + ".html"
 			print("writing to ", outfile)
 			with open(outfile, 'w') as outf:
 				print(r.text, file=outf)
