@@ -97,7 +97,7 @@ class Config(object):
 
     def save(self):
         with open(os.path.join(data_dir, "config.json"), 'w') as fp:
-            json.dump(self.config, fp)
+            json.dump(self.config, fp, indent=4, sort_keys=True)
 
     def get(self, s):
         return self.config.get(s, None)
