@@ -1,0 +1,13 @@
+{
+    "backtest_start_time": "",
+    "dataname": "HSI",
+    "exitbars": "3",
+    "id": "sample-backtest-00001",
+    "initial_cash": "100000",
+    "jitter": "5",
+    "loglevel": "20",
+    "maperiod": "10",
+    "report": "debug",
+    "strategy": "sample",
+    "tickersource": "HSI_20150409.txt"
+}
