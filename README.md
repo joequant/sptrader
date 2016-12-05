@@ -26,9 +26,23 @@ RUN
 Double click scripts/webui.py
 Take web browser and point to http://localhost:5000/
 
+BATCH_BACKTESTER
+----------------
+
+Put a configuration .json file in data (example sample)
+Run scripts/webui.py
+Run scripts/backtest_files.py (config name) (file names)
+
+Files are log files exported by SPTrader application.  Sample file in
+included in data HSI_20150409.txt
+
+
+
 TESTS
 -----
 There are a number of other scripts in directory tests
+
+
 
 DEMO ACCOUNTS
 -------------
