@@ -40,7 +40,7 @@ for i in args.items:
 			  data)
 	k = base_name.rsplit(".", 1)
 	if args.multifile:
-		outfile = k[0] + ".html"
+		outfile = args.config_name + '-' + k[0] + ".html"
 		print("writing to ", outfile)
 		with open(outfile, 'w') as outf:
 			print(r.text, file=outf)
