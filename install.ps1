@@ -8,14 +8,14 @@ $nodeversion = "v7.0.0"
 #$pyfile = "python-$($pyversion)-webinstall.exe"
 #$pypath = "c:\\Program Files (x86)\\Python35-32\\Scripts"
 #$vcredist = "vcredist_x86.exe"
-#$spzipfile = "SPAPIDLL_R8.742_WIN32.zip"
+#$spzipfile = "SPAPIDLL_R8.743_WIN32.zip"
 #$sslzipfile = "openssl-1.0.2h-i386-win32.zip"
 #$nodefile = "node-$($nodeversion)-x86.msi"
 
 $pyfile = "python-$($pyversion)-amd64-webinstall.exe"
 $pypath = "c:\\Program Files\\Python35\\Scripts"
 $vcredist = "vcredist_x64.exe"
-$spzipfile = "SPAPIDLL_R8.742_WIN64.zip"
+$spzipfile = "SPAPIDLL_R8.743_WIN64.zip"
 $sslzipfile = "openssl-1.0.2h-x64_86-win64.zip"
 $nodefile = "node-$($nodeversion)-x64.msi"
 
@@ -40,7 +40,7 @@ Start-Process "$($env:TEMP)/$($nodefile)" -Wait
 Remove-Item "$($env:TEMP)/$($nodefile)"
 
 New-Item dll -type directory -force
-unzip -filename $spzipfile -url http://spsystem.info/download/API/R8742 -dir dll -name SPTrader
+unzip -filename $spzipfile -url http://spsystem.info/download/API/R8743 -dir dll -name SPTrader
 unzip -filename $sslzipfile -url "https://indy.fulgan.com/SSL/" -dir dll -name OpenSSL
 Pause
 
