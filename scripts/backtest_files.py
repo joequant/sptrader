@@ -10,7 +10,7 @@ import shutil
 import argparse
 
 parser = argparse.ArgumentParser(description='Process backtesting')
-parser.add_argument('--multifile', dest='multifile',
+parser.add_argument('--onefile', dest='onefile',
 		    action='store_true')
 parser.add_argument('progname', nargs='?', default=None)
 parser.add_argument('config_name',nargs='?',default=None)
@@ -39,7 +39,7 @@ for i in args.items:
 	r = requests.post("http://localhost:5000/backtest",
 			  data)
 	k = base_name.rsplit(".", 1)
-	if args.multifile:
+	if not args.onefile:
 		outfile = args.config_name + '-' + k[0] + ".html"
 		print("writing to ", outfile)
 		with open(outfile, 'w') as outf:
