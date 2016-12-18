@@ -157,11 +157,12 @@ def run_backtest(kwargs):
 
     # Run over everything
     cerebro.run()
-    plotter = Plot(style='candle', bardownfill=False)
-    cerebro.plot(plotter)
     imgdata = io.BytesIO()
-    plt.savefig(imgdata, format='svg')
-
+    plot_type = kwargs.get("plot", "candle")
+    if plot_type != "none":
+        plotter = Plot(style='candle', bardownfill=False)
+        cerebro.plot(plotter)
+        plt.savefig(imgdata, format='svg')
 
     # Print out the final result
     print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue(),
@@ -176,9 +177,10 @@ def run_backtest(kwargs):
 </head>
 <body>
 """.format(kwargs['id'])
-    retval += '<img src="data:image/svg+xml;base64,%s" /><br>' % \
-             base64.b64encode(imgdata.getvalue()).decode('ascii') + \
-             '<pre>%s</pre></body></html>' % f.getvalue()
+    if plot_type != "none": 
+        retval += '<img src="data:image/svg+xml;base64,%s" /><br>' % \
+             base64.b64encode(imgdata.getvalue()).decode('ascii')
+    retval += '<pre>%s</pre></body></html>' % f.getvalue()
     imgdata.close()
     plt.close('all')
     f.close()
