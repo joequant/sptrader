@@ -11,6 +11,7 @@ New-Item -ItemType directory sptrader\static
 New-Item -ItemType directory sptrader\tests
 New-Item -ItemType directory sptrader\scripts
 New-Item -ItemType directory sptrader\strategy
+New-Item -ItemType directory sptrader\data
 Copy-Item ..\sptrader\*.md sptrader
 Copy-Item ..\sptrader\*.ps1 sptrader
 Copy-Item ..\sptrader\*.psm1 sptrader
@@ -24,4 +25,6 @@ Copy-Item ..\sptrader\static\*.html sptrader\static
 Copy-Item ..\sptrader\static\*.css sptrader\static
 Copy-Item ..\sptrader\static\*.js sptrader\static
 Copy-Item ..\sptrader\tests\*.py sptrader\tests
+Copy-Item ..\sptrader\data\*.json sptrader\data
+Copy-Item ..\sptrader\data\*.txt sptrader\data
 Compress-Archive -Path sptrader -DestinationPath sptrader.zip
