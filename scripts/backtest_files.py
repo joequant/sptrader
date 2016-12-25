@@ -10,13 +10,11 @@ import shutil
 import argparse
 
 parser = argparse.ArgumentParser(description='Process backtesting')
-parser.add_argument('--onefile', dest='onefile',
-		    action='store_true')
-parser.add_argument('progname', nargs='?', default=None)
+parser.add_argument('--onefile', action='store_true')
 parser.add_argument('config_name',nargs='?',default=None)
 parser.add_argument('items',nargs='*')
 
-args = parser.parse_args(sys.argv)
+args = parser.parse_args(sys.argv[1:])
 
 location = os.path.dirname(os.path.realpath(__file__))
 data_dir = os.path.join(location, "..", "data")
