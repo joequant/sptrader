@@ -25,6 +25,12 @@ print("looking for ", config_file)
 with open(config_file) as data_file:
 	data = json.load(data_file)
 
+if args.onefile:
+	outfile = args.config_name + ".html"
+	print("writing to ", outfile)
+	with open(outfile, 'w') as outf:
+		pass
+
 for i in args.items:
 	base_name = os.path.basename(i)
 	data_file = os.path.join(data_dir, base_name)

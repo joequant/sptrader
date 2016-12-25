@@ -29,10 +29,10 @@ class ReportBase(object):
               file=self.strategy.p.log)
 
     def buy(self, kwargs):
-        self.log("buy", kwargs, level=logging.DEBUG)
+        self.log("buy", level=logging.DEBUG)
 
     def sell(self, kwargs):
-        self.log("sell", kwargs, level=logging.DEBUG)
+        self.log("sell", level=logging.DEBUG)
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
