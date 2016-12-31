@@ -8,6 +8,7 @@ import re
 import os
 import shutil
 import argparse
+import glob
 
 parser = argparse.ArgumentParser(description='Process backtesting')
 parser.add_argument('--onefile', action='store_true')
@@ -31,7 +32,7 @@ if args.onefile:
 	with open(outfile, 'w') as outf:
 		pass
 
-for i in args.items:
+for i in sorted(sum([glob.glob(i) for i in args.items], [])):
 	base_name = os.path.basename(i)
 	data_file = os.path.join(data_dir, base_name)
 	if os.path.exists(data_file):
