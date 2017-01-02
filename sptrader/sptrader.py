@@ -12,6 +12,7 @@ import os
 import struct
 import cffi_to_py
 import sys
+from enum import Enum
 
 if 8 * struct.calcsize("P") != 64:
     print("sptrader only supported for 64 bit")
@@ -399,6 +400,10 @@ else:
 # ordinary characters
 
 
+class SPTraderMode(Enum):
+    live = 1
+    inactive_order = 2
+
 class SPTrader(object):
     ffi = ffi
     api = spapi
@@ -409,6 +414,7 @@ class SPTrader(object):
         self.api.SPAPI_Initialize()
         self.user = None
         self.acc_no = None
+        self.mode = SPTraderMode.live
 
     def ready(self):
         if self.user is None:
