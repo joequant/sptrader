@@ -81,14 +81,22 @@ class TradeReport(ReportBase):
         tickersource = self.strategy.p.tickersource
         tickersource = tickersource.replace("%{instrument}",
                                             self.strategy.p.dataname)
-        self.log("TRADE:", self.strategy.p, trade,
+        self.log("TRADE:", self.strategy.p, trade, "foo!",
+                 trade.history[0].event['order'],
                  level=logging.DEBUG)
         qty = trade.history[0].status['size']
+
+        if hasattr(self.strategy, "open_price"):
+            open_price = self.strategy.open_price
+        else:
+            open_price = trade.history[0].status['price']
+
+        close_price = trade.history[-1].event['price']
         print(",".join([tickersource, str(abs(qty)),
                         ("L" if qty > 0 else "S"),
-                        str(trade.history[0].status['price']),
-                        str(trade.history[-1].event['price']),
-                        str(trade.pnl),
+                        str(open_price),
+                        str(close_price),
+                        str(qty * (close_price - open_price)),
                         "{:%H%M}".format(trade.open_datetime()),
                         "{:%H%M}".format(trade.close_datetime())]),
               file=self.strategy.p.log)
