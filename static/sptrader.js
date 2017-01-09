@@ -194,8 +194,8 @@ class SpTraderApp extends React.Component {
 	if (parseInt(data.ret_code) != 0) {
 	    this.setState({
 		isLogin: false,
-		label: data.ret_msg,
-		loginLabel: data.ret_msg});
+		label: data.ret_msg + " (" + data.ret_code + ")",
+		loginLabel: data.ret_msg + " (" + data.ret_code + ")"});
 	} else {
 	    this.setState({
 		isLogin: true,
