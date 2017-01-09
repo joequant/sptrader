@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='sptrader',
-      version='0.7.0',
+      version='0.8.0',
       description='SharpPoint trading system',
       author='Joseph C Wang',
       author_email='joequant@gmail.com',
