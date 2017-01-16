@@ -79,7 +79,6 @@ export class StrategyControl extends React.Component {
 	    pause_disabled = false;
 	    stop_disabled = false;
 	}
-	export_params_disabled = false;
 	return (
 		<div>
 		<Button onClick={this.start}
@@ -88,8 +87,6 @@ export class StrategyControl extends React.Component {
 	    disabled={stop_disabled}>Stop</Button>
 		<Button onClick={this.removeRow}
 	    disabled={remove_row_disabled}>Remove row</Button>
-		<Button onClick={this.exportParams}
-	    disabled={export_params_disabled}>Export parameters</Button>
 		</div>
 	);
     }
