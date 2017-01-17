@@ -91,10 +91,26 @@ class TradeReport(ReportBase):
         else:
             open_price = trade.history[0].status['price']
 
+        cut_loss = 0.0
+        if hasattr(self.strategy, 'cut_loss'):
+            cut_loss = self.strategy.cut_loss
+        tp_be = 0.0
+        if hasattr(self.strategy, 'level') and \
+           self.strategy.level is not None:
+            tp_be = self.strategy.level
+        if hasattr(self.strategy, 'level_be') and \
+           self.strategy.level_be is not None and \
+           self.strategy.level_be > tp_be:
+            if qty > 0:
+                tp_be = open_price + self.strategy.level_be
+            else:
+                tp_be = open_price - self.strategy.level_be
         close_price = trade.history[-1].event['price']
         print(",".join([tickersource, str(abs(qty)),
                         ("L" if qty > 0 else "S"),
                         str(open_price),
+                        str(cut_loss),
+                        str(tp_be),
                         str(close_price),
                         str(qty * (close_price - open_price)),
                         "{:%H%M}".format(trade.open_datetime()),
