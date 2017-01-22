@@ -1,3 +1,6 @@
+0.8.1 - 22 January 2016
+* Fix hammer and engulfing differences
+
 0.4.0 - 23 October 2016
 
 New Features:
