@@ -105,23 +105,28 @@ class SharpPointCSVData(with_metaclass(MetaSharpPointData, feed.CSVDataBase)):
         return self.p.keepalive
 
     def _loadline(self, linetokens):
-        itoken = iter(linetokens)
-        sdate = next(itoken)
-        sopen = float(next(itoken))
-        shigh = float(next(itoken))
-        slow = float(next(itoken))
-        sclose = float(next(itoken))
-        svolume = int(next(itoken))
+        try:
+            itoken = iter(linetokens)
+            sdate = next(itoken)
+            sopen = float(next(itoken))
+            shigh = float(next(itoken))
+            slow = float(next(itoken))
+            sclose = float(next(itoken))
+            svolume = int(next(itoken))
 
-        ldata = [int(x) for x in sdate.split(self.p.separatordate)]
-        self.lines.datetime[0] = date2num(datetime.datetime(*ldata))
-        self.lines.open[0] = sopen
-        self.lines.high[0] = shigh
-        self.lines.low[0] = slow
-        self.lines.close[0] = sclose
-        self.lines.volume[0] = svolume
-        self.lines.openinterest[0] = 0.0
-        return True
+            ldata = [int(x) for x in sdate.split(self.p.separatordate)]
+            self.lines.datetime[0] = date2num(datetime.datetime(*ldata))
+            self.lines.open[0] = sopen
+            self.lines.high[0] = shigh
+            self.lines.low[0] = slow
+            self.lines.close[0] = sclose
+            self.lines.volume[0] = svolume
+            self.lines.openinterest[0] = 0.0
+            return True
+        except Exception as e:
+            print("error reading line", type(e), str(linetokens))
+            self.error = "error reading line" + str(linetokens)
+            return None
 
 
 class SharpPointCSV(feed.CSVFeedBase):
