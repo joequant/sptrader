@@ -400,10 +400,6 @@ else:
 # ordinary characters
 
 
-class SPTraderMode(Enum):
-    live = 1
-    inactive_order = 2
-
 class SPTrader(object):
     ffi = ffi
     api = spapi
@@ -414,7 +410,6 @@ class SPTrader(object):
         self.api.SPAPI_Initialize()
         self.user = None
         self.acc_no = None
-        self.mode = SPTraderMode.live
 
     def ready(self):
         if self.user is None:
@@ -609,6 +604,15 @@ class SPTrader(object):
         if buffer is None:
             return -2
         return self.api.SPAPI_AddOrder(buffer)
+
+    def order_add_inactive(self, data):
+        data['AccNo'] = self.acc_no
+        data['Initiator'] = self.user
+        buffer = self.ffi.new("SPApiOrder[1]")
+        self.ffi_conv.from_py(buffer, data)
+        if buffer is None:
+            return -2
+        return self.api.SPAPI_AddInactiveOrder(buffer)
 
     def order_delete(self, data):
         accOrderNo = int(data['IntOrderNo'])

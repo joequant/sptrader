@@ -614,6 +614,16 @@ def order_add():
         abort(400)
     return str(sp.order_add(f))
 
+@app.route("/order/add_inactive", methods=['POST'])
+def order_add_inactive():
+    if request.form:
+        f = request.form.to_dict()
+    elif request.json:
+        f = request.json
+    else:
+        abort(400)
+    return str(sp.order_add_inactive(f))
+
 @app.route("/order/delete", methods=['POST'])
 def order_delete():
     if request.form:
