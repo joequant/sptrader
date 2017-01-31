@@ -24,6 +24,7 @@ class SharpPointStrategy(bt.Strategy):
         ('tickersource', None),
         ('dataname', None),
         ('loglevel_default', logging.INFO),
+        ('order_mode', ["inactive", "active"])
     )
 
     headers =  [
@@ -31,7 +32,10 @@ class SharpPointStrategy(bt.Strategy):
          'field': "loglevel"},
         {'headerName': "Report",
          'field': "report",
-         'select' : ["debug", "trade"]}
+         'select' : ["debug", "trade"]},
+        {'headerName': "Order Mode",
+         'field': "order_mode",
+         'select' : ["inactive", "active"]}
         ]
 
     def __init__(self):
@@ -52,11 +56,19 @@ class SharpPointStrategy(bt.Strategy):
 
     def buy(self, **kwargs):
         kwargs['Ref'] = self.p.id
+        if self.p.order_mode == "inactive":
+            kwargs['Inactive'] = True
+        else:
+            kwargs['Inactive'] = False
         self.report.buy(kwargs)
         return super().buy(**kwargs)
 
     def sell(self, **kwargs):
         kwargs['Ref'] = self.p.id
+        if self.p.order_mode == "inactive":
+            kwargs['Inactive'] = True
+        else:
+            kwargs['Inactive'] = False
         self.report.sell(kwargs)
         return super().sell(**kwargs)
 

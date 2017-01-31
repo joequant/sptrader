@@ -333,6 +333,7 @@ or ``BackTestCls``
         order.ref = "{:%Y%m%d%H%M%S}".format(datetime.now())
         self._orders[order.ref] = order
         okwargs['Ref2'] = str(order.ref)
+        okwargs['Inactive'] = kwargs.get('Inactive', False)
         if self.p.loglevel <= logging.DEBUG:
             print(okwargs)
         self.q_ordercreate.put((order.ref, okwargs,))
@@ -350,7 +351,12 @@ or ``BackTestCls``
             if self.p.loglevel <= logging.DEBUG:
                 print(msg)
             try:
-                r = self._post_request("order/add", json=okwargs)
+                inactive = okwargs.pop("Inactive", False)
+                if inactive:
+                    r = self._post_request("order/add_inactive",
+                                           json=okwargs)
+                else:
+                    r = self._post_request("order/add", json=okwargs)
             except Exception as e:
                 self.put_notification(e)
                 self.broker._reject(order.ref)
