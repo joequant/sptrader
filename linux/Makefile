@@ -1,5 +1,5 @@
 MAJOR_VERSION=8
-MINOR_VERSION=744
+MINOR_VERSION=742
 ZIP_FILE=SPAPIDLL_R${MAJOR_VERSION}.${MINOR_VERSION}_LINUX.zip
 
 ../dll/linux-shim.so: linux-shim.cpp ../dll/libapiwrapper.so
