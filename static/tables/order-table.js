@@ -41,6 +41,37 @@ var OrderControl = React.createClass({
     }
 });
 
+function renderStatus(params) {
+    var x = params.value;
+    if ( x == 0) {
+	return "Sent";
+    } else if ( x== 1) {
+	return "Working";
+    } else if ( x == 2 ) {
+	return "Inactive";
+    } else if ( x== 3 ) {
+	return "Pending";
+    } else if ( x == 4) {
+	return "Adding";
+    } else if ( x == 5 ) {
+	return "Changing";
+    } else if ( x == 6 ) {
+	return "Deleting";
+    } else if ( x == 7 ) {
+	return "Inactivating";
+    } else if ( x == 8) {
+	return "Partially filled";
+    } else if ( x == 9 ) {
+	return "Filled";
+    } else if ( x == 10) {
+	return "Cancelled";
+    } else if ( x == 18 ) {
+	return "Pending approval";
+    } else {
+	return x;
+    }
+}
+
 export default class OrderTable extends React.Component {
     constructor(props) {
 	super(props);
