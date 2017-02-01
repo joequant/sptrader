@@ -17,6 +17,7 @@ export default class OrderForm extends React.Component {
 	super(props);
 	this.state = {
 	    data: {
+		'Inactive': 0
 	    },
 	    confirm_text: '',
 	    confirm_show: false,
@@ -75,6 +76,7 @@ export default class OrderForm extends React.Component {
 	    d['StopType'] = 'L';
 	}
 	delete d['MyOrderType'];
+	d['Inactive'] = parseInt(d['Inactive']);
     }
     onBuy(e) {
 	var d = this.state.data;
@@ -146,6 +148,18 @@ export default class OrderForm extends React.Component {
 	    onChange={this.onChangeInt}
 	    value={this.state.data.Qty}
 		/>
+		<FormGroup controlId="formInactiveSelect">
+      <ControlLabel>Inactive</ControlLabel>
+		<FormControl componentClass="select" placeholder="select"
+		name="Inactive"
+		onChange={this.onChangeInt}
+		value={this.state.data.Inactive}
+		>
+		<option value="0">Active</option>
+		<option value="1">Inactive</option>
+      </FormControl>
+    </FormGroup>
+
 		</Col>
 		<Col sm={6} md={3}>
 <FormGroup controlId="formControlsSelect">
