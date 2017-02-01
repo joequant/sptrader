@@ -24,7 +24,7 @@ class SharpPointStrategy(bt.Strategy):
         ('tickersource', None),
         ('dataname', None),
         ('loglevel_default', logging.INFO),
-        ('order_mode', ["inactive", "active"])
+        ('order_mode', "active")
     )
 
     headers =  [
@@ -35,7 +35,7 @@ class SharpPointStrategy(bt.Strategy):
          'select' : ["debug", "trade"]},
         {'headerName': "Order Mode",
          'field': "order_mode",
-         'select' : ["inactive", "active"]}
+         'select' : ["active", "inactive"]}
         ]
 
     def __init__(self):
