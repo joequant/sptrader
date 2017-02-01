@@ -7,8 +7,9 @@ import {shortnumberwidth, renderNumber, renderDateTime,
 
 var OrderControl = React.createClass({
     post(url, data) {
+	$.post(url, data);
     },
-    cancel() {
+    delete() {
 	var data = this.props.data;
 	console.log(this.props);
 	var d = {}
@@ -31,11 +32,21 @@ var OrderControl = React.createClass({
 	this.post("/order/inactivate", d);
     },
     render() {
+	var status = this.props.data.Status;
+	var inactive = false;
+	var show_inactivate = false;
+	if (status == 2) {
+	    inactive = true;
+	}
+	if (status == 3) {
+	    show_inactivate = true;
+	}
+	    
 	return (
 	    <div>
-		<Button onClick={this.cancel}>Cancel</Button>
-		<Button onClick={this.activate}>Activate</Button>
-		<Button onClick={this.inactivate}>Inactivate</Button>
+		<Button onClick={this.delete}>Delete</Button>
+		<Button onClick={this.activate} disabled={inactive}>Activate</Button>
+		<Button onClick={this.inactivate} disabled={show_inactivate}>Inactivate</Button>
 		</div>
 	);
     }
@@ -64,7 +75,7 @@ function renderStatus(params) {
     } else if ( x == 9 ) {
 	return "Filled";
     } else if ( x == 10) {
-	return "Cancelled";
+	return "Deleted";
     } else if ( x == 18 ) {
 	return "Pending approval";
     } else {
@@ -106,7 +117,8 @@ export default class OrderTable extends React.Component {
 		 width: shortnumberwidth},
 		{headerName: "Status",
 		 field: "Status",
-		 width: shortnumberwidth},
+		 width: shortnumberwidth,
+		 cellRenderer: renderStatus},
 		{headerName: "Traded",
 		 field: "TradedQty",
 		 width: shortnumberwidth},
