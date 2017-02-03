@@ -183,9 +183,8 @@ class SpTraderApp extends React.Component {
 	}
     }
     addToLog(event) {
-	data = JSON.parse(event.data);
-	console.log(data);
-	this.setState({log: this.state.log + event.data + "\n"});
+	console.log(event);
+	this.setState({log: this.state.log + event + "\n"});
     }
     loginReply(event) {
 	data = JSON.parse(event.data);

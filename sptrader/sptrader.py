@@ -619,7 +619,8 @@ class SPTrader(object):
         return self.api.SPAPI_DeleteOrderBy(self.user,
                                             self.acc_no,
                                             accOrderNo,
-                                            data['clOrderId'])
+                                            data['ProdCode'].encode("utf-8"),
+                                            data['ClOrderId'].encode("utf-8"))
 
     def order_activate(self, data):
         accOrderNo = int(data['IntOrderNo'])

@@ -11,10 +11,12 @@ var OrderControl = React.createClass({
     },
     delete() {
 	var data = this.props.data;
-	console.log(this.props);
-	var d = {}
-	d['clOrderId'] = data.clOrderId;
-	d['IntOrderNo'] = data.IntOrderNo;
+	console.log(data);
+	var d = {
+	    'ClOrderId' : data.ClOrderId,
+	    'IntOrderNo' : data.IntOrderNo,
+	    'ProdCode' : data.ProdCode
+	};
 	this.post("/order/delete", d);
     },
     activate() {
@@ -92,6 +94,8 @@ export default class OrderTable extends React.Component {
 		 field: "Ref"},
 		{headerName: "Ref2",
 		 field: "Ref2"},
+		{headerName: "Product",
+		 field: "ProdCode"},
 		{headerName: "Price",
 		 field: "Price",
 		 width: shortnumberwidth,
@@ -137,6 +141,8 @@ export default class OrderTable extends React.Component {
 		{headerName: "Int.Order#",
 		 field: "IntOrderNo",
 		 width: shortnumberwidth},
+		{headerName: "ClOrderId",
+		 field: "ClOrderId"},
 		{headerName: "Actions",
 		 field: "action",
 		 cellRenderer: reactCellRendererFactory(OrderControl)}

@@ -626,8 +626,9 @@ def order_delete():
         f = request.json
     else:
         abort(400)
-    if 'IntOrderNo' not in f and \
-       'clOrderId' not in f:
+    if 'IntOrderNo' not in f or \
+       'ProdCode' not in f or \
+       'ClOrderId' not in f:
         abort(400)
     return str(sp.order_delete(f))
 
