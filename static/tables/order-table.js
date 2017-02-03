@@ -7,8 +7,9 @@ import {shortnumberwidth, renderNumber, renderDateTime,
 
 var OrderControl = React.createClass({
     post(url, data) {
+	$.post(url, data);
     },
-    cancel() {
+    delete() {
 	var data = this.props.data;
 	console.log(this.props);
 	var d = {}
@@ -31,15 +32,56 @@ var OrderControl = React.createClass({
 	this.post("/order/inactivate", d);
     },
     render() {
+	var status = this.props.data.Status;
+	var inactive = false;
+	var show_inactivate = false;
+	if (status == 2) {
+	    inactive = true;
+	}
+	if (status == 3) {
+	    show_inactivate = true;
+	}
+	    
 	return (
 	    <div>
-		<Button onClick={this.cancel}>Cancel</Button>
-		<Button onClick={this.activate}>Activate</Button>
-		<Button onClick={this.inactivate}>Inactivate</Button>
+		<Button onClick={this.delete}>Delete</Button>
+		<Button onClick={this.activate} disabled={inactive}>Activate</Button>
+		<Button onClick={this.inactivate} disabled={show_inactivate}>Inactivate</Button>
 		</div>
 	);
     }
 });
+
+function renderStatus(params) {
+    var x = params.value;
+    if ( x == 0) {
+	return "Sent";
+    } else if ( x== 1) {
+	return "Working";
+    } else if ( x == 2 ) {
+	return "Inactive";
+    } else if ( x== 3 ) {
+	return "Pending";
+    } else if ( x == 4) {
+	return "Adding";
+    } else if ( x == 5 ) {
+	return "Changing";
+    } else if ( x == 6 ) {
+	return "Deleting";
+    } else if ( x == 7 ) {
+	return "Inactivating";
+    } else if ( x == 8) {
+	return "Partially filled";
+    } else if ( x == 9 ) {
+	return "Filled";
+    } else if ( x == 10) {
+	return "Deleted";
+    } else if ( x == 18 ) {
+	return "Pending approval";
+    } else {
+	return x;
+    }
+}
 
 export default class OrderTable extends React.Component {
     constructor(props) {
@@ -75,7 +117,8 @@ export default class OrderTable extends React.Component {
 		 width: shortnumberwidth},
 		{headerName: "Status",
 		 field: "Status",
-		 width: shortnumberwidth},
+		 width: shortnumberwidth,
+		 cellRenderer: renderStatus},
 		{headerName: "Traded",
 		 field: "TradedQty",
 		 width: shortnumberwidth},

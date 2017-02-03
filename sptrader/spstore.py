@@ -333,6 +333,7 @@ or ``BackTestCls``
         order.ref = "{:%Y%m%d%H%M%S}".format(datetime.now())
         self._orders[order.ref] = order
         okwargs['Ref2'] = str(order.ref)
+        okwargs['Inactive'] = kwargs.get('Inactive', 0)
         if self.p.loglevel <= logging.DEBUG:
             print(okwargs)
         self.q_ordercreate.put((order.ref, okwargs,))
