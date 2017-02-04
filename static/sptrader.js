@@ -218,14 +218,18 @@ class SpTraderApp extends React.Component {
     }
     fillTables() {
 	var l = this;
-	$.when($.getJSON("/account-info"),
-	       $.getJSON("/ticker/list"),
-	       $.getJSON("/order/list"),
-	       $.getJSON("/trade/list")).done(function(d1, d2, d3, d4) {
-		   l.setState({tickers: d2.data,
-			       orders: d3.data,
-			       trades: d4.data});
-	       });
+	$.getJSON("/ticker/list").done(function(x) {
+	    console.log("tickers", x);
+	    l.setState({tickers: x.data});
+	});
+	$.getJSON("/trade/list").done(function(x) {
+	    console.log("trades", x);
+	    l.setState({trades: x.data});
+	});
+	$.getJSON("/order/list").done(function(x) {
+	    console.log("orders", x);
+	    l.setState({orders: x.data});
+	});
     }
     showOrderForm(event) {
 	this.setState({showOrderForm: true});
