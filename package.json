@@ -8,8 +8,8 @@
     "url": "https://github.com/joequant/sptrader.git"
   },
   "dependencies": {
-    "ag-grid": "6.2.x",
-    "ag-grid-react": "6.2.x",
+    "ag-grid": "7.2.x",
+    "ag-grid-react": "7.2.x",
     "eventsource-polyfill": "0.9.x",
     "react": "15.4.x",
     "react-bootstrap": "0.30.x",
