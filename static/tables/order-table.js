@@ -35,20 +35,26 @@ var OrderControl = React.createClass({
     },
     render() {
 	var status = this.props.data.Status;
-	var inactive = false;
-	var show_inactivate = false;
+	var delete_disabled = true;
+	var activate_disabled = true;
+	var inactivate_disabled = true;
 	if (status == 2) {
-	    inactive = true;
+	    activate_disabled = false;
+	    delete_disabled = false;
 	}
-	if (status == 3) {
-	    show_inactivate = true;
+	if (status == 3 || status == 8) {
+	    inactivate_disabled = true;
+	    delete_disabled = false;
 	}
 	    
 	return (
 	    <div>
-		<Button onClick={this.delete}>Delete</Button>
-		<Button onClick={this.activate} disabled={inactive}>Activate</Button>
-		<Button onClick={this.inactivate} disabled={show_inactivate}>Inactivate</Button>
+		<Button onClick={this.delete}
+	    disabled={delete_disabled}>Delete</Button>
+		<Button onClick={this.activate}
+	    disabled={activate_disabled}>Activate</Button>
+		<Button onClick={this.inactivate}
+	    disabled={inactivate_disabled}>Inactivate</Button>
 		</div>
 	);
     }
