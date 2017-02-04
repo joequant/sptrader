@@ -2,28 +2,34 @@ import React from 'react';
 import {Button, FormControl} from 'react-bootstrap';
 import {AgGridReact} from 'ag-grid-react';
 
-var TickerControl = React.createClass({
-    getInitialState: function() {
-	return {
+export default class TickerControl extends React.Component {
+    constructor(props) {
+	super(props);
+	this.state = {
 	    tickers_add: ''
 	};
-    },
-    onChange: function(e) {
+	this.onChange = this.onChange.bind(this);
+	this.add_ticker = this.add_ticker.bind(this);
+	this.clear_ticker = this.clear_ticker.bind(this);
+	this.view_ticker = this.view_ticker.bind(this);
+	this.unsubscribe_ticker = this.unsubscribe_ticker.bind(this);
+    }
+    onChange(e) {
 	this.setState({tickers_add: e.target.value});
-    },
-    add_ticker: function() {
+    }
+    add_ticker(e) {
 	$.get("/ticker/subscribe/" + this.state.tickers_add);
-    },
-    clear_ticker: function(e) {
+    }
+    clear_ticker(e) {
 	$.get("/ticker/clear/" + e.target.name);
-    },
-    view_ticker: function(e) {
+    }
+    view_ticker(e) {
 	var myWindow = window.open("/ticker/view/" + e.target.name);
-    },
-    unsubscribe_ticker: function(e) {
+    }
+    unsubscribe_ticker(e) {
 	$.get("/ticker/unsubscribe/" + e.target.name);
-    },
-    render: function() {
+    }
+    render() {
 	var l = this;
 	var items = this.props.tickers.map(function(i) {
 	    return (<div key={i}>{i} -
@@ -43,6 +49,4 @@ var TickerControl = React.createClass({
 		/><Button bsStyle="success" onClick={this.add_ticker}>Add Ticker</Button><br/>
 		{items}<br/></div>);
     }
-});
-    
-module.exports = TickerControl;
+}
