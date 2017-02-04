@@ -38,12 +38,12 @@ var OrderControl = React.createClass({
 	var delete_disabled = true;
 	var activate_disabled = true;
 	var inactivate_disabled = true;
-	if (status == 2) {
+	if (status == 2 ) {
 	    activate_disabled = false;
 	    delete_disabled = false;
 	}
-	if (status == 3 || status == 8) {
-	    inactivate_disabled = true;
+	if (status == 3 || status == 8 || status == 1) {
+	    inactivate_disabled = false;
 	    delete_disabled = false;
 	}
 	    
