@@ -9,6 +9,7 @@ ZIP_FILE=SPAPIDLL_R${MAJOR_VERSION}.${MINOR_VERSION}_LINUX.zip
 	rm -rf lib include
 	unzip ${ZIP_FILE}
 	mv lib/libapiwrapper.so ../dll
+	touch ../dll/libapiwrapper.so
 	rm -rf lib include
 
 ${ZIP_FILE}:

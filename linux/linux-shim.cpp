@@ -1,7 +1,11 @@
 // Copyright (C) Bitquant Research Laboratories (Asia) Limited
 // released under terms of the Simplified BSD License
 
+const char *SP_SUFFIX = "20160718";
+
 #include <cstddef>
+#include <string.h>
+#include <iostream>
 #include <vector>
   template <typename T>
   class FStore {
@@ -503,6 +507,17 @@ static ApiProxyWrapper api_proxy_wrapper;
 int  SPAPI_Initialize(){
   int retval = api_proxy_wrapper.SPAPI_Initialize();
   api_proxy_wrapper.SPAPI_RegisterApiProxyWrapperReply(&wrapper_reply);
+  char dll_ver_no[64];
+  char dll_rel_no[64];
+  char dll_suffix[64];
+  api_proxy_wrapper.SPAPI_GetDllVersion(dll_ver_no, dll_rel_no, dll_suffix);
+  if (strcmp(dll_suffix, SP_SUFFIX)) {
+    std::cerr << "Version mismatch: "
+	      << dll_suffix
+	      << " versus " << SP_SUFFIX
+	      << std::endl;
+	exit(1);
+      }
   return retval;
 }
 void SPAPI_SetLoginInfo(char *host,
