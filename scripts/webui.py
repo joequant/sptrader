@@ -614,9 +614,9 @@ def order_add():
         abort(400)
     inactive = bool(int(f.pop("Inactive", 0)))
     if inactive:
-        return str(sp.order_add(f))
-    else:
         return str(sp.order_add_inactive(f))
+    else:
+        return str(sp.order_add(f))
 
 @app.route("/order/delete", methods=['POST'])
 def order_delete():

@@ -57,18 +57,18 @@ class SharpPointStrategy(bt.Strategy):
     def buy(self, **kwargs):
         kwargs['Ref'] = self.p.id
         if self.p.order_mode == "inactive":
-            kwargs['Inactive'] = True
+            kwargs['Inactive'] = 1
         else:
-            kwargs['Inactive'] = False
+            kwargs['Inactive'] = 0
         self.report.buy(kwargs)
         return super().buy(**kwargs)
 
     def sell(self, **kwargs):
         kwargs['Ref'] = self.p.id
         if self.p.order_mode == "inactive":
-            kwargs['Inactive'] = True
+            kwargs['Inactive'] = 1
         else:
-            kwargs['Inactive'] = False
+            kwargs['Inactive'] = 0
         self.report.sell(kwargs)
         return super().sell(**kwargs)
 
