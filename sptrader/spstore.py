@@ -304,7 +304,6 @@ or ``BackTestCls``
 
     def order_create(self, order, **kwargs):
         okwargs = {"DecInPrice": 0,
-                   "ClOrderId": "test2",
                    "OpenClose": 0,
                    "CondType": 0,
                    "OrderType": 0,
