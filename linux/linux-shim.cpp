@@ -1,7 +1,7 @@
 // Copyright (C) Bitquant Research Laboratories (Asia) Limited
 // released under terms of the Simplified BSD License
 
-const char *SP_SUFFIX = "20160718";
+const char *SP_SUFFIX = "20161214";
 
 #include <cstddef>
 #include <string.h>
@@ -45,109 +45,99 @@ using STR40 = char[40];
 
 typedef struct
 {
-    int32_t Qty;
-    int32_t DepQty;
-    int32_t LongQty;
-    int32_t ShortQty;
-    double TotalAmt;
-    double DepTotalAmt;
-    double LongTotalAmt;
-    double ShortTotalAmt;
-    double PLBaseCcy;
-    double PL;
-    double ExchangeRate;
-    STR16 AccNo;
-    STR16 ProdCode;
-    char LongShort;
-    tinyint DecInPrice;
+	int32_t Qty;                    //上日仓位
+	int32_t DepQty;                 //存储仓位
+	int32_t LongQty;                //今日长仓
+    int32_t ShortQty;               //今日短仓
+    double TotalAmt;             //上日成交
+    double DepTotalAmt;          //上日持仓总数(数量*价格)
+    double LongTotalAmt;         //今日长仓总数(数量*价格)
+    double ShortTotalAmt;        //今日短仓总数(数量*价格)
+    double PLBaseCcy;            //盈亏(基本货币)
+    double PL;                   //盈亏
+    double ExchangeRate;         //汇率
+    STR16 AccNo;                 //用户
+    STR16 ProdCode;              //合约代码
+    char LongShort;              //上日持仓买卖方向
+    tinyint DecInPrice;          //小数点
 } SPApiPos;
 
 typedef struct
 {
-    double Price;
-    double StopLevel;
-    double UpLevel;
-    double UpPrice;
-    double DownLevel;
-    double DownPrice;
-    bigint ExtOrderNo;
-    int32_t IntOrderNo;
-    int32_t Qty;
-    int32_t TradedQty;
-    int32_t TotalQty;
-    int32_t ValidTime;
-    int32_t SchedTime;
-    int32_t TimeStamp;
+    double Price;              //价格
+    double StopLevel;          //止损价格
+    double UpLevel;            //上限水平
+    double UpPrice;            //上限价格
+    double DownLevel;          //下限水平
+    double DownPrice;          //下限价格
+    bigint ExtOrderNo;         //外部指示
+	int32_t IntOrderNo;           //用户订单编号
+	int32_t Qty;                  //剩余数量
+	int32_t TradedQty;            //已成交数量
+	int32_t TotalQty;             //全部数量
+	int32_t ValidTime;            //有效时间
+	int32_t SchedTime;            //预订发送时间
+    int32_t TimeStamp;            //服务器接收订单时间
     uint32_t OrderOptions;
-    STR16 AccNo;
-    STR16 ProdCode;
-    STR16 Initiator;
-    STR16 Ref;
-    STR16 Ref2;
-    STR16 GatewayCode;
-    STR40 ClOrderId;
-    char BuySell;
-    char StopType;
-    char OpenClose;
-    tinyint CondType;
-    tinyint OrderType;
-    tinyint ValidType;
-    tinyint Status;
-    tinyint DecInPrice;
-        tinyint OrderAction;
-        int32_t UpdateTime;
-        int32_t UpdateSeqNo;
+    STR16 AccNo;               //用户帐号
+    STR16 ProdCode;            //合约代号
+    STR16 Initiator;           //下单用户
+    STR16 Ref;                 //参考
+    STR16 Ref2;                //参考2
+    STR16 GatewayCode;         //网关
+    STR40 ClOrderId;           //用户自定义指令代号
+    char BuySell;              //买卖方向
+    char StopType;             //止损类型
+    char OpenClose;            //开平仓
+    tinyint CondType;          //订单条件类型
+    tinyint OrderType;         //订单类型
+    tinyint ValidType;         //订单有效类型
+    tinyint Status;            //状态
+    tinyint DecInPrice;        //合约小数位
+	tinyint OrderAction;
+	int32_t UpdateTime;
+	int32_t UpdateSeqNo;
 } SPApiOrder;
 
 typedef struct
 {
-    bigint BidExtOrderNo;
-    bigint AskExtOrderNo;
-    long BidAccOrderNo;
-    long AskAccOrderNo;
-    double BidPrice;
-    double AskPrice;
-    long BidQty;
-    long AskQty;
-    long SpecTime;
-        u_long OrderOptions;
-    STR16 ProdCode;
-    STR16 AccNo;
-        STR40 ClOrderId;
-    STR40 OrigClOrdId;
-    tinyint OrderType;
-    tinyint ValidType;
-    tinyint DecInPrice;
-} SPApiMMOrder;
+    int32_t RecNo;
+    double Price;              //成交价格
+    bigint TradeNo;            //成交编号
+    bigint ExtOrderNo;         //外部指示
+	int32_t IntOrderNo;           //用户订单编号
+	int32_t Qty;                  //成交数量
+	int32_t TradeDate;            //成交日期
+    int32_t TradeTime;            //成交时间
+    STR16 AccNo;               //用户
+    STR16 ProdCode;            //合约代码
+    STR16 Initiator;           //下单用户
+    STR16 Ref;                 //参考
+    STR16 Ref2;                //参考2
+    STR16 GatewayCode;         //网关
+    STR40 ClOrderId;           //用户自定义指令代号
+    char BuySell;              //买卖方向
+    char OpenClose;            //开平仓
+    tinyint Status;            //状态
+	tinyint DecInPrice;        //小数位
+	double OrderPrice;
+	STR40 TradeRef;
+	int32_t TotalQty;
+	int32_t RemainingQty;
+	int32_t TradedQty;
+	double AvgTradedPrice;
+} SPApiTrade;
+
+
+#define REQMODE_UNSUBSCRIBE     0
+#define REQMODE_SUBSCRIBE       1
+#define REQMODE_SNAPSHOT        2
 
 typedef struct
 {
-        int32_t RecNo;
-    double Price;
-    bigint TradeNo;
-    bigint ExtOrderNo;
-    int32_t IntOrderNo;
-    int32_t Qty;
-    int32_t TradeDate;
-    int32_t TradeTime;
-    STR16 AccNo;
-    STR16 ProdCode;
-    STR16 Initiator;
-    STR16 Ref;
-    STR16 Ref2;
-    STR16 GatewayCode;
-    STR40 ClOrderId;
-    char BuySell;
-    char OpenClose;
-    tinyint Status;
-    tinyint DecInPrice;
-        double OrderPrice;
-        STR40 TradeRef;
-        int32_t TotalQty;
-        int32_t RemainingQty;
-        int32_t TradedQty;
-        double AvgTradedPrice;
-} SPApiTrade;
+    STR16 MarketCode;
+    STR40 MarketName;
+} SPApiMarket;
 
 typedef struct
 {
@@ -156,8 +146,8 @@ typedef struct
     STR16 MarketCode;
     STR16 InstCode;
     STR40 InstName;
-    STR40 InstName1;
-    STR40 InstName2;
+    STR40 InstName1; //new added
+    STR40 InstName2; //new added
     STR4 Ccy;
     char DecInPrice;
     char InstType;
@@ -180,94 +170,120 @@ typedef struct
    int32_t TickSize;
 }SPApiProduct;
 
+#define SP_MAX_DEPTH    20
+#define SP_MAX_LAST     20
 typedef struct
 {
-    double Bid[20];
-    int32_t BidQty[20];
-    int32_t BidTicket[20];
-    double Ask[20];
-    int32_t AskQty[20];
-    int32_t AskTicket[20];
-    double Last[20];
-    int32_t LastQty[20];
-    int32_t LastTime[20];
-    double Equil;
-    double Open;
-    double High;
-    double Low;
-    double Close;
-    int32_t CloseDate;
-    double TurnoverVol;
-    double TurnoverAmt;
-    int32_t OpenInt;
-    STR16 ProdCode;
-    STR40 ProdName;
-    char DecInPrice;
-        int32_t ExStateNo;
-        int32_t TradeStateNo;
-        bool Suspend;
-        int32_t ExpiryYMD;
-        int32_t ContractYMD;
-        int32_t Timestamp;
+    double Bid[SP_MAX_DEPTH];     //买入价
+	int32_t BidQty[SP_MAX_DEPTH];    //买入量
+	int32_t BidTicket[SP_MAX_DEPTH]; //买指令数量
+    double Ask[SP_MAX_DEPTH];     //卖出价
+	int32_t AskQty[SP_MAX_DEPTH];    //卖出量
+	int32_t AskTicket[SP_MAX_DEPTH]; //卖指令数量
+    double Last[SP_MAX_LAST];     //成交价
+	int32_t LastQty[SP_MAX_LAST];    //成交数量
+    int32_t LastTime[SP_MAX_LAST];   //成交时间
+    double Equil;                 //平衡价
+    double Open;                  //开盘价
+    double High;                  //最高价
+    double Low;                   //最低价
+    double Close;                 //收盘价
+    int32_t CloseDate;               //收市日期
+    double TurnoverVol;           //总成交量
+    double TurnoverAmt;           //总成交额
+    int32_t OpenInt;                 //未平仓
+    STR16 ProdCode;               //合约代码
+    STR40 ProdName;               //合约名称
+    char DecInPrice;              //合约小数位
+    int32_t Timestamp;
 } SPApiPrice;
 
 typedef struct
 {
-    double Price;
-    int32_t Qty;
-    int32_t TickerTime;
-    int32_t DealSrc;
-    STR16 ProdCode;
-    char DecInPrice;
+    double Price;              //价格
+	int32_t Qty;                  //成交量
+	int32_t TickerTime;           //时间
+    int32_t DealSrc;              //来源
+    STR16 ProdCode;            //合约代码
+    char DecInPrice;           //小数位
 } SPApiTicker;
 
 typedef struct
 {
-        double NAV;
-    double BuyingPower;
-    double CashBal;
-        double MarginCall;
-    double CommodityPL;
-    double LockupAmt;
-    double CreditLimit;
-    double MaxMargin;
-    double MaxLoanLimit;
-    double TradingLimit;
-    double RawMargin;
-    double IMargin;
-    double MMargin;
-    double TodayTrans;
-    double LoanLimit;
-    double TotalFee;
-    double LoanToMR;
-    double LoanToMV;
-    STR16 AccName;
-    STR4 BaseCcy;
-    STR16 MarginClass;
-    STR16 TradeClass;
-    STR16 ClientId;
-    STR16 AEId;
-    char AccType;
-    char CtrlLevel;
-    char Active;
-    char MarginPeriod;
+    double NAV;              // 资产净值
+    double BuyingPower;      // 购买力
+    double CashBal;          // 现金结余
+    double MarginCall;       //追收金额
+    double CommodityPL;      //商品盈亏
+    double LockupAmt;        //冻结金额
+    double CreditLimit;      // 信貸限額
+    double MaxMargin;        // 最高保証金
+    double MaxLoanLimit;     // 最高借貸上限
+    double TradingLimit;     // 信用交易額
+    double RawMargin;        // 原始保證金
+    double IMargin;          //  基本保証金
+    double MMargin;           // 維持保証金
+    double TodayTrans;        // 交易金額
+    double LoanLimit;         // 證券可按總值
+    double TotalFee;          //  費用總額
+	double LoanToMR;
+	double LoanToMV;
+    STR16 AccName;            //  戶口名稱
+    STR4 BaseCcy;             // 基本貨幣
+    STR16 MarginClass;        // 保証金類別
+    STR16 TradeClass;         // 交易類別
+    STR16 ClientId;           // 客戶
+    STR16 AEId;               //  經紀
+    char AccType;             // 戶口類別
+    char CtrlLevel;           //  控制級數
+    char Active;              //  生效
+    char MarginPeriod;         // 時段
 } SPApiAccInfo;
 
 typedef struct
 {
-    double CashBf;
-    double TodayCash;
-    double NotYetValue;
-    double Unpresented;
-    double TodayOut;
-    STR4 Ccy;
+    double CashBf;          //上日结余
+    double TodayCash;       //今日存取
+    double NotYetValue;     //未交收
+    double Unpresented;     //未兑现
+    double TodayOut;        //提取要求
+    STR4 Ccy;               //货币
 } SPApiAccBal;
 
 typedef struct
 {
-    STR4 Ccy;
-    double Rate;
-} SPApiCcyRate;
+	u_short HostType;
+	char Host[100];
+	u_short Port;
+	bool SecureConnection;
+	bool IsConnected;
+	u_short LoginStatus;
+} SPConnectionInfo;
+
+typedef struct
+{
+    bigint BidExtOrderNo;   //Bid(买)单外部指示
+    bigint AskExtOrderNo;   //Ask(沽)单外部指示
+    long BidAccOrderNo;     //Bid(买)单编号
+    long AskAccOrderNo;     //Ask(沽)单编号
+    double BidPrice;          //Bid(买)单价格
+    double AskPrice;          //Ask(沽)单价格
+    long BidQty;            //Bid(买)单数量
+    long AskQty;            //Ask(沽)单数量
+    long SpecTime;          //预订发送时间 //箇璹祇癳丁 
+   	u_long OrderOptions;    //0=默认,1=T+1
+    STR16 ProdCode;         //合约代号 //腹 
+    STR16 AccNo;            //用户帐号 //ノめ眀腹 
+	STR40 ClOrderId;
+    STR40 OrigClOrdId;
+    tinyint OrderType;      //订单类型 //璹虫摸  
+    tinyint ValidType;      //订单有效类型 //璹虫Τ摸 
+    tinyint DecInPrice;     //合约小数位 //计 
+} SPApiMMOrder;
+
+
+enum LangNoEnum { ENG, TCHI, SCHI, TCHI_UNICODE, SCHI_UNICODE};
+
 
 using LoginReplyAddr = void(*)(long ret_code, char *ret_msg);
 using ConnectedReplyAddr = void (*)(long host_type, long con_status);
@@ -327,6 +343,8 @@ public:
 	virtual void OnApiMMOrderBeforeSendReport(SPApiMMOrder *mm_order) = 0;
 	virtual void OnApiMMOrderRequestFailed(SPApiMMOrder *mm_order, long err_code, char *err_msg) = 0;
 	virtual void OnApiQuoteRequestReceived(char *product_code, char buy_sell, long qty) = 0;
+  virtual void OnApiAccountControlReply(long ret_code, char *ret_msg) = 0;
+  virtual void OnApiLoadTradeReadyPush(long rec_no, const SPApiTrade *trade) = 0;
 };
 
 #define DECLARE_PROXY(X,Y) \
@@ -433,6 +451,10 @@ public:
     };
     virtual void OnApiQuoteRequestReceived(char *product_code, char buy_sell, long qty) final {
       _s_ApiQuoteRequestReceived(product_code, buy_sell, qty);
+    };
+    virtual void OnApiAccountControlReply(long ret_code, char *ret_msg) final {
+    };
+    virtual void OnApiLoadTradeReadyPush(long rec_no, const SPApiTrade *trade) final {
     };
   };
   
