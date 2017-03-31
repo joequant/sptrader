@@ -59,6 +59,10 @@ class ImmediateStrategy(spstrategy.SharpPointStrategy):
             # Keep track of the created order to avoid a 2nd order
             self.order = self.sell()
 
+    def notify_order(self, order):
+        super().notify_order(order)
+        self.log("order notified", order)
+
     def notify_trade(self, trade):
         if not trade.isclosed:
             return
