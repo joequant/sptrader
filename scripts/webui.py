@@ -51,7 +51,7 @@ def get_ticker(s):
     return ticker_file % s
 
 sp = sptrader.SPTrader.instance()
-log_subscriptions = []
+
 empty_cache = {"connected": {},
                "account_info": None}
 info_cache = empty_cache
@@ -66,13 +66,6 @@ app = Flask(__name__,
 def hello():
     '''Main application file'''
     return app.send_static_file("sptrader.html")
-
-
-def send_dict(event_id, msg):
-    '''Send dictionary as event'''
-    for sub in log_subscriptions[:]:
-        sub.put((event_id, msg))
-
 
 class Config(object):
     '''Load and save config'''
@@ -89,7 +82,7 @@ class Config(object):
             for k in self.config[r]:
                 self.config[r][k]['status'] = "stopped"
                 self.config[r][k]['comment'] = ""
-                send_dict("LocalStrategyStatus",
+                sp.send_dict("LocalStrategyStatus",
                           {"strategy":  self.config[r][k]['strategy'],
                            "id": self.config[r][k]['id'],
                            "status": "stopped",
@@ -128,7 +121,7 @@ my_config = Config()
 
 
 def send_cdata(event_id, data):
-    send_dict(event_id, {"data": sp.cdata_to_py(data[0])})
+    sp.send_dict(event_id, {"data": sp.cdata_to_py(data[0])})
 
 
 @app.route("/login-info")
@@ -160,7 +153,7 @@ def login_reply(ret_code, ret_msg):
         ret_msg = ''
     else:
         ret_msg = sp.ffi.string(ret_msg).decode('utf-8')
-    send_dict("LoginReply", {
+    sp.send_dict("LoginReply", {
         "ret_code": ret_code,
         "ret_msg": ret_msg
     })
@@ -169,7 +162,7 @@ sp.register_login_reply(login_reply)
 
 @sp.ffi.callback("ConnectedReplyAddr")
 def connected_reply(host_type, con_status):
-    send_dict("ConnectedReply", {
+    sp.send_dict("ConnectedReply", {
         "host_type": host_type,
         "con_status": con_status
     })
@@ -183,7 +176,7 @@ sp.register_connecting_reply(connected_reply)
 
 @sp.ffi.callback("ApiOrderRequestFailedAddr")
 def order_request_failed(action, order, error_code, error_msg):
-    send_dict("OrderRequestFailed", {
+    sp.send_dict("OrderRequestFailed", {
         "action": ord(action),
         "data": sp.cdata_to_py(order[0]),
         "error_code": error_code,
@@ -193,7 +186,7 @@ sp.register_order_request_failed(order_request_failed)
 
 @sp.ffi.callback("ApiOrderReportAddr")
 def order_report(rec_no, data):
-    send_dict("OrderReport", {
+    sp.send_dict("OrderReport", {
         "rec_no": rec_no,
         "data": sp.cdata_to_py(data[0])
     })
@@ -208,7 +201,7 @@ sp.register_order_before_send_report(api_order_before_send_report)
 
 @sp.ffi.callback("AccountLoginReplyAddr")
 def account_login_reply(accNo, ret_code, ret_msg):
-    send_dict("AccountLoginReply", {
+    sp.send_dict("AccountLoginReply", {
         "accNo": accNo,
         "ret_code": ret_code,
         "ret_msg": ret_msg
@@ -218,7 +211,7 @@ sp.register_account_login_reply(account_login_reply)
 
 @sp.ffi.callback("AccountLogoutReplyAddr")
 def account_logout_reply(ret_code, ret_msg):
-    send_dict("AccountLogoutReply", {
+    sp.send_dict("AccountLogoutReply", {
         "ret_code": ret_code,
         "ret_msg": ret_msg
     })
@@ -282,7 +275,7 @@ def product_list_by_code(inst_code, is_ready, ret_msg):
         "is_ready": is_ready,
         "ret_msg": ret_msg,
         "data": sp.get_product()}
-    send_dict("ProductListByCodeReply", data)
+    sp.send_dict("ProductListByCodeReply", data)
 sp.register_product_list_by_code_reply(product_list_by_code)
 
 
@@ -291,13 +284,13 @@ def instrument_list_reply(is_ready, ret_msg):
     data = {"is_ready": is_ready,
             "ret_msg": ret_msg,
             "data": sp.get_instrument()}
-    send_dict("InstrumentListReply", data)
+    sp.send_dict("InstrumentListReply", data)
 sp.register_instrument_list_reply(instrument_list_reply)
 
 
 @sp.ffi.callback("BusinessDateReplyAddr")
 def business_date_reply(business_date):
-    send_dict("BusinessDateReply", {
+    sp.send_dict("BusinessDateReply", {
         "business_date": business_date
     })
 sp.register_business_date_reply(business_date_reply)
@@ -311,7 +304,7 @@ sp.register_mm_order_before_send_report(api_mm_order_before_send_report)
 
 @sp.ffi.callback("ApiMMOrderRequestFailedAddr")
 def api_mm_order_request_failed(mm_order, err_code, err_msg):
-    send_dict("MMOrderRequestFailed",
+    sp.send_dict("MMOrderRequestFailed",
               {"data": sp.cdata_to_py(mm_order[0]),
                "err_code": sp.cdata_to_py(err_code),
                "err_msg": sp.cdata_to_py(err_msg)})
@@ -320,7 +313,7 @@ sp.register_mm_order_request_failed(api_mm_order_request_failed)
 
 @sp.ffi.callback("ApiQuoteRequestReceivedAddr")
 def quote_request_received(product_code, buy_sell, qty):
-    send_dict("QuoteRequestReceived",
+    sp.send_dict("QuoteRequestReceived",
               {"product_code": product_code,
                "buy_sell": buy_sell,
                "qty": qty})
@@ -418,7 +411,7 @@ def subscribe_ticker(products):
     if sp.ready() != 0:
         return "NOLOGIN"
     else:
-        send_dict("TickerUpdate",
+        sp.send_dict("TickerUpdate",
                   {"data": list(ticker_products)})
         return "OK"
 
@@ -432,7 +425,7 @@ def unsubscribe_ticker(products):
     if sp.ready() != 0:
         return "NOLOGIN"
     else:
-        send_dict("TickerUpdate",
+        sp.send_dict("TickerUpdate",
                   {"data": list(ticker_products)})
         return "OK"
 
@@ -473,7 +466,7 @@ class StrategyList(object):
             t = threading.Thread(target=strategy_listener, args=(p, q))
             t.daemon = True
             t.start()
-            send_dict("LocalStrategyStatus",
+            sp.send_dict("LocalStrategyStatus",
                       {"strategy": kwargs['strategy'],
                        "id": kwargs['id'],
                        "status": "running",
@@ -494,7 +487,7 @@ class StrategyList(object):
                 p.terminate()
                 p.join()
         self.stratlist.pop(sid)
-        send_dict("LocalStrategyStatus",
+        sp.send_dict("LocalStrategyStatus",
                   {"strategy": info['strategy'],
                    "id": info['id'],
                    "status": info['status'],
@@ -686,15 +679,14 @@ def get_account_info():
 @app.route("/log/subscribe")
 def subscribe():
     def gen():
-        q = Queue()
-        log_subscriptions.append(q)
+        q = sp.add_listener()
         try:
             while True:
                 (event_id, result) = q.get()
                 ev = ServerSentEvent(result, event_id)
                 yield ev.encode()
         except GeneratorExit:  # Or maybe use flask signals
-            log_subscriptions.remove(q)
+            sp.remove_listener(q)
     return Response(gen(), mimetype="text/event-stream")
 
 

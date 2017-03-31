@@ -13,6 +13,7 @@ import struct
 import cffi_to_py
 import sys
 from enum import Enum
+from queue import Queue
 
 if 8 * struct.calcsize("P") != 64:
     print("sptrader only supported for 64 bit")
@@ -418,6 +419,20 @@ class SPTrader(object):
         self.api.SPAPI_Initialize()
         self.user = None
         self.acc_no = None
+        self.log_subscriptions = []
+
+    def send_dict(self, event_id, msg):
+        '''Send dictionary as event'''
+        for sub in self.log_subscriptions[:]:
+            sub.put((event_id, msg))
+
+    def add_listener(self):
+        q = Queue()
+        self.log_subscriptions.append(q)
+        return q
+
+    def remove_listener(self, q):
+        self.log_subscriptions.remove(q)
 
     def ready(self):
         if self.user is None:
