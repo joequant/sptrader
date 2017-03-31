@@ -404,6 +404,14 @@ class SPTrader(object):
     ffi = ffi
     api = spapi
     ffi_conv = cffi_to_py.FfiConverter(ffi)
+    __instance = None
+    @classmethod
+    def instance(cls):
+        if cls.__instance is not None:
+            return cls.__instance
+        else:
+            cls.__instance = SPTrader()
+            return cls.__instance
 
     def __init__(self):
         self.api.SPAPI_SetLanguageId(0)

@@ -50,7 +50,7 @@ def get_ticker(s):
         raise ValueError
     return ticker_file % s
 
-sp = sptrader.SPTrader()
+sp = sptrader.SPTrader.instance()
 log_subscriptions = []
 empty_cache = {"connected": {},
                "account_info": None}
