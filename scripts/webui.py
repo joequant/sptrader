@@ -119,11 +119,6 @@ class Config(object):
 
 my_config = Config()
 
-
-def send_cdata(event_id, data):
-    sp.send_dict(event_id, {"data": sp.cdata_to_py(data[0])})
-
-
 @app.route("/login-info")
 def logininfo():
     d = {"status": "%d" % sp.get_login_status(80)}
@@ -195,7 +190,7 @@ sp.register_order_report(order_report)
 
 @sp.ffi.callback("ApiOrderBeforeSendReportAddr")
 def api_order_before_send_report(data):
-    send_cdata("OrderBeforeSendReport", data)
+    sp.send_cdata("OrderBeforeSendReport", data)
 sp.register_order_before_send_report(api_order_before_send_report)
 
 
@@ -221,49 +216,49 @@ sp.register_account_logout_reply(account_logout_reply)
 @sp.ffi.callback("AccountInfoPushAddr")
 def account_info_push(data):
     info_cache['account_info'] = sp.cdata_to_py(data[0])
-    send_cdata("AccountInfoPush", data)
+    sp.send_cdata("AccountInfoPush", data)
 sp.register_account_info_push(account_info_push)
 
 
 @sp.ffi.callback("AccountPositionPushAddr")
 def account_position_push(data):
-    send_cdata("AccountPositionPush", data)
+    sp.send_cdata("AccountPositionPush", data)
 sp.register_account_position_push(account_position_push)
 
 
 @sp.ffi.callback("UpdatedAccountPositionPushAddr")
 def updated_account_position_push(data):
-    send_cdata("UpdatedAccountPositionPush", data)
+    sp.send_cdata("UpdatedAccountPositionPush", data)
 sp.register_updated_account_position_push(updated_account_position_push)
 
 
 @sp.ffi.callback("UpdatedAccountBalancePushAddr")
 def updated_account_balance_push(data):
-    send_cdata("UpdatedAccountBalancePush", data)
+    sp.send_cdata("UpdatedAccountBalancePush", data)
 sp.register_updated_account_balance_push(updated_account_balance_push)
 
 
 @sp.ffi.callback("ApiTradeReportAddr")
 def trade_report(rec_no, data):
-    send_cdata("TradeReport", data)
+    sp.send_cdata("TradeReport", data)
 sp.register_trade_report(trade_report)
 
 
 @sp.ffi.callback("ApiPriceUpdateAddr")
 def api_price_update(data):
-    send_cdata("PriceUpdate", data)
+    sp.send_cdata("PriceUpdate", data)
 sp.register_price_update(api_price_update)
 
 
 @sp.ffi.callback("ApiTickerUpdateAddr")
 def api_ticker_update(data):
-    send_cdata("TickerUpdate", data)
+    sp.send_cdata("TickerUpdate", data)
 sp.register_ticker_update(api_ticker_update)
 
 
 @sp.ffi.callback("PswChangeReplyAddr")
 def psw_change_reply(ret_code, ret_msg):
-    send_cdata("PswChangeReply", {"ret_code": ret_code,
+    sp.send_cdata("PswChangeReply", {"ret_code": ret_code,
                                   "ret_msg": ret_msg})
 sp.register_psw_change_reply(psw_change_reply)
 
@@ -298,7 +293,7 @@ sp.register_business_date_reply(business_date_reply)
 
 @sp.ffi.callback("ApiMMOrderBeforeSendReportAddr")
 def api_mm_order_before_send_report(mm_order):
-    send_cdata("MMOrderBeforeSendReport", mm_order)
+    sp.send_cdata("MMOrderBeforeSendReport", mm_order)
 sp.register_mm_order_before_send_report(api_mm_order_before_send_report)
 
 
@@ -386,7 +381,7 @@ def logout():
 
 @sp.ffi.callback("ApiTickerUpdateAddr")
 def ticker_update(data):
-    send_cdata("ApiTickerUpdate", data)
+    sp.send_cdata("ApiTickerUpdate", data)
     t = sp.cdata_to_py(data[0])
     tickerfile = open(get_ticker(t['ProdCode']), "a")
     dt = datetime.datetime.fromtimestamp(float(t['TickerTime']))

@@ -426,6 +426,9 @@ class SPTrader(object):
         for sub in self.log_subscriptions[:]:
             sub.put((event_id, msg))
 
+    def send_cdata(self, event_id, data):
+        self.send_dict(event_id, {"data": self.cdata_to_py(data[0])})
+
     def add_listener(self):
         q = Queue()
         self.log_subscriptions.append(q)
