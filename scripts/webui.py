@@ -55,7 +55,6 @@ sp = sptrader.SPTrader.instance()
 empty_cache = {"connected": {},
                "account_info": None}
 info_cache = empty_cache
-ticker_products = set()
 app = Flask(__name__,
             static_url_path="/static",
             static_folder=os.path.join(location, "..",
@@ -164,7 +163,7 @@ def connected_reply(host_type, con_status):
     info_cache['connected'][host_type] = con_status
     if host_type == 83 and con_status == 2:
         sp.register_ticker_update(ticker_update)
-        for p in ticker_products:
+        for p in sp.ticker_products:
             sp.subscribe_ticker(p, 1)
 sp.register_connecting_reply(connected_reply)
 
@@ -400,34 +399,34 @@ sp.register_ticker_update(ticker_update)
 @app.route("/ticker/subscribe/<string:products>")
 def subscribe_ticker(products):
     for p in products.split(","):
-        ticker_products.add(p)
+        sp.ticker_products.add(p)
         if sp.ready() == 0:
             sp.subscribe_ticker(p, 1)
     if sp.ready() != 0:
         return "NOLOGIN"
     else:
         sp.send_dict("TickerUpdate",
-                  {"data": list(ticker_products)})
+                  {"data": list(sp.ticker_products)})
         return "OK"
 
 
 @app.route("/ticker/unsubscribe/<string:products>")
 def unsubscribe_ticker(products):
     for p in products.split(","):
-        ticker_products.discard(p)
+        sp.ticker_products.discard(p)
         if sp.ready() == 0:
             sp.subscribe_ticker(p, 0)
     if sp.ready() != 0:
         return "NOLOGIN"
     else:
         sp.send_dict("TickerUpdate",
-                  {"data": list(ticker_products)})
+                  {"data": list(sp.ticker_products)})
         return "OK"
 
 
 @app.route("/ticker/list")
 def list_ticker():
-    return jsonify({"data": list(ticker_products)})
+    return jsonify({"data": list(sp.ticker_products)})
 
 
 @app.route("/ticker/view/<string:product>")
@@ -600,11 +599,7 @@ def order_add():
         f = request.json
     else:
         abort(400)
-    inactive = bool(int(f.pop("Inactive", 0)))
-    if inactive:
-        return str(sp.order_add_inactive(f))
-    else:
-        return str(sp.order_add(f))
+    return sp.order_add_from_dict(f)
 
 @app.route("/order/delete", methods=['POST'])
 def order_delete():

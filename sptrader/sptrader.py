@@ -420,6 +420,7 @@ class SPTrader(object):
         self.user = None
         self.acc_no = None
         self.log_subscriptions = []
+        self.ticker_products = set()
 
     def send_dict(self, event_id, msg):
         '''Send dictionary as event'''
@@ -639,6 +640,13 @@ class SPTrader(object):
         if buffer is None:
             return -2
         return self.api.SPAPI_AddInactiveOrder(buffer)
+
+    def order_add_from_dict(self, f):
+        inactive = bool(int(f.pop("Inactive", 0)))
+        if inactive:
+            return str(self.order_add_inactive(f))
+        else:
+            return str(self.order_add(f))
 
     def order_delete(self, data):
         accOrderNo = int(data['IntOrderNo'])
