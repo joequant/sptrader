@@ -363,7 +363,7 @@ def ping():
     msg = {
         "msg": "Ping"
     }
-    for sub in log_subscriptions[:]:
+    for sub in sp.log_subscriptions:
         sub.put(("ping", msg))
     return "OK"
 
