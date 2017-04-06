@@ -13,7 +13,7 @@ import struct
 import cffi_to_py
 import sys
 from enum import Enum
-from queue import Queue
+from multiprocessing import Queue
 
 if 8 * struct.calcsize("P") != 64:
     print("sptrader only supported for 64 bit")
