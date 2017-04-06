@@ -18,6 +18,7 @@ import threading
 import requests
 import sseclient
 import logging
+import sys
 import backtrader as bt
 from backtrader.metabase import MetaParams
 from backtrader.utils.py3 import queue, with_metaclass
@@ -87,9 +88,9 @@ or ``BackTestCls``
             return cls.BackTestCls(*args, **kwargs)
         return cls.BrokerCls(*args, **kwargs)
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         super(SharpPointStore, self).__init__()
-
+        self.log = kwargs.get('log', sys.stdout)
         self.positions = collections.defaultdict(Position)
         self.notifs = collections.deque()  # store notifications for cerebro
 
@@ -177,7 +178,7 @@ or ``BackTestCls``
                                 abs(data['TotalAmt']/data['Qty']))
             self.positions[data['ProdCode']] = position
         except KeyError:
-            print("key-error in updateposition", data)
+            print("key-error in updateposition", data, file=self.log)
 
 
     def getposition(self, data, clone=False):
@@ -189,6 +190,13 @@ or ``BackTestCls``
 
     def _t_streaming_listener(self, q, tmout=None):
         response = self._get_request("log/subscribe", stream=True)
+        if self.p.loglevel <= logging.INFO:
+            print("connecting to events", file=self.log)
+        if response.status_code != requests.codes.ok:
+            if self.p.loglevel <= logging.ERROR:
+                print("failed response code", response,
+                      file=self.log)
+                raise ValueError('failed response code')
         client = sseclient.SSEClient(response)
         for event in client.events():
             data = json.loads(event.data)
@@ -197,7 +205,7 @@ or ``BackTestCls``
 
             if event.event == "AccountPositionPush":
                 if self.p.loglevel <= logging.DEBUG:
-                    print(event.event, data['data'])
+                    print(event.event, data['data'], file=self.log)
                 self.updateposition(data['data'])
                 continue
             if self.broker is None:
@@ -207,22 +215,22 @@ or ``BackTestCls``
                 oref = info['Ref2']
             except:
                 if self.p.loglevel <= logging.DEBUG:
-                    print("Unhandled event")
+                    print("Unhandled event", file=self.log)
                 continue
 
             if self.p.loglevel <= logging.DEBUG:
-                print(event)
+                print(event, file=self.log)
             if event.event == "OrderBeforeSendReport":
                 if self.p.loglevel <= logging.DEBUG:
-                    print(data)
+                    print(data, file=self.log)
                 self.broker._submit(oref)
             elif event.event == "OrderRequestFailed":
                 if self.p.loglevel <= logging.DEBUG:
-                    print(data)
+                    print(data, file=self.log)
                 self.broker._reject(oref)
             elif event.event == "OrderReport":
                 if self.p.loglevel <= logging.DEBUG:
-                    print(data)
+                    print(data, file=self.log)
                 status = int(info['Status'])
                 if status == 4:
                     self.broker._accept(oref)
@@ -230,7 +238,7 @@ or ``BackTestCls``
                     self.broker._cancel(oref)
             elif event.event == "TradeReport":
                 if self.p.loglevel <= logging.DEBUG:
-                    print(data)
+                    print(data, file=self.log)
                 qty = int(info['Qty'])
                 price = float(info['Price'])
                 self.broker._fill(oref, qty, price)
@@ -276,7 +284,7 @@ or ``BackTestCls``
     def isloggedin(self):
         login_info = self._get_request("login-info").json()
         if self.p.loglevel <= logging.DEBUG:
-            print("login-info", login_info)
+            print("login-info", login_info, file=self.log)
         return int(login_info['status']) != -1
 
     def setlogin(self, login):
@@ -285,7 +293,7 @@ or ``BackTestCls``
 
     def _t_account(self):
         if self.p.loglevel <= logging.DEBUG:
-            print("t_account")
+            print("t_account", file=self.log)
         while True:
             try:
                 msg = self.q_account.get(timeout=self.p.account_tmout)
@@ -296,7 +304,7 @@ or ``BackTestCls``
             try:
                 if self.p.login is not None and not self.isloggedin():
                     if self.p.loglevel <= logging.DEBUG:
-                        print("login", self.p.login)
+                        print("login", self.p.login, file=self.log)
                     r = self._post_request("login", json=self.p.login)
             except Exception as e:
                 self.put_notification(e)
@@ -334,7 +342,7 @@ or ``BackTestCls``
         okwargs['Ref2'] = str(order.ref)
         okwargs['Inactive'] = kwargs.get('Inactive', 0)
         if self.p.loglevel <= logging.DEBUG:
-            print(okwargs)
+            print(okwargs, file=self.log)
         self.q_ordercreate.put((order.ref, okwargs,))
         return order
 
@@ -348,7 +356,7 @@ or ``BackTestCls``
                 break
             oref, okwargs = msg
             if self.p.loglevel <= logging.DEBUG:
-                print(msg)
+                print(msg, file=self.log)
             try:
                 r = self._post_request("order/add", json=okwargs)
             except Exception as e:

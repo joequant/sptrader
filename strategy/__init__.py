@@ -56,7 +56,7 @@ def run_strategy(kwargs, q):
         stratargs['strategy'] = module
         cerebro = bt.Cerebro()
         cerebro.addstrategy(**stratargs)
-        store = spstore.SharpPointStore()
+        store = spstore.SharpPointStore(log=f)
         broker = store.getbroker()
         cerebro.setbroker(broker)
 
@@ -118,7 +118,7 @@ def run_backtest(kwargs):
     stratargs['strategy'] = module
     cerebro = bt.Cerebro()
     cerebro.addstrategy(**stratargs)
-    store = spstore.SharpPointStore()
+    store = spstore.SharpPointStore(log=f)
     broker = store.getbroker(backtest=kwargs.get('backtest', True))
     cerebro.setbroker(broker)
 
