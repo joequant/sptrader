@@ -15,9 +15,11 @@ import json
 import errno
 import datetime
 import pkg_resources
+import tendo.singleton
 from queue import Queue
 
 from flask import Flask, Response, jsonify, request, abort
+me = tendo.singleton.SingleInstance()
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 sys.path.insert(0, os.path.join(location, ".."))
@@ -711,6 +713,6 @@ def exit_done():
 if __name__ == "__main__":
     try:
         app.debug = True
-        app.run(threaded=True)
+        app.run(threaded=True,use_reloader=False)
     except KeyboardInterrupt:
         stratlist.terminate_all()

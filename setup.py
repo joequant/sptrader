@@ -16,6 +16,7 @@ setup(name='sptrader',
     'matplotlib',
     'sseclient-py',
     'requests',
-    'pytz'
+    'pytz',
+    'temdo'
     ]
       )
