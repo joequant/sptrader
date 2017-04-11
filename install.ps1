@@ -2,7 +2,7 @@ $ScriptDir = Split-Path -parent $MyInvocation.MyCommand.Path
 Import-module $ScriptDir\modules
 
 #filenames
-$pyversion = "3.5.2"
+$pyversion = "3.5.3"
 $nodeversion = "v7.0.0"
 
 #$pyfile = "python-$($pyversion)-webinstall.exe"
@@ -15,8 +15,11 @@ $nodeversion = "v7.0.0"
 $pyfile = "python-$($pyversion)-amd64-webinstall.exe"
 $pypath = "c:\\Program Files\\Python35\\Scripts"
 $vcredist = "vcredist_x64.exe"
-$spzipfile = "SPAPIDLL_R8.742_WIN64.zip"
-$sslzipfile = "openssl-1.0.2h-x64_86-win64.zip"
+$spmajorversion = "8"
+$spminorversion = "742"
+$opensslversion = "1.0.2k"
+$spzipfile = "SPAPIDLL_R$($spmajorversion).$($spminorversion)_WIN64.zip"
+$sslzipfile = "openssl-$($opensslversion)-x64_86-win64.zip"
 $nodefile = "node-$($nodeversion)-x64.msi"
 
 #start
@@ -27,7 +30,7 @@ wget "https://www.python.org/ftp/python/$($pyversion)/$($pyfile)" -OutFile "$($e
 Start-Process "$($env:TEMP)/$($pyfile)" "PrependPath=1 InstallAllUsers=1 Include_test=0" -Wait
 Remove-Item "$($env:TEMP)/$($pyfile)"
 $env:Path += ";$($pypath)"
-Start-Process pip3 "install --upgrade cffi flask backtrader==1.9.12.99 matplotlib sseclient-py requests pytz tendo" -Verb runAs -Wait
+Start-Process pip3 "install --no-cache-dir --upgrade cffi flask backtrader==1.9.12.99 matplotlib sseclient-py requests pytz tendo" -Verb runAs -Wait
 
 Write-Output "Installing VC redistribution"
 wget "http://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/$($vcredist)" -OutFile "$($env:TEMP)/$($vcredist)"
@@ -40,7 +43,6 @@ Start-Process "$($env:TEMP)/$($nodefile)" -Wait
 Remove-Item "$($env:TEMP)/$($nodefile)"
 
 New-Item dll -type directory -force
-unzip -filename $spzipfile -url http://spsystem.info/download/API/R8742 -dir dll -name SPTrader
+unzip -filename $spzipfile -url http://spsystem.info/download/API/R$spmajorversion$spminorversion -dir dll -name SPTrader
 unzip -filename $sslzipfile -url "https://indy.fulgan.com/SSL/" -dir dll -name OpenSSL
 Pause
-
