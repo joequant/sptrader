@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='sptrader',
-      version='0.9.0',
+      version='0.10.0',
       description='SharpPoint trading system',
       author='Joseph C Wang',
       author_email='joequant@gmail.com',
@@ -17,6 +17,6 @@ setup(name='sptrader',
     'sseclient-py',
     'requests',
     'pytz',
-    'temdo'
+    'tendo'
     ]
       )
