@@ -14,6 +14,7 @@ import argparse
 import backtrader as bt
 import sptrader
 from spfeed import SharpPointCSVData
+from spwriter import SharpPointWriter
 import backtrader.feeds as btfeeds
 
 
@@ -50,13 +51,10 @@ def runstrat():
                                 compression=args.compression)
 
     # add a writer
-    cerebro.addwriter(bt.WriterFile, csv=True)
+    cerebro.addwriter(SharpPointWriter, csv=True)
 
     # Run over everything
     cerebro.run()
-
-    # Plot the result
-    cerebro.plot(style='bar')
 
 
 def parse_args():
