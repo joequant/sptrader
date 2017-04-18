@@ -30,9 +30,23 @@ def runstrat():
     # Load the Data
     datapath = args.dataname or '../../datas/ticksample.csv'
 
+    if not os.path.isfile(datapath):
+        datapath_new = os.path.join(data_dir, datapath)
+        if os.path.isfile(datapath_new):
+            datapath = datapath_new
+        else:
+            print('cannot find %s or %s' % (datapath, datapath_new))
+            exit
+
+    if args.outfile == '':
+        outfile = sys.stdout
+    else:
+        outfile = open(args.outfile, 'w')
+
     data = SharpPointCSVData(
         dataname=datapath,
         timeframe=bt.TimeFrame.Ticks,
+        gateway=None
     )
 
     # Handy dictionary for the argument timeframe conversion
@@ -51,7 +65,8 @@ def runstrat():
                                 compression=args.compression)
 
     # add a writer
-    cerebro.addwriter(SharpPointWriter, csv=True)
+    cerebro.addwriter(SharpPointWriter, csv=True,
+                      out=outfile)
 
     # Run over everything
     cerebro.run()
@@ -61,7 +76,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='Resampling script down to tick data')
 
-    parser.add_argument('--dataname', default='', required=True,
+    parser.add_argument('dataname', default='',
                         help='File Data to Load')
 
     parser.add_argument('--timeframe', default='minutes', required=False,
@@ -71,6 +86,9 @@ def parse_args():
 
     parser.add_argument('--compression', default=5, required=False, type=int,
                         help=('Compress n bars into 1'))
+
+    parser.add_argument('--outfile', default='', required=False,
+                        help='Output file')
 
     return parser.parse_args()
 
