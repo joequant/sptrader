@@ -684,9 +684,11 @@ def get_account_info():
     sp.get_acc_bal_count()
     return "OK"
 
+# include tag so that different items get different streams
+# flask seems set things up so that one subscribe is one stream
 
-@app.route("/log/subscribe")
-def subscribe():
+@app.route("/log/subscribe/<string:data>")
+def subscribe(data):
     def gen():
         q = Queue()
         log_subscriptions.append(q)

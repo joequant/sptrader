@@ -354,7 +354,7 @@ class SpTraderApp extends React.Component {
 	    "LocalStrategyStatus" : ::this.strategyStatus
 	}
 	return(<div>
-	    	<SubscribeBox url="/log/subscribe" event={events}
+               <SubscribeBox url="/log/subscribe/ui" event={events}
 	       onerror={::this.onerror}
 	       ref={(c) => this._subscribe_box = c}
 	       />

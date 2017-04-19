@@ -191,7 +191,8 @@ or ``BackTestCls``
     def _t_streaming_listener(self, q, tmout=None):
         if self.p.gateway is None:
             return
-        response = self._get_request("log/subscribe", stream=True)
+        response = self._get_request("log/subscribe/" + str(_time.time()),
+                                     stream=True)
         if self.p.loglevel <= logging.INFO:
             print("connecting to events", file=self.log)
         if response.status_code != requests.codes.ok:
