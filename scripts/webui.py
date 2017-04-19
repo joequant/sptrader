@@ -19,7 +19,7 @@ import tendo.singleton
 from queue import Queue
 
 from flask import Flask, Response, jsonify, request, abort
-me = tendo.singleton.SingleInstance()
+#me = tendo.singleton.SingleInstance()
 location = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(location, "..", "sptrader"))
 sys.path.insert(0, os.path.join(location, ".."))
