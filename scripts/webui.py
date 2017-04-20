@@ -456,6 +456,16 @@ def clear_ticker(product):
     fo.close()
     return "OK"
 
+@app.route("/account-info-push-send")
+def account_info_push_send():
+    acc_info = sp.get_acc_info()
+    if acc_info is not None:
+        info_cache['account_info'] = acc_info
+        send_dict("AccountInfoPush", {"data": acc_info})
+        return "OK"
+    else:
+        return "NODATA"
+
 # ----------- Strategy ------
 
 

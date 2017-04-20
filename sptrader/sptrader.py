@@ -532,6 +532,13 @@ class SPTrader(object):
             return []
         return self.cdata_to_py(buffer)
 
+    def get_acc_info(self):
+        if self.user is None:
+            return None
+        buffer = self.ffi.new("SPApiAccInfo[1]")
+        self.api.SPAPI_GetAccInfo(self.user, buffer)
+        return self.cdata_to_py(buffer[0])
+
     def get_acc_bal_count(self):
         return self.api.SPAPI_GetAccBalCount(self.user)
 

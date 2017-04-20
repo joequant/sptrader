@@ -175,6 +175,9 @@ class SpTraderApp extends React.Component {
 		       connection_info: {}
 		      });
     }
+    accountInfoPushSend() {
+	$.get("/account-info-push-send");
+    }
     onerror(event) {
 	if (!this.state.showLoginForm) {
 	    this.setState({loginLabel: 'Connection broken',
@@ -377,6 +380,8 @@ class SpTraderApp extends React.Component {
 	       <Tab eventKey={1} title="Account"
 	       disabled={!this.state.isLogin}
 	       >
+	       <Button onClick={::this.accountInfoPushSend}>Refresh</Button>
+	       <br/>
 		<AccountTable
 	    fields={this.state.account_fields} 
 	    data={this.state.account_info} />
