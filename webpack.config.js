@@ -9,7 +9,7 @@ module.exports = {
 	      loader: 'babel-loader',
 	      exclude: /node_modules/,
 	      include: __dirname,
-	      query: {
+	      options: {
 		  retainLines: true,
 		  cacheDirectory: true,
 		  plugins: ['transform-runtime'],
@@ -19,3 +19,5 @@ module.exports = {
 	]
     }
 }
+process.traceDeprecation = true
+
