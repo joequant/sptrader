@@ -23,7 +23,8 @@
     "babel-preset-es2015": "latest",
     "babel-preset-react": "latest",
     "babel-preset-stage-0": "latest",
-    "webpack": "latest"
+      "webpack": "latest",
+      "prop-types": "latest"
   },
     "scripts": {
 	"build-prod": "webpack -p",
