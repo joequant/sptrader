@@ -644,6 +644,10 @@ def order_delete():
         abort(400)
     return str(sp.order_delete(f))
 
+@app.route("/order/delete-all", methods=['POST'])
+def order_delete_all():
+    return str(sp.order_delete_all())
+
 @app.route("/order/activate", methods=['POST'])
 def order_activate():
     if request.form:
