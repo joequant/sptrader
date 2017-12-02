@@ -65,7 +65,7 @@ class SharpPointStore(with_metaclass(MetaSingleton, object)):
         ('account', ''),
         ('login', None),
         ('practice', False),
-        ('loglevel', logging.INFO),
+        ('loglevel', logging.DEBUG),
         ('account_tmout', 30.0),
     )
 
