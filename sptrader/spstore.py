@@ -340,7 +340,9 @@ or ``BackTestCls``
         okwargs['Qty'] = abs(order.created.size)
         okwargs['ProdCode'] = order.data._dataname
         okwargs['Ref'] = kwargs.get('Ref', '')
-        order.ref = "{:%Y%m%d%H%M%S}".format(datetime.now())
+        order.ref = \
+                  "{:%Y%m%d%H%M%S%f}".format(datetime.datetime.utcnow()) + \
+                  "%05d" % random.randrange(100000)
         self._orders[order.ref] = order
         okwargs['Ref2'] = str(order.ref)
         okwargs['Inactive'] = kwargs.get('Inactive', 0)
