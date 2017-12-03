@@ -20,6 +20,7 @@ import sseclient
 import logging
 import sys
 import backtrader as bt
+import random
 from backtrader.metabase import MetaParams
 from backtrader.utils.py3 import queue, with_metaclass
 from backtrader.utils import AutoDict
@@ -341,8 +342,8 @@ or ``BackTestCls``
         okwargs['ProdCode'] = order.data._dataname
         okwargs['Ref'] = kwargs.get('Ref', '')
         order.ref = \
-                  "{:%Y%m%d%H%M%S%f}".format(datetime.datetime.utcnow()) + \
-                  "%05d" % random.randrange(100000)
+                  "{:%m%d%H%M%S}".format(datetime.utcnow()) + \
+                  "%04d" % random.randrange(10000)
         self._orders[order.ref] = order
         okwargs['Ref2'] = str(order.ref)
         okwargs['Inactive'] = kwargs.get('Inactive', 0)
@@ -375,7 +376,7 @@ or ``BackTestCls``
 
     def _t_order_cancel(self):
         while True:
-            order = self.q_orderclose.get()
+            oref = self.q_orderclose.get()
             if oref is None:
                 break
             oid = self._orders.get(oref, None)

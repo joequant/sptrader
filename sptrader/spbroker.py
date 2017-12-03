@@ -223,7 +223,7 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
 
     def _cancel(self, oref):
         order = self.o.order_by_ref(oref)
-        order.cancel(self)
+        order.cancel()
         self.notify(order)
 
     def _expire(self, oref):
