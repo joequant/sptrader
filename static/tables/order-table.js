@@ -13,9 +13,7 @@ var OrderControl = React.createClass({
 	var data = this.props.data;
 	console.log(data);
 	var d = {
-	    'ClOrderId' : data.ClOrderId,
 	    'IntOrderNo' : data.IntOrderNo,
-	    'ProdCode' : data.ProdCode
 	};
 	this.post("/order/delete", d);
     },
