@@ -378,13 +378,14 @@ or ``BackTestCls``
             order = self.q_orderclose.get()
             if oref is None:
                 break
-
             oid = self._orders.get(oref, None)
             if oid is None:
                 continue  # the order is no longer there
             try:
-                o = self.oapi.close_order(self.p.account, oid)
+                okwargs = {'Ref2': oref}
+                r = self._post_request("order/delete", json=okwargs)
             except Exception as e:
+                self.put_notification(e)
                 continue  # not cancelled - FIXME: notify
             self.broker._cancel(oref)
 

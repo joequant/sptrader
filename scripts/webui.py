@@ -641,6 +641,20 @@ def order_delete():
     if 'IntOrderNo' not in f or \
        'ProdCode' not in f or \
        'ClOrderId' not in f:
+        orders = sp.get_all_orders()
+        found = False
+        for o in orders:
+            found = True
+            for k, v in f.items():
+                if str(o[k]) != str(v):
+                    found = False
+                    break
+            if found:
+                fin = {}
+                fin['IntOrderNo'] = str(o['IntOrderNo'])
+                fin['ProdCode'] = str(o['ProdCode'])
+                fin['ClOrderId'] = str(o['ClOrderId'])
+                return str(sp.order_delete(o))
         abort(400)
     return str(sp.order_delete(f))
 
