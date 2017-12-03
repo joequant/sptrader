@@ -8,12 +8,15 @@ class ImmediateStrategy(spstrategy.SharpPointStrategy):
     params = (
         ('qty', 1),
         ('delay', 5),
+        ('cancel', 0),
         ('order', "B")
     )
 
     headers = [
         {'headerName': "Order",
          'field': "order"},
+        {'headerName': "Cancel",
+         'field': "cancel"},
         {'headerName': "Delay",
          'field': "delay"}
         ]
@@ -36,7 +39,8 @@ class ImmediateStrategy(spstrategy.SharpPointStrategy):
         # Check if an order is pending ... if yes, we cannot send a 2nd one
         if len(self.datas[0].close) > self.p.delay:
             self.log("CLOSE!!!")
-            self.close()
+            if (self.p.cancel > 0):
+                self.cancel(self.order)
             self.order = None
 
         if len(self.datas[0].close) < 1:
