@@ -243,9 +243,12 @@ or ``BackTestCls``
             elif event.event == "TradeReport":
                 if self.p.loglevel <= logging.DEBUG:
                     print(data, file=self.log)
-                qty = int(info['Qty'])
+                qty = int(info['TradedQty'])
                 price = float(info['Price'])
-                self.broker._fill(oref, qty, price)
+                pqty = int(info['Qty'])
+                avgprice = float(info['AvgTradedPrice'])
+                self.broker._fill(oref, qty, price,
+                                  pqty=pqty, avgpice=avgprice)
 
     def streaming_prices(self, dataname, tmout=None):
         q = queue.Queue()
@@ -353,7 +356,11 @@ or ``BackTestCls``
         return order
 
     def order_by_ref(self, oref):
-        return self._orders.get(oref, None)
+        o = self._orders.get(oref, None)
+        if o is None and self.p.loglevel <= logging.INFO:
+            print('cannot find oref %s' % oref, file=self-log)
+            print(self._orders, file=self.log)
+        return o
 
     def _t_order_create(self):
         while True:

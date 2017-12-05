@@ -235,9 +235,13 @@ class SharpPointBroker(with_metaclass(MetaSharpPointBroker, bt.BrokerBase)):
         order = self.o.order_by_ref(oref)
         if order is None:
             return
-
-        data = order.data
-        pos = self.getposition(data)
+        if 'pqty' in kwargs and \
+           'avgprice' in kwargs:
+            pos = Position(kwargs['pqty'],
+                           kwargs['avgprice'])
+        else:
+            data = order.data
+            pos = self.getposition(data)
         psize, pprice, opened, closed = pos.update(size, price)
 
         closedvalue = closedcomm = 0.0
