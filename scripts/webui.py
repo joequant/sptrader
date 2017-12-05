@@ -44,7 +44,7 @@ except OSError as exception:
         raise
 
 ticker_file = os.path.join(data_dir, "ticker-%s.txt")
-VERSION="0.4.2"
+VERSION="0.11.0"
 
 def get_ticker(s):
     '''Get ticker file'''
