@@ -240,6 +240,14 @@ or ``BackTestCls``
                     self.broker._accept(oref)
                 elif status == 6:
                     self.broker._cancel(oref)
+                elif status == 8:
+                    order = self.order_by_ref(oref)
+                    order.partial()
+                    self.broker.notify(order)
+                elif status == 9:
+                    order = self.order_by_ref(oref)
+                    order.completed()
+                    self.broker.notify(order)
             elif event.event == "TradeReport":
                 if self.p.loglevel <= logging.DEBUG:
                     print(data, file=self.log)
