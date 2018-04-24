@@ -1,4 +1,4 @@
-Modules in directories other than strategy are
+Most modules in directories other than strategy are
 Copyright (c) 2016 Bitquant Research Laboratories (Asia) Limited
 Released under the GPLv3+ license
 
@@ -6,6 +6,9 @@ The modules in the directory "strategy" are copyright by their owners.
 They may contain proprietary and confidential code, which are not
 intended for public release, and should not be distributed in either
 source or binary form.
+
+Some modules which do not contain code from Backtrader are released
+under Simplified BSD license
 
 NOTE that this system is NOT supported by SharpPoint.
 
