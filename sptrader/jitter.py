@@ -5,7 +5,7 @@
 #
 # Copyright (C) 2016 Bitquant Research Laboratories (Asia) Limited
 #
-# Licensed under the Simplified BSD License
+# Licensed under the GPLv3+ License
 #
 ###############################################################################
 

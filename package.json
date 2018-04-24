@@ -2,7 +2,7 @@
   "name": "Sptrader",
   "version": "0.10.0",
   "author": "Joseph C Wang <joequant@gmail.com>",
-  "license": "BSD-2-Clause",
+  "license": "GPLv3+",
   "repository": {
     "type": "git",
     "url": "https://github.com/joequant/sptrader.git"

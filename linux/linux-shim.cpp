@@ -1,5 +1,5 @@
 // Copyright (C) Bitquant Research Laboratories (Asia) Limited
-// released under terms of the Simplified BSD License
+// released under terms of the GPLv3+ License
 
 const char *SP_SUFFIX = "20160718";
 

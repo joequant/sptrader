@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2016 Bitquant Research Laboratories (Asia) Limited
 #
-# Licensed under the Simplified BSD License
+# Licensed under the GPLv3+ License
 #
 ###############################################################################
 from __future__ import (absolute_import, division, print_function,

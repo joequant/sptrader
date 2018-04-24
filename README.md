@@ -1,10 +1,11 @@
 Modules in directories other than strategy are
 Copyright (c) 2016 Bitquant Research Laboratories (Asia) Limited
-Released under the Simplified BSD License
+Released under the GPLv3+ license
 
-The modules in the directory "strategy" are copyright by their owners
-and may contain proprietary and confidential code, which are not
-intended for public release.
+The modules in the directory "strategy" are copyright by their owners.
+They may contain proprietary and confidential code, which are not
+intended for public release, and should not be distributed in either
+source or binary form.
 
 NOTE that this system is NOT supported by SharpPoint.
 
